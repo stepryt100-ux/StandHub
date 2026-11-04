@@ -245,6 +245,9 @@ feedback = require('./feedback')({ db, save, sendTo, tell: tgUser, go, escH, ale
 support = require('./support')({ db, save, sendTo, tell: tgUser, go, escH, alertAdmins, onChange: uid => pushBadges(uid) });
 // ---------- магазин: монеты → промокоды ----------
 const shop = require('./shop')({ db, save, sendTo, sendAll, tell: tgUser, alertAdmins, go, escH, tgName, onCoins: uid => sendTo(uid, tasks.state(uid)), onPending: () => pushBadges(null) });
+// ---------- турнир «Кубок открытия»: плашка на сайте и отдельный бот регистрации команд ----------
+const cup = require('./cup')({ db, save, sendTo, sendAll, tell: tgUser, alertAdmins, escH, siteUrl: SITE_URL, partyOf: uid => party.partyOf(uid),
+  mainBot: () => botUsername, envToken: process.env.CUP_BOT_TOKEN || '', mainToken: TG_TOKEN });
 
 // ---------- http ----------
 const send = (res, code, obj) => { res.writeHead(code, { 'Content-Type': 'application/json; charset=utf-8' }); res.end(JSON.stringify(obj)); };
@@ -407,6 +410,14 @@ http.createServer(async (req, res) => {
     const b = await body(req, 4e3), act = String(b.act || ''), id = String(b.item || '');
     const r = act === 'cfg' ? shop.setCfg(id, b) : act === 'contact' ? shop.setContact(b.contact) : act === 'order' ? shop.setOrder(u, b.n, String(b.do || '')) : { error: 'Неизвестное действие' };
     return send(res, r.error ? 400 : 200, { ...r, admin: shop.adminState() });
+  }
+  // ---------- турнир ----------
+  if (p === '/api/cup') { const u = authUser(req); return send(res, 200, cup.state(u && u.id)); }
+  if (p === '/api/admin/cup') {
+    const u = authUser(req); if (!isAdmin(u)) return send(res, 403, { error: 'Только для администратора' });
+    if (req.method !== 'POST') return send(res, 200, cup.adminState());
+    const b = await body(req, 4e3), r = await cup.admin(u, String(b.act || ''), b);
+    return send(res, r.error ? 400 : 200, { ...r, admin: cup.adminState() });
   }
   // ---------- поддержка ----------
   if (p === '/api/support' || p.startsWith('/api/support/')) {
