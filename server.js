@@ -166,7 +166,7 @@ async function handlePhoto(msg) {
     if (ids.all.includes(u.soid)) {
       const taken = verified().find(x => x.soid === u.soid);
       if (taken) return say(chatId, '❌ Этот игровой ID уже подтверждён другим аккаунтом StandHub. Если это ошибка — напишите в поддержку.');
-      u.verified = true; u.tgId = msg.from.id; u.vcode = null;
+      u.verified = true; u.tgId = msg.from.id; if (msg.from.username) u.tgUser = msg.from.username; u.vcode = null;
       db.users = db.users.filter(x => x === u || x.verified || (x.soid !== u.soid && x.nick.toLowerCase() !== u.nick.toLowerCase() && x.email !== u.email));
       save();
       return say(chatId, `✅ <b>Всё верно!</b> ID <code>${escH(u.soid)}</code> совпадает.\n\nАккаунт <b>${escH(u.nick)}</b> подтверждён — теперь можно войти на сайт:\n${go('/#/login')}`);
@@ -212,6 +212,13 @@ startBot();
 const tgUser = (uid, text) => { const u = db.users.find(x => x.id === uid); if (TG_TOKEN && u && u.tgChat) say(u.tgChat, text).catch(() => {}); };
 const adminUsers = () => db.users.filter(u => u.verified && isAdmin(u));
 const alertAdmins = text => adminUsers().forEach(u => tgUser(u.id, text));
+// ник игрока в Telegram (для админа магазина: сверить, что за промокодом пишет сам покупатель)
+const tgName = async u => {
+  if (!TG_TOKEN || !u.tgChat) return u.tgUser || null;
+  const r = await tg('getChat', { chat_id: u.tgChat }).catch(() => null), n = r && r.ok && r.result && typeof r.result.username === 'string' ? r.result.username : null;
+  if (n && n !== u.tgUser) { u.tgUser = n; save(); }
+  return n || u.tgUser || null;
+};
 
 // ---------- пароль: восстановление через Telegram и смена в профиле ----------
 const account = require('./account')({ db, save, hash, check, say, escH, siteUrl: SITE_URL, bot: () => botUsername, newSession, dropSessions, meOf });
@@ -231,13 +238,13 @@ const friends = require('./friends')({ db, save, sendTo, tell: tgUser, go, pub, 
 party = require('./party')({ db, save, sendTo, tell: tgUser, go, pub, isOnline, match });
 // ---------- значки в меню: ответы поддержки, у админа — новые жалобы и обращения ----------
 let support = null, feedback = null;
-const badges = uid => { const u = db.users.find(x => x.id === uid); return { type: 'badges', sup: support.unread(uid), ...(isAdmin(u) ? { admR: feedback.openCount(), admT: support.waiting() } : {}) }; };
+const badges = uid => { const u = db.users.find(x => x.id === uid); return { type: 'badges', sup: support.unread(uid), ...(isAdmin(u) ? { admR: feedback.openCount(), admT: support.waiting(), admS: shop.pending() } : {}) }; };
 const pushBadges = uid => { for (const id of new Set([uid, ...adminUsers().map(u => u.id)])) if (id && isOnline(id)) sendTo(id, badges(id)); };
 // ---------- «Спасибо» и жалобы после матча, поддержка ----------
 feedback = require('./feedback')({ db, save, sendTo, tell: tgUser, go, escH, alertAdmins, match, tasks, onChange: () => pushBadges(null) });
 support = require('./support')({ db, save, sendTo, tell: tgUser, go, escH, alertAdmins, onChange: uid => pushBadges(uid) });
 // ---------- магазин: монеты → промокоды ----------
-const shop = require('./shop')({ db, save, sendTo, sendAll, tell: tgUser, alertAdmins, go, escH, onCoins: uid => sendTo(uid, tasks.state(uid)) });
+const shop = require('./shop')({ db, save, sendTo, sendAll, tell: tgUser, alertAdmins, go, escH, tgName, onCoins: uid => sendTo(uid, tasks.state(uid)), onPending: () => pushBadges(null) });
 
 // ---------- http ----------
 const send = (res, code, obj) => { res.writeHead(code, { 'Content-Type': 'application/json; charset=utf-8' }); res.end(JSON.stringify(obj)); };
@@ -397,9 +404,8 @@ http.createServer(async (req, res) => {
   if (p === '/api/admin/shop') {
     const u = authUser(req); if (!isAdmin(u)) return send(res, 403, { error: 'Только для администратора' });
     if (req.method !== 'POST') return send(res, 200, shop.adminState());
-    const b = await body(req, 1e5), act = String(b.act || ''), id = String(b.item || '');
-    if (b.tooBig) return send(res, 400, { error: 'Слишком много текста — добавляйте коды частями' });
-    const r = act === 'add' ? shop.addCodes(id, b.text) : act === 'remove' ? shop.removeCode(id, String(b.code || '')) : act === 'cfg' ? shop.setCfg(id, b) : { error: 'Неизвестное действие' };
+    const b = await body(req, 4e3), act = String(b.act || ''), id = String(b.item || '');
+    const r = act === 'cfg' ? shop.setCfg(id, b) : act === 'contact' ? shop.setContact(b.contact) : act === 'order' ? shop.setOrder(u, b.n, String(b.do || '')) : { error: 'Неизвестное действие' };
     return send(res, r.error ? 400 : 200, { ...r, admin: shop.adminState() });
   }
   // ---------- поддержка ----------

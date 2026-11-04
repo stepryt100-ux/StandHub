@@ -616,7 +616,7 @@ body::after{width:520px;height:520px;left:140px;bottom:-220px;background:radial-
 .sh-oc{display:flex;align-items:center;gap:8px}
 .sh-code{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:15px;font-weight:700;letter-spacing:.06em;padding:6px 12px;border-radius:6px;background:var(--bg2);border:1px dashed rgba(255,200,0,.45);color:#ffd84d;-webkit-user-select:all;user-select:all;word-break:break-all}
 .sh-oc .btn .ic{width:16px;height:16px}
-.sh-steps{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.sh-steps{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
 .sh-step{display:flex;gap:12px;padding:16px}
 .sh-step .n{width:32px;height:32px;flex:none;border-radius:50%;display:grid;place-items:center;font-weight:900;color:#fff;background:linear-gradient(180deg,#ff6c22,#ff4f00)}
 .sh-step b{display:block;font-size:15px}
@@ -630,6 +630,42 @@ body::after{width:520px;height:520px;left:140px;bottom:-220px;background:radial-
 .sh-how li b{color:#fff}
 .sh-mhint{margin-top:10px}
 .sh-mhint b{color:var(--text,#fff)}
+.sh-mhint a{color:var(--orange2);font-weight:700}
+.sh-ost{display:inline-flex;align-items:center;height:26px;padding:0 10px;border-radius:13px;font-size:12px;font-weight:800;white-space:nowrap;background:rgba(255,200,0,.1);color:#ffd84d;border:1px solid rgba(255,200,0,.35)}
+.sh-ost.od{background:rgba(63,207,106,.1);color:var(--green);border-color:rgba(63,207,106,.35)}
+.sh-ost.orf{background:var(--card2);color:var(--muted);border-color:var(--line)}
+.sh-ord.off .sh-om b{color:var(--muted)}
+.sh-rc{display:grid;grid-template-columns:1fr 1fr;gap:10px 14px;margin-top:14px;padding:12px 14px;border-radius:10px;border:1px dashed rgba(255,200,0,.55);background:rgba(255,200,0,.06);text-align:left}
+.sh-rc>div{min-width:0}
+.sh-rc small{display:block;font-size:11px;color:var(--muted);font-weight:800;text-transform:uppercase;letter-spacing:.04em}
+.sh-rc b{display:flex;align-items:center;gap:6px;font-size:16px;font-weight:900;color:#fff;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-variant-numeric:tabular-nums}
+.sh-rc b.no{font-size:22px;color:#ffd84d;letter-spacing:.02em}
+.sh-rc .coin{width:18px;height:18px;flex:none}
+.sh-rc .w2{grid-column:1/-1;display:flex;align-items:center;justify-content:space-between;gap:10px;padding-top:10px;border-top:1px dashed rgba(255,200,0,.3)}
+.sh-pv.sm{height:92px}
+.sh-pv.sm .gold{width:124px;height:85px}
+.sh-fn{font-size:13px;margin-top:12px}
+.sh-fn b{color:#fff}
+.sh-pm .row2 .btn .ic{width:18px;height:18px}
+.adm-ct{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;flex-wrap:wrap}
+.adm-ct>div:first-child{flex:1;min-width:240px}
+.adm-cfg input[type=number][data-cfg="qty"]{width:190px}
+.adm-cfg input[type=text]{width:200px;height:40px;background:var(--bg2);border:1px solid var(--line);border-radius:6px;color:#fff;padding:0 12px;font:inherit;font-size:15px}
+.adm-cfg input[type=text]:focus,.adm-oh input:focus{border-color:var(--orange);outline:none;box-shadow:0 0 0 3px rgba(255,85,0,.15)}
+.adm-oh{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-top:12px}
+.adm-oh .adm-sub{margin:0}
+.adm-oh input{height:38px;width:240px;background:var(--bg2);border:1px solid var(--line);border-radius:6px;color:#fff;padding:0 12px;font:inherit;font-size:14px}
+.adm-o{display:grid;grid-template-columns:76px minmax(0,1fr) auto;gap:14px;align-items:center;padding:12px 18px;border-bottom:1px solid var(--line);font-size:14px}
+.adm-o:last-child{border-bottom:0}
+.adm-o.pend{background:rgba(255,200,0,.035)}
+.adm-on{font-size:16px;font-weight:900;color:#ffd84d;font-variant-numeric:tabular-nums}
+.adm-ow .muted{font-size:13px;margin-top:2px}
+.adm-tg{color:var(--orange2);font-weight:700;font-size:13px}
+.adm-oa{display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:flex-end}
+.adm-oa .btn .ic{width:16px;height:16px}
+.adm-undo{background:none;border:0;color:var(--muted);font:inherit;font-size:12px;text-decoration:underline;cursor:pointer;padding:4px}
+.adm-undo:hover{color:#fff}
+.adm-none{padding:16px 18px}
 .modal .card.pm.sh-pm{text-align:center}
 .sh-pv{height:116px;margin:-8px -24px 12px;display:grid;place-items:center;background:radial-gradient(60% 90% at 50% 100%,rgba(255,170,0,.35),transparent 70%)}
 .sh-pv .gold{width:156px;height:107px}
@@ -640,9 +676,6 @@ body::after{width:520px;height:520px;left:140px;bottom:-220px;background:radial-
 .sh-sum b{display:flex;align-items:center;gap:6px;font-size:20px;font-weight:900;color:#ffd84d;font-variant-numeric:tabular-nums}
 .sh-sum .coin{width:20px;height:20px}
 .sh-pm .row2{justify-content:center}
-.sh-codebox{display:flex;align-items:center;justify-content:center;gap:12px;flex-wrap:wrap;margin-top:14px;padding:14px;border-radius:10px;border:1px dashed rgba(255,200,0,.55);background:rgba(255,200,0,.06)}
-.sh-codebox code{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:22px;font-weight:800;letter-spacing:.08em;color:#ffd84d;-webkit-user-select:all;user-select:all;word-break:break-all}
-.sh-codebox .ic{width:16px;height:16px}
 .sh-promo{display:flex;align-items:center;gap:18px;margin-top:16px;padding:16px 22px;border-color:rgba(255,200,0,.3);background:radial-gradient(50% 140% at 0% 50%,rgba(255,170,0,.2),transparent 70%),linear-gradient(180deg,#28282d,#212125);transition:transform .25s var(--ease),border-color .25s,box-shadow .25s}
 .sh-promo:hover{transform:translateY(-2px);border-color:rgba(255,200,0,.6);box-shadow:0 18px 40px -24px rgba(255,170,0,.55)}
 .sh-promo .gold{width:96px;height:66px;flex:none}
@@ -665,19 +698,7 @@ body::after{width:520px;height:520px;left:140px;bottom:-220px;background:radial-
 .adm-cfg input[type=number]{width:160px;height:40px;background:var(--bg2);border:1px solid var(--line);border-radius:6px;color:#fff;padding:0 12px;font:inherit;font-size:15px}
 .adm-cfg input[type=number]:focus{border-color:var(--orange);outline:none;box-shadow:0 0 0 3px rgba(255,85,0,.15)}
 .adm-cfg .chk{margin:0 0 10px}
-.adm-add{display:grid;gap:8px}
-.adm-add label{font-size:14px}
-.adm-add .txa{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:14px}
-.adm-add .btn{justify-self:start}
-.adm-codes summary{cursor:pointer;font-weight:700;font-size:14px;color:var(--orange2)}
-.adm-codes>div{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px;max-height:260px;overflow:auto}
-.adm-code{display:inline-flex;align-items:center;gap:2px;padding:2px 3px 2px 10px;border-radius:6px;background:var(--bg2);border:1px solid var(--line);font-size:13px}
-.adm-code code,.adm-ord code{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
-.adm-code button{width:24px;height:24px;border-radius:12px;border:0;background:transparent;color:var(--muted);cursor:pointer;font-size:17px;line-height:1;font-family:inherit}
-.adm-code button:hover{color:var(--red);background:rgba(255,77,77,.12)}
-.adm-ord{display:grid;grid-template-columns:150px minmax(0,1fr) auto 130px;gap:12px;align-items:center;padding:11px 18px;border-bottom:1px solid var(--line);font-size:14px}
-.adm-ord:last-child{border-bottom:0}
-.adm-ord code{color:#ffd84d;word-break:break-all}
+@media (max-width:1100px){.sh-steps{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media (max-width:760px){
  .sh-hero{padding:22px 18px 20px;min-height:0;display:block}
  .sh-hero h1{font-size:34px;margin:8px 0 10px}
@@ -698,11 +719,17 @@ body::after{width:520px;height:520px;left:140px;bottom:-220px;background:radial-
  .sh-ord{flex-wrap:wrap}
  .sh-oc{width:100%}
  .sh-oc .sh-code{flex:1;text-align:center}
+ .sh-oc .btn{flex:1}
  .sh-promo{flex-wrap:wrap;padding:16px}
  .sh-promo .gold{width:72px;height:50px}
  .sh-promo .btn{width:100%}
- .adm-ord{grid-template-columns:minmax(0,1fr) auto;gap:4px 12px;padding:10px 14px}
  .adm-cfg input[type=number]{width:130px}
+ .adm-cfg input[type=number][data-cfg="qty"]{width:180px}
+ .adm-o{grid-template-columns:auto minmax(0,1fr);gap:6px 12px;padding:12px 14px}
+ .adm-oa{grid-column:1/-1;justify-content:flex-start}
+ .adm-oh input{width:100%}
+ .sh-rc b{font-size:15px}
+ .sh-pm .row2 .btn{flex:1 1 auto}
 }
 /* правила и поддержка */
 .doc{max-width:860px;display:grid;gap:16px}
@@ -886,7 +913,7 @@ function qHint(){
 const L=k=>`<b data-live="${k}">${S.live[k]==null?"—":fmt(S.live[k])}</b>`;
 
 /* ===== Каркас ===== */
-const ICONS={"copy":"<path d=\"M8 3h11a2 2 0 012 2v11h-2V5H8z\"/><path fill-rule=\"evenodd\" d=\"M5 7h10a2 2 0 012 2v10a2 2 0 01-2 2H5a2 2 0 01-2-2V9a2 2 0 012-2zm0 2v10h10V9z\"/>","bell":"<path d=\"M12 2a7 7 0 00-7 7v4.5L3 17v1h18v-1l-2-3.5V9a7 7 0 00-7-7zm-2.5 17a2.5 2.5 0 005 0z\"/>","gift":"<path d=\"M3 8h18v4H3zM4.5 13H11v8H4.5zM13 13h6.5v8H13z\"/><path d=\"M12 8c-1.5-3-5.5-4-6-1.5S9 8 12 8zm0 0c1.5-3 5.5-4 6-1.5S15 8 12 8z\"/>","check":"<path d=\"M9.5 16.2L5.3 12l-1.4 1.4 5.6 5.6L20.1 8.4 18.7 7z\"/>","alert":"<path fill-rule=\"evenodd\" d=\"M12 2.5L1.5 21h21zM11 9.5h2v6h-2zm0 7.5h2v2h-2z\"/>","lock":"<path fill-rule=\"evenodd\" d=\"M8 10V7a4 4 0 018 0v3h-2V7a2 2 0 00-4 0v3zM5 10h14a1 1 0 011 1v10a1 1 0 01-1 1H5a1 1 0 01-1-1V11a1 1 0 011-1zm7 3.5a1.5 1.5 0 00-.75 2.8V18h1.5v-1.7a1.5 1.5 0 00-.75-2.8z\"/>","users":"<circle cx=\"9\" cy=\"8\" r=\"3.6\"/><path d=\"M2.5 20c0-3.7 2.9-5.8 6.5-5.8s6.5 2.1 6.5 5.8z\"/><circle cx=\"16.6\" cy=\"8.8\" r=\"2.9\"/><path d=\"M16.3 13.4c3.2.1 5.2 2.1 5.2 5.4h-4.6c-.1-2.1-.9-3.9-2.3-5.2.5-.1 1.1-.2 1.7-.2z\"/>","home":"<path d=\"M3 11l9-8 9 8v10h-6v-6H9v6H3z\"/>","play":"<path d=\"M7 4l13 8-13 8z\"/>","user":"<circle cx=\"12\" cy=\"8\" r=\"4\"/><path d=\"M4 21c0-4 4-6 8-6s8 2 8 6z\"/>","swords":"<path d=\"M3 3h4l10 10-2 2-2-2-3 3-2-2 3-3zM21 3h-4l-5 5 2 2 1-1 2 2-6 6 2 2 3-3 2 2 2-2-2-2 3-3z\"/>","crown":"<path d=\"M3 7l5 4 4-7 4 7 5-4-2 12H5z\"/>","shield":"<path d=\"M12 2l8 3v6c0 5-3.5 9-8 11-4.5-2-8-6-8-11V5z\"/>","spark":"<path d=\"M12 2l2.4 6.6L21 11l-6.6 2.4L12 20l-2.4-6.6L3 11l6.6-2.4z\"/>","help":"<circle cx=\"12\" cy=\"12\" r=\"10\"/><path d=\"M9.5 9a2.5 2.5 0 115 0c0 2-2.5 2-2.5 4M12 17h0\" stroke=\"#0f0f11\" stroke-width=\"2\" fill=\"none\"/>",
+const ICONS={"copy":"<path d=\"M8 3h11a2 2 0 012 2v11h-2V5H8z\"/><path fill-rule=\"evenodd\" d=\"M5 7h10a2 2 0 012 2v10a2 2 0 01-2 2H5a2 2 0 01-2-2V9a2 2 0 012-2zm0 2v10h10V9z\"/>","bell":"<path d=\"M12 2a7 7 0 00-7 7v4.5L3 17v1h18v-1l-2-3.5V9a7 7 0 00-7-7zm-2.5 17a2.5 2.5 0 005 0z\"/>","gift":"<path d=\"M3 8h18v4H3zM4.5 13H11v8H4.5zM13 13h6.5v8H13z\"/><path d=\"M12 8c-1.5-3-5.5-4-6-1.5S9 8 12 8zm0 0c1.5-3 5.5-4 6-1.5S15 8 12 8z\"/>","check":"<path d=\"M9.5 16.2L5.3 12l-1.4 1.4 5.6 5.6L20.1 8.4 18.7 7z\"/>","tg":"<path fill-rule=\"evenodd\" d=\"M2.4 11.1 21.2 3.9c.7-.3 1.4.3 1.2 1.1L19 20c-.2.8-1.1 1.1-1.7.7l-5.1-3.8-2.6 2.5c-.4.3-.9.2-1-.3L7.8 14l-5.4-1.7c-.7-.2-.8-1-.1-1.2zM8.9 14.2l.7 4 .5-3.1 7.6-7.6z\"/>","alert":"<path fill-rule=\"evenodd\" d=\"M12 2.5L1.5 21h21zM11 9.5h2v6h-2zm0 7.5h2v2h-2z\"/>","lock":"<path fill-rule=\"evenodd\" d=\"M8 10V7a4 4 0 018 0v3h-2V7a2 2 0 00-4 0v3zM5 10h14a1 1 0 011 1v10a1 1 0 01-1 1H5a1 1 0 01-1-1V11a1 1 0 011-1zm7 3.5a1.5 1.5 0 00-.75 2.8V18h1.5v-1.7a1.5 1.5 0 00-.75-2.8z\"/>","users":"<circle cx=\"9\" cy=\"8\" r=\"3.6\"/><path d=\"M2.5 20c0-3.7 2.9-5.8 6.5-5.8s6.5 2.1 6.5 5.8z\"/><circle cx=\"16.6\" cy=\"8.8\" r=\"2.9\"/><path d=\"M16.3 13.4c3.2.1 5.2 2.1 5.2 5.4h-4.6c-.1-2.1-.9-3.9-2.3-5.2.5-.1 1.1-.2 1.7-.2z\"/>","home":"<path d=\"M3 11l9-8 9 8v10h-6v-6H9v6H3z\"/>","play":"<path d=\"M7 4l13 8-13 8z\"/>","user":"<circle cx=\"12\" cy=\"8\" r=\"4\"/><path d=\"M4 21c0-4 4-6 8-6s8 2 8 6z\"/>","swords":"<path d=\"M3 3h4l10 10-2 2-2-2-3 3-2-2 3-3zM21 3h-4l-5 5 2 2 1-1 2 2-6 6 2 2 3-3 2 2 2-2-2-2 3-3z\"/>","crown":"<path d=\"M3 7l5 4 4-7 4 7 5-4-2 12H5z\"/>","shield":"<path d=\"M12 2l8 3v6c0 5-3.5 9-8 11-4.5-2-8-6-8-11V5z\"/>","spark":"<path d=\"M12 2l2.4 6.6L21 11l-6.6 2.4L12 20l-2.4-6.6L3 11l6.6-2.4z\"/>","help":"<circle cx=\"12\" cy=\"12\" r=\"10\"/><path d=\"M9.5 9a2.5 2.5 0 115 0c0 2-2.5 2-2.5 4M12 17h0\" stroke=\"#0f0f11\" stroke-width=\"2\" fill=\"none\"/>",
  "tasks":"<path fill-rule=\"evenodd\" d=\"M7 2h2v2h6V2h2v2h2a2 2 0 012 2v13a2 2 0 01-2 2H5a2 2 0 01-2-2V6a2 2 0 012-2h2zM7.4 13.1l1.5-1.5 2.1 2.1 4.6-4.6 1.5 1.5-6.1 6.1z\"/>",
  "shop":"<path d=\"M3.6 8h16.8l-1.3 13H4.9zM8 8V6.5a4 4 0 018 0V8h-2V6.5a2 2 0 00-4 0V8z\"/>",
  "book":"<path d=\"M5 3.5A1.5 1.5 0 016.5 2H20v15H6.6a1.6 1.6 0 000 3.2H20V22H6.5A2.5 2.5 0 014 19.5v-15c0-.4.4-1 1-1zM8 6v2h8V6z\"/>",
@@ -943,14 +970,15 @@ document.addEventListener("click",e=>{if(!e.target.closest("[data-logout]"))retu
 // монеты и значки в меню
 function paintCoins(){const t=fmt(S.tasks?S.tasks.coins:0);document.querySelectorAll("[data-coins]").forEach(el=>{if(el.textContent===t)return;const was=el.textContent;el.textContent=t;const c=el.closest(".coins,.sh-bal");if(c&&was&&!RM()){c.classList.remove("bump");void c.offsetWidth;c.classList.add("bump")}});paintBadges()}
 function paintBadges(){const b=S.badges||{},set=(sel,n)=>document.querySelectorAll(sel).forEach(el=>{el.textContent=n;el.classList.toggle("z",!n)});
-  set("[data-supn]",b.sup||0);set("[data-admn]",(b.admR||0)+(b.admT||0));set("[data-tkn]",S.user&&S.tasks?S.tasks.ready||0:0);
+  set("[data-supn]",b.sup||0);set("[data-admn]",(b.admR||0)+(b.admT||0)+(b.admS||0));set("[data-tkn]",S.user&&S.tasks?S.tasks.ready||0:0);
   const nw=shopNew();document.querySelectorAll("[data-shopn]").forEach(el=>el.classList.toggle("z",!nw));
-  const more=(b.sup||0)+(b.admR||0)+(b.admT||0)+(nw?1:0);document.querySelectorAll("[data-mon]").forEach(el=>el.classList.toggle("z",!more))}
+  const more=(b.sup||0)+(b.admR||0)+(b.admT||0)+(b.admS||0)+(nw?1:0);document.querySelectorAll("[data-mon]").forEach(el=>el.classList.toggle("z",!more))}
 function onBadges(d){const was=S.badges||{},h=curHash();S.badges=d;paintBadges();
   if(h.startsWith("/admin"))paintAdmTabs();
   if(h==="/support"&&d.sup>0)loadSup();                                  // ответ поддержки пришёл, пока страница открыта
   if(h==="/admin/support"&&(d.admT||0)>(was.admT||0))admSupport();      // новое обращение или ответ игрока
-  if(h==="/admin/reports"&&(d.admR||0)>(was.admR||0))admReports()}
+  if(h==="/admin/reports"&&(d.admR||0)>(was.admR||0))admReports();
+  if(h==="/admin/shop"&&(d.admS||0)>(was.admS||0))admShop()}          // новый заказ
 // при перерисовке списка обращений не теряем набранный текст
 function keepTx(el){const o={};el.querySelectorAll("form[data-tid],form[data-aid]").forEach(f=>{const t=f.querySelector("textarea"),a=document.activeElement===t;if(t&&(t.value||a))o[f.dataset.tid||f.dataset.aid]={v:t.value,a,s:[t.selectionStart,t.selectionEnd]}});return o}
 function restoreTx(el,o){for(const k in o){const t=el.querySelector(`form[data-tid="${k}"] textarea,form[data-aid="${k}"] textarea`);if(!t)continue;t.value=o[k].v;if(o[k].a){t.focus({preventScroll:true});try{t.setSelectionRange(...o[k].s)}catch{}}}}
@@ -959,7 +987,7 @@ function toast(t){const e=document.getElementById("toast");e.textContent=t;e.cla
 function needAuth(){if(!S.user){location.hash="#/login";toast("Войдите, чтобы продолжить");return true}return false}
 function empty(title,text,btn){return `<div class="empty"><div class="empty-ic">${ic("crown")}</div><b>${title}</b><p class="muted">${text}</p>${btn||""}</div>`}
 /* ===== Анимации ===== */
-const APP_V="1.9.1";
+const APP_V="1.10";
 // анимации включены всегда; выключить можно кнопкой «Анимации» (меню слева / низ главной)
 const RM=()=>document.documentElement.classList.contains("no-motion");
 function paintMotion(){document.querySelectorAll("[data-motion] b").forEach(b=>b.textContent=RM()?"выкл":"вкл")}
@@ -1458,6 +1486,7 @@ function onLive(d){
   if(d.type==="party")return onParty(d);
   if(d.type==="tasks")return onTasks(d);
   if(d.type==="shopItems")return onShopItems(d);
+  if(d.type==="shop")return onShop(d);
   if(d.type==="badges")return onBadges(d);
   if(d.type==="chat")return onChat(d);
   if(d.type==="toast")return toast(d.text);
@@ -1810,7 +1839,7 @@ function bindMatch(m){
   if(m.state==="live"&&m.claimFrom&&m.claimFrom>now)S.enT=setTimeout(()=>{const x=S.mv[m.id];if(x&&curHash()==="/match/"+m.id)renderMatch(x)},m.claimFrom-now+300);
 }
 /* ----- Админка ----- */
-const ADM_TABS=[["","Матчи"],["reports","Жалобы","admR"],["support","Поддержка","admT"],["shop","Магазин"]];
+const ADM_TABS=[["","Матчи"],["reports","Жалобы","admR"],["support","Поддержка","admT"],["shop","Магазин","admS"]];
 function paintAdmTabs(){const el=document.getElementById("admTabs");if(!el)return;const b=S.badges||{};
   el.querySelectorAll("[data-tab]").forEach(a=>{const t=ADM_TABS.find(x=>x[0]===a.dataset.tab),n=t[2]?b[t[2]]||0:0,nb=a.querySelector(".nb");nb.textContent=n;nb.classList.toggle("z",!n)})}
 const dtm=t=>new Date(t).toLocaleString("ru-RU",{day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"});
@@ -1818,7 +1847,7 @@ async function pageAdmin(tab){
   if(needAuth())return;
   if(!S.user.admin){app.innerHTML=`<div class="wrap">${empty("Нет доступа","Эта страница только для администраторов")}</div>`;return}
   tab=["reports","support","shop"].includes(tab)?tab:"";
-  const sub={"":"Идущие и спорные матчи. Спорный — когда результат оспорили или капитаны отметили разное. Доказательства от игроков приходят вам в Telegram.",reports:"Жалобы игроков после матчей. Можно закрыть жалобу или закрыть нарушителю поиск матчей.",support:"Обращения в поддержку. Ответ придёт игроку на сайт и в Telegram.",shop:"Товары, цены и запас промокодов. Код выдаётся игроку автоматически при покупке, о каждой покупке придёт сообщение в Telegram."}[tab];
+  const sub={"":"Идущие и спорные матчи. Спорный — когда результат оспорили или капитаны отметили разное. Доказательства от игроков приходят вам в Telegram.",reports:"Жалобы игроков после матчей. Можно закрыть жалобу или закрыть нарушителю поиск матчей.",support:"Обращения в поддержку. Ответ придёт игроку на сайт и в Telegram.",shop:"Товары, цены и заказы. После покупки игрок пишет вам в Telegram и присылает скриншот заказа — сверьте номер заказа здесь, выдайте промокод и нажмите «Выдан». О каждой покупке придёт сообщение в Telegram."}[tab];
   app.innerHTML=`<div class="wrap"><h1 class="h">Админка</h1><div class="tabs" id="admTabs" style="margin-top:-6px">${ADM_TABS.map(([k,t])=>`<a href="#/admin${k?"/"+k:""}" data-tab="${k}" class="${tab===k?"on":""}">${t}<span class="nb z">0</span></a>`).join("")}</div><p class="muted" style="margin:-6px 0 20px">${sub}</p><div id="adm" class="grid"><div class="card">${skel(3)}</div></div></div>`;entered();paintAdmTabs();
   if(tab==="reports")return admReports();if(tab==="support")return admSupport();if(tab==="shop")return admShop();
   const list=await api("/api/admin/matches").catch(()=>[]);const el=document.getElementById("adm");if(!el)return;
@@ -1840,24 +1869,36 @@ async function pageAdmin(tab){
 }
 async function admShop(){const el=document.getElementById("adm");if(!el)return;
   try{paintAdmShop(await api("/api/admin/shop"))}catch(e){el.innerHTML=`<div class="card">${empty("Не удалось загрузить магазин",esc(e.message))}</div>`}}
+function admOrd(o){
+  const act=o.st==="wait"?`<button class="btn btn-o btn-sm" data-oact="done" data-n="${o.n}">${ic("check")}Выдан</button><button class="btn btn-g btn-sm" data-oact="refund" data-n="${o.n}">Вернуть монеты</button>`
+   :o.st==="done"?`<span class="sh-ost od">Выдан${o.by?" · "+esc(o.by):""}${o.doneAt?" · "+dtm(o.doneAt):""}</span><button type="button" class="adm-undo" data-oact="undo" data-n="${o.n}">Снять отметку</button>`
+   :`<span class="sh-ost orf">Отменён · монеты возвращены</span>`;
+  return `<div class="adm-o${o.st==="wait"?" pend":""}" data-q="${esc((o.n+" "+o.nick+" "+(o.tg||"")).toLowerCase())}"><b class="adm-on">№${o.n}</b>
+   <div class="adm-ow"><a href="#/player/${encodeURIComponent(o.nick)}"><b>${esc(o.nick)}</b></a>${o.tg?` <a class="adm-tg" href="https://t.me/${encodeURIComponent(o.tg)}" target="_blank" rel="noopener">@${esc(o.tg)}</a>`:""}<div class="muted">${esc(o.title)} · ${fmt(o.price)} монет · ${dtm(o.at)}</div></div>
+   <div class="adm-oa">${act}</div></div>`}
 function paintAdmShop(d){const el=document.getElementById("adm");if(!el)return;
-  const open=[...el.querySelectorAll(".adm-shop details[open]")].map(x=>x.closest(".adm-shop").dataset.it);
+  const q=(el.querySelector("#admOq")||{}).value||"";
   el.innerHTML=d.items.map(x=>`<div class="card pad adm-shop" data-it="${x.id}">
-    <div class="adm-h"><div class="adm-sh-t">${GOLD()}<div><b style="font-size:17px">${esc(x.full)}</b><div class="muted" style="font-size:13px;margin-top:2px">Продано: ${fmt(x.sold)}${x.waiting?` · ждут поступления: ${x.waiting}`:""}</div></div></div><div class="adm-stock${!x.stock?" zero":x.stock<=3?" low":""}"><b>${fmt(x.stock)}</b><span>${x.stock?"в наличии":"кодов нет"}</span></div></div>
+    <div class="adm-h"><div class="adm-sh-t">${GOLD()}<div><b style="font-size:17px">${esc(x.full)}</b><div class="muted" style="font-size:13px;margin-top:2px">Продано: ${fmt(x.sold)}${x.stock!=null?` · осталось: ${fmt(x.stock)}`:""}${x.waiting?` · ждут поступления: ${x.waiting}`:""}</div></div></div><div class="adm-stock${x.pending?" low":""}"><b>${fmt(x.pending)}</b><span>ждут выдачи</span></div></div>
     <div class="adm-cfg"><label>Цена, монет<input type="number" inputmode="numeric" min="1" max="1000000" step="1" data-cfg="price" value="${x.price}"></label>
      <label>Лимит в неделю на игрока (0 — без лимита)<input type="number" inputmode="numeric" min="0" max="100" step="1" data-cfg="limit" value="${x.limit}"></label>
-     <label class="chk"><input type="checkbox" data-cfg="on"${x.on?" checked":""}><span>Продаётся</span></label><button class="btn btn-g btn-sm" data-cfgsave>Сохранить</button></div>
-    <div class="adm-add"><label for="codes-${x.id}"><b>Добавить промокоды</b> <span class="muted">— каждый с новой строки. Каждый код продаётся один раз, повторы пропускаются.</span></label>
-     <textarea class="txa" id="codes-${x.id}" rows="4" spellcheck="false" autocomplete="off" placeholder="Например:&#10;GOLD-7F3K-92LQ&#10;GOLD-1M8D-0ZXA"></textarea><button class="btn btn-o btn-sm" data-addc>Добавить</button></div>
-    ${x.codes.length?`<details class="adm-codes"${open.includes(x.id)?" open":""}><summary>Коды в наличии (${fmt(x.codes.length)})</summary><div>${x.codes.map(c=>`<span class="adm-code"><code>${esc(c)}</code><button type="button" data-rmc="${esc(c)}" aria-label="Удалить код ${esc(c)}">×</button></span>`).join("")}</div></details>`:""}</div>`).join("")+
-   `<h3 class="adm-sub">Последние покупки</h3><div class="card">${d.orders.length?`<div class="adm-ords">${d.orders.map(o=>`<div class="adm-ord"><a href="#/player/${encodeURIComponent(o.nick)}"><b>${esc(o.nick)}</b></a><span class="muted">${esc(o.title)} · ${fmt(o.price)} монет</span><code>${esc(o.code)}</code><span class="muted">${dtm(o.at)}</span></div>`).join("")}</div>`:empty("Покупок пока нет","Когда игрок купит товар, покупка появится здесь, а вам придёт сообщение в Telegram")}</div>`;
+     <label>Сколько в наличии (пусто — без ограничения)<input type="number" inputmode="numeric" min="0" max="100000" step="1" data-cfg="qty" value="${x.stock==null?"":x.stock}" placeholder="без ограничения"></label>
+     <label class="chk"><input type="checkbox" data-cfg="on"${x.on?" checked":""}><span>Продаётся</span></label><button class="btn btn-g btn-sm" data-cfgsave>Сохранить</button></div></div>`).join("")+
+   `<div class="card pad adm-ct"><div><b>Кому писать за промокодом</b><div class="muted" style="font-size:13px;margin-top:2px">После покупки игрок видит кнопку «Написать» и присылает сюда скриншот заказа. Найдите заказ ниже по номеру, выдайте промокод и нажмите «Выдан».</div></div>
+    <div class="adm-cfg"><label>Ник в Telegram<input type="text" data-contact value="@${esc(d.contact)}" maxlength="40" autocomplete="off" spellcheck="false"></label><button class="btn btn-g btn-sm" data-ctsave>Сохранить</button></div></div>
+   <div class="adm-oh"><h3 class="adm-sub">Заказы${d.pending?` · ждут выдачи: ${d.pending}`:""}</h3>${d.orders.length?`<input type="search" id="admOq" placeholder="Номер заказа или ник" value="${esc(q)}" autocomplete="off" aria-label="Найти заказ">`:""}</div>
+   <div class="card" id="admOl">${d.orders.length?`<div class="adm-none muted hid">Ничего не найдено</div>`+d.orders.map(admOrd).join(""):empty("Заказов пока нет","Когда игрок купит товар, заказ появится здесь, а вам придёт сообщение в Telegram")}</div>`;
+  const post=async(body,btn,msg)=>{if(btn)btn.disabled=true;try{const r=await api("/api/admin/shop",{method:"POST",body:JSON.stringify(body)});toast(msg(r));paintAdmShop(r.admin)}catch(e){toast(e.message);if(btn&&btn.isConnected)btn.disabled=false}};
   el.querySelectorAll(".adm-shop").forEach(card=>{const id=card.dataset.it;
-    const post=async(body,btn,msg)=>{if(btn)btn.disabled=true;try{const r=await api("/api/admin/shop",{method:"POST",body:JSON.stringify({item:id,...body})});toast(msg(r));paintAdmShop(r.admin)}catch(e){toast(e.message);if(btn&&btn.isConnected)btn.disabled=false}};
-    card.querySelector("[data-cfgsave]").onclick=e=>{const g=k=>card.querySelector(`[data-cfg="${k}"]`);post({act:"cfg",price:Number(g("price").value),limit:Number(g("limit").value||0),on:g("on").checked},e.currentTarget,r=>"Сохранено"+(r.told?` · сообщили ${r.told} игрокам`:""))};
-    card.querySelector("[data-addc]").onclick=e=>{const t=card.querySelector("textarea");if(!t.value.trim()){t.focus();return toast("Вставьте промокоды — каждый с новой строки")}
-      post({act:"add",text:t.value},e.currentTarget,r=>`Добавлено кодов: ${r.added}`+(r.dup?` · повторы пропущены: ${r.dup}`:"")+(r.told?` · сообщили ${r.told} игрокам`:""))};
-    card.querySelectorAll("[data-rmc]").forEach(b=>b.onclick=()=>{if(!confirm("Удалить код "+b.dataset.rmc+"? Его больше нельзя будет купить."))return;post({act:"remove",code:b.dataset.rmc},b,()=>"Код удалён")});
-  });
+    card.querySelector("[data-cfgsave]").onclick=e=>{const g=k=>card.querySelector(`[data-cfg="${k}"]`),qv=g("qty").value.trim();
+      post({item:id,act:"cfg",price:Number(g("price").value),limit:Number(g("limit").value||0),qty:qv===""?null:Number(qv),on:g("on").checked},e.currentTarget,r=>"Сохранено"+(r.told?` · сообщили ${r.told} игрокам`:""))}});
+  const ct=el.querySelector("[data-ctsave]");if(ct)ct.onclick=e=>post({act:"contact",contact:el.querySelector("[data-contact]").value},e.currentTarget,r=>"Сохранено: игроки будут писать @"+r.contact);
+  el.querySelectorAll("[data-oact]").forEach(b=>b.onclick=()=>{const n=b.dataset.n,a=b.dataset.oact;
+    if(a==="refund"&&!confirm(`Отменить заказ №${n} и вернуть монеты игроку?`))return;
+    post({act:"order",n:Number(n),do:a},b,()=>a==="done"?`Заказ №${n} — выдан`:a==="undo"?`Заказ №${n} снова ждёт выдачи`:`Заказ №${n} отменён, монеты вернули`)});
+  const fq=el.querySelector("#admOq"),flt=()=>{const v=fq.value.trim().toLowerCase().replace(/^[№#@]\s*/,"");let k=0;
+    el.querySelectorAll("#admOl .adm-o").forEach(r=>{const ok=!v||r.dataset.q.includes(v);r.classList.toggle("hid",!ok);if(ok)k++});const no=el.querySelector(".adm-none");if(no)no.classList.toggle("hid",!!k||!v)};
+  if(fq){fq.oninput=flt;flt()}
 }
 async function admReports(){
   const d=await api("/api/admin/reports").catch(()=>null),el=document.getElementById("adm");if(!el||curHash()!=="/admin/reports")return;
@@ -1913,77 +1954,93 @@ document.addEventListener("click",async e=>{const b=e.target.closest("[data-clai
   try{const r=await api("/api/tasks/claim",{method:"POST",body:JSON.stringify({id:b.dataset.claim})});onTasks(r.state);toast(`+${r.amount} монет 🎉`);if(b.dataset.claim==="all")confetti()}
   catch(err){toast(err.message);if(b.isConnected)b.disabled=false;if(err.state)onTasks(err.state)}});
 /* ===== Магазин ===== */
-function onShop(d){S.shop={u:S.user?S.user.nick:null,items:d.items||[],orders:d.orders||[]};paintShop()}
-function onShopItems(d){if(!S.shop)return;S.shop.items=d.items.map(x=>{const o=S.shop.items.find(y=>y.id===x.id)||{};return {...x,wait:o.wait,next:o.next}});paintShop()}
+// промокод выдаёт администратор: после покупки игрок пишет ему в Telegram и присылает скриншот заказа
+const shNick=()=>(S.shop&&S.shop.contact)||"swupliq",shWho=()=>"@"+shNick(),shTg=()=>"https://t.me/"+encodeURIComponent(shNick());
+const OST={wait:["ow","Ожидает выдачи"],done:["od","Выдан"],refund:["orf","Отменён · монеты возвращены"]};
+const ostHtml=st=>{const [c,t]=OST[st]||OST.wait;return `<span class="sh-ost ${c}">${t}</span>`};
+function onShop(d){S.shop={u:S.user?S.user.nick:null,contact:d.contact||"swupliq",items:d.items||[],orders:d.orders||[]};paintShop();paintOrd();paintTgw()}
+function onShopItems(d){if(!S.shop)return;if(d.contact)S.shop.contact=d.contact;S.shop.items=d.items.map(x=>{const o=S.shop.items.find(y=>y.id===x.id)||{};return {...x,wait:o.wait,next:o.next}});paintShop();paintTgw()}
 async function loadShop(){try{onShop(await api("/api/shop"))}catch{}}
+// ник для связи в правилах и FAQ — обновляется, когда пришли данные магазина
+const tgw=()=>`<a data-tgw href="${shTg()}" target="_blank" rel="noopener">${esc(shWho())}</a>`;
+function paintTgw(){document.querySelectorAll("[data-tgw]").forEach(a=>{if(a.textContent!==shWho()){a.textContent=shWho();a.href=shTg()}})}
 function copyTxt(t,ok){const done=()=>toast(ok||"Скопировано"),fb=()=>{const a=document.createElement("textarea");a.value=t;a.setAttribute("readonly","");a.style.cssText="position:fixed;top:0;left:0;opacity:0";document.body.appendChild(a);a.select();let r=false;try{r=document.execCommand("copy")}catch{}a.remove();r?done():toast("Не удалось скопировать — выделите код и скопируйте вручную")};
   if(navigator.clipboard&&window.isSecureContext)navigator.clipboard.writeText(t).then(done,fb);else fb()}
 function shItem(x){
-  const c=S.tasks?S.tasks.coins:0,need=Math.max(0,x.price-c),lim=x.next&&x.next>Date.now()+S.skew,can=x.on&&x.stock>0;
+  const c=S.tasks?S.tasks.coins:0,need=Math.max(0,x.price-c),lim=x.next&&x.next>Date.now()+S.skew,can=x.on&&x.stock!==0;
   const act=!S.user?`<a class="btn btn-o sh-cta" href="#/login">Войти и купить</a>`
    :!x.on?`<button class="btn btn-g sh-cta" disabled>Сейчас не продаётся</button>`
-   :!x.stock?(x.wait?`<button class="btn btn-g sh-cta on" data-notify="${x.id}" data-on="0">${ic("check")}Сообщим о поступлении</button>`:`<button class="btn btn-g sh-cta" data-notify="${x.id}" data-on="1">${ic("bell")}Сообщить о поступлении</button>`)
+   :x.stock===0?(x.wait?`<button class="btn btn-g sh-cta on" data-notify="${x.id}" data-on="0">${ic("check")}Сообщим о поступлении</button>`:`<button class="btn btn-g sh-cta" data-notify="${x.id}" data-on="1">${ic("bell")}Сообщить о поступлении</button>`)
    :lim?`<button class="btn btn-g sh-cta" disabled>Снова можно ${dtm(x.next)}</button>`
    :!S.tasks?`<button class="btn btn-g sh-cta" disabled>Загрузка…</button>`
    :need?`<a class="btn btn-g sh-cta" href="#/tasks">Заработать ещё ${fmt(need)}</a>`
    :`<button class="btn btn-o sh-cta" data-buy="${x.id}">Купить за ${fmt(x.price)}</button>`;
-  const st=!x.on?`<span class="sh-st out">Не продаётся</span>`:!x.stock?`<span class="sh-st out">Нет в наличии</span>`:x.stock<=5?`<span class="sh-st low">Осталось всего ${x.stock}</span>`:`<span class="sh-st">В наличии: ${fmt(x.stock)}</span>`;
+  const st=!x.on?`<span class="sh-st out">Не продаётся</span>`:x.stock===0?`<span class="sh-st out">Нет в наличии</span>`:x.stock==null?`<span class="sh-st">В наличии</span>`:x.stock<=5?`<span class="sh-st low">Осталось всего ${x.stock}</span>`:`<span class="sh-st">В наличии: ${fmt(x.stock)}</span>`;
   const prog=S.user&&S.tasks&&can&&need&&!lim?`<div class="sh-prog"><div class="bar"><div style="width:${Math.min(100,Math.round(c/x.price*100))}%"></div></div><span>${fmt(c)} / ${fmt(x.price)}</span></div>`:"";
   return `<div class="card sh-item${can?"":" out"}" data-item="${x.id}"><div class="sh-vis"><span class="sh-tag">Промокод</span><span class="sh-for">StandLeo</span>${GOLD()}</div>
-   <div class="sh-body"><b class="sh-name">${esc(x.title)}</b><div class="muted sh-desc">Промокод для StandLeo. Код появится сразу после покупки — здесь и в Telegram.</div>
+   <div class="sh-body"><b class="sh-name">${esc(x.title)}</b><div class="muted sh-desc">Промокод для StandLeo. После покупки напишите ${esc(shWho())} в Telegram — вам выдадут код.</div>
     <div class="sh-meta"><span class="sh-price">${COIN}<b>${fmt(x.price)}</b></span>${st}</div>${x.limit?`<div class="sh-lim muted">Не больше ${x.limit} в неделю на игрока</div>`:""}${prog}${act}</div></div>`;
 }
 const shSoon=()=>`<div class="card sh-item sh-soon"><div class="sh-vis"><div class="sh-q">${ic("gift")}</div></div><div class="sh-body"><b class="sh-name">Скоро новые товары</b><div class="muted sh-desc">Готовим новые награды. Есть идея, что добавить? Напишите в <a href="#/support">поддержку</a>.</div></div></div>`;
-const shMine=o=>o.length?`<h3 class="tk-sub">Мои покупки</h3><div class="card sh-mine">${o.map(x=>`<div class="sh-ord"><div class="sh-oic">${GOLD()}</div><div class="sh-om"><b>${esc(x.title)}</b><div class="muted">${dtm(x.at)} · ${fmt(x.price)} монет</div></div><div class="sh-oc"><code class="sh-code">${esc(x.code)}</code><button class="btn btn-g btn-sm" data-copyc="${esc(x.code)}" aria-label="Скопировать код ${esc(x.code)}">${ic("copy")}<span>Скопировать</span></button></div></div>`).join("")}</div><p class="muted sh-help sh-mhint">Куда вводить код: в StandLeo на главном экране нажмите <b>«События»</b> → <b>«Секретный код»</b>.</p>`:"";
+const shMine=o=>o.length?`<h3 class="tk-sub">Мои покупки</h3><div class="card sh-mine">${o.map(x=>`<div class="sh-ord${x.st==="refund"?" off":""}" data-n="${x.n}"><div class="sh-oic">${GOLD()}</div><div class="sh-om"><b>${esc(x.title)}</b><div class="muted">Заказ №${x.n} · ${dtm(x.at)} · ${fmt(x.price)} монет</div></div><div class="sh-oc">${ostHtml(x.st)}${x.code?`<code class="sh-code">${esc(x.code)}</code><button class="btn btn-g btn-sm" data-copyc="${esc(x.code)}" aria-label="Скопировать код ${esc(x.code)}">${ic("copy")}<span>Скопировать</span></button>`:x.st==="wait"?`<button class="btn btn-o btn-sm" data-ord="${x.n}">${ic("tg")}<span>Получить код</span></button>`:""}</div></div>`).join("")}</div>
+  <p class="muted sh-help sh-mhint">Чтобы получить промокод, напишите <a href="${shTg()}" target="_blank" rel="noopener">${esc(shWho())}</a> в Telegram и пришлите скриншот заказа. Код вводится в StandLeo: <b>«События»</b> → <b>«Секретный код»</b>.</p>`:"";
 function shHero(){const u=S.user;
   return `<section class="card sh-hero"><div class="sh-stripes" aria-hidden="true"></div>
    <div class="sh-art" aria-hidden="true"><span class="cw c1">${COIN}</span><span class="cw c2">${COIN}</span><span class="cw c3">${COIN}</span></div>
    <div class="sh-in"><div class="sh-kick">${ic("shop")}StandHub Shop</div><h1>Магазин <span>наград</span></h1><p>Играйте матчи, выполняйте задания и меняйте монеты на голду для StandLeo.</p>
     ${u?`<div class="sh-row"><div class="sh-bal"><span>Ваш баланс</span><div>${COIN}<b data-coins>${fmt(S.tasks?S.tasks.coins:0)}</b></div></div><a class="btn btn-g" href="#/tasks">${ic("tasks")}Заработать<span class="sh-mh">&nbsp;монеты</span></a></div>`
      :`<div class="sh-row"><a class="btn btn-o" href="#/login">Войти</a><a class="btn btn-g" href="#/register">Регистрация</a></div>`}</div></section>`}
-const SH_HOW=`<div class="sh-how"><b class="sh-how-t">Как активировать в StandLeo</b><ol><li><i>1</i><span>На главном экране игры нажмите <b>«События»</b></span></li><li><i>2</i><span>Откройте <b>«Секретный код»</b></span></li><li><i>3</i><span>Вставьте промокод</span></li></ol></div>`;
-const shSteps=`<h3 class="tk-sub">Как это работает</h3><div class="sh-steps">
+const shSteps=()=>`<h3 class="tk-sub">Как это работает</h3><div class="sh-steps">
   <div class="card sh-step"><span class="n">1</span><div><b>Копите монеты</b><p class="muted">Выполняйте ежедневные задания и забирайте бонус за вход</p></div></div>
-  <div class="card sh-step"><span class="n">2</span><div><b>Купите промокод</b><p class="muted">Код появится сразу — на сайте и в Telegram</p></div></div>
-  <div class="card sh-step"><span class="n">3</span><div><b>Активируйте в StandLeo</b><p class="muted">В игре: «События» → «Секретный код» → вставьте код</p></div></div></div>
-  <p class="muted sh-help">Код не сработал? Напишите в <a href="#/support">поддержку</a> — тема «Магазин и промокоды».</p>`;
+  <div class="card sh-step"><span class="n">2</span><div><b>Купите промокод</b><p class="muted">Заказ с номером появится в «Мои покупки»</p></div></div>
+  <div class="card sh-step"><span class="n">3</span><div><b>Напишите ${esc(shWho())}</b><p class="muted">Пришлите в Telegram скриншот заказа — вам выдадут промокод</p></div></div>
+  <div class="card sh-step"><span class="n">4</span><div><b>Активируйте в StandLeo</b><p class="muted">В игре: «События» → «Секретный код» → вставьте код</p></div></div></div>
+  <p class="muted sh-help">Не выдали промокод или он не сработал? Напишите в <a href="#/support">поддержку</a> — тема «Магазин и промокоды».</p>`;
 function pageShop(){
   try{localStorage.setItem("sh_shop_seen","1")}catch{}paintBadges();
   if(S.shop&&S.shop.u!==(S.user?S.user.nick:null))S.shop=null;
-  app.innerHTML=`<div class="wrap sh">${shHero()}<h3 class="tk-sub">Товары</h3><div class="sh-grid" id="shItems"><div class="card">${skel(3)}</div></div><div id="shMine"></div>${shSteps}</div>`;entered();
+  app.innerHTML=`<div class="wrap sh">${shHero()}<h3 class="tk-sub">Товары</h3><div class="sh-grid" id="shItems"><div class="card">${skel(3)}</div></div><div id="shMine"></div><div id="shSteps">${shSteps()}</div></div>`;entered();
   paintShop();loadShop();if(S.user&&!S.tasks)loadTasks();
 }
-function paintShop(){if(curHash()!=="/shop"||!S.shop)return;const g=document.getElementById("shItems"),m=document.getElementById("shMine");if(!g||!m)return;
+function paintShop(){if(curHash()!=="/shop"||!S.shop)return;const g=document.getElementById("shItems"),m=document.getElementById("shMine"),st=document.getElementById("shSteps");if(!g||!m)return;
   const h=S.shop.items.map(shItem).join("")+shSoon();if(g._h!==h){const first=!g._h;g._h=h;g.innerHTML=h;if(first)rise(g.children,70,420)}
-  const hm=shMine(S.shop.orders);if(m._h!==hm){m._h=hm;m.innerHTML=hm}}
+  const hm=shMine(S.shop.orders);if(m._h!==hm){m._h=hm;m.innerHTML=hm}
+  if(st){const hs=shSteps();if(st._h!==hs){st._h=hs;st.innerHTML=hs}}}
 function openBuy(x){const c=S.tasks?S.tasks.coins:0;
   openX(`<div class="card pm sh-pm" role="dialog" aria-modal="true" aria-labelledby="xH"><button type="button" class="pm-x" data-x aria-label="Закрыть">×</button>
    <div class="sh-pv">${GOLD()}</div><h3 id="xH">Купить ${esc(x.title)}?</h3>
-   <p class="muted pm-sub">Вы получите промокод для StandLeo. Он появится сразу после покупки и придёт вам в Telegram.</p>
+   <p class="muted pm-sub">После покупки напишите ${esc(shWho())} в Telegram и пришлите скриншот заказа — вам выдадут промокод.</p>
    <div class="sh-sum"><div><span>Цена</span><b>${COIN}${fmt(x.price)}</b></div><div><span>Останется</span><b>${COIN}${fmt(Math.max(0,c-x.price))}</b></div></div>
    <p class="muted" style="font-size:13px;margin-top:12px">Покупку нельзя отменить — монеты не возвращаются.</p>
    <div class="row2" style="margin-top:16px"><button class="btn btn-o" id="buyYes">Купить за ${fmt(x.price)}</button><button class="btn btn-g" type="button" data-x>Отмена</button></div></div>`);
   const y=document.getElementById("buyYes");
   y.onclick=async()=>{y.disabled=true;y.textContent="Покупаем…";
-    try{const r=await api("/api/shop/buy",{method:"POST",body:JSON.stringify({item:x.id})});if(S.tasks){S.tasks.coins=r.coins;paintCoins()}onShop(r.state);openGot(r.order)}
+    try{const r=await api("/api/shop/buy",{method:"POST",body:JSON.stringify({item:x.id})});if(S.tasks){S.tasks.coins=r.coins;paintCoins()}onShop(r.state);openOrd(r.order,true)}
     catch(err){closeX();toast(err.message);if(err.state)onShop(err.state)}};
 }
-function openGot(o){
-  openX(`<div class="card pm sh-pm sh-got" role="dialog" aria-modal="true" aria-labelledby="xH"><button type="button" class="pm-x" data-x aria-label="Закрыть">×</button>
-   <div class="sh-pv">${GOLD()}</div><h3 id="xH">Готово! Ваш промокод</h3><p class="muted pm-sub">${esc(o.title)} для StandLeo</p>
-   <div class="sh-codebox"><code>${esc(o.code)}</code><button class="btn btn-o btn-sm" data-copyc="${esc(o.code)}">${ic("copy")}Скопировать</button></div>
-   ${SH_HOW}<p class="muted" style="font-size:13px;margin-top:12px">Код также отправлен вам в Telegram и всегда есть в разделе «Мои покупки».</p>
-   <div class="row2" style="margin-top:16px"><button class="btn btn-g" type="button" data-x>Готово</button></div></div>`);
-  confetti();
+// окно заказа: чек для скриншота и как получить промокод
+function openOrd(o,fresh){const u=S.user,w=o.st==="wait";
+  openX(`<div class="card pm sh-pm sh-got" role="dialog" aria-modal="true" aria-labelledby="xH" data-ordm="${o.n}"><button type="button" class="pm-x" data-x aria-label="Закрыть">×</button>
+   <div class="sh-pv sm">${GOLD()}</div><h3 id="xH">${fresh?"Покупка оформлена!":"Заказ №"+o.n}</h3><p class="muted pm-sub">${esc(o.title)} для StandLeo</p>
+   <div class="sh-rc"><div><small>Заказ</small><b class="no">№${o.n}</b></div><div><small>Игрок</small><b>${esc(u?u.nick:"")}</b></div><div><small>Оплачено</small><b>${COIN}${fmt(o.price)}</b></div><div><small>Дата</small><b>${dtm(o.at)}</b></div><div class="w2"><small>Статус</small>${ostHtml(o.st)}</div></div>
+   ${w?`<div class="sh-how"><b class="sh-how-t">Как получить промокод</b><ol><li><i>1</i><span>Сделайте скриншот этого окна</span></li><li><i>2</i><span>Напишите в Telegram <b>${esc(shWho())}</b></span></li><li><i>3</i><span>Отправьте скриншот — вам пришлют промокод</span></li></ol></div>
+   <div class="row2" style="margin-top:14px"><a class="btn btn-o" href="${shTg()}" target="_blank" rel="noopener" data-tgo>${ic("tg")}Написать ${esc(shWho())}</a><button class="btn btn-g" type="button" data-x>Готово</button></div>`
+   :`<div class="row2" style="margin-top:16px"><button class="btn btn-g" type="button" data-x>Готово</button></div>`}
+   <p class="muted sh-fn">Промокод вводится в StandLeo: <b>«События»</b> → <b>«Секретный код»</b>. Заказ всегда есть в разделе «Мои покупки».</p></div>`);
+  if(fresh)confetti();
 }
-document.addEventListener("click",async e=>{const b=e.target.closest("[data-buy],[data-notify],[data-copyc]");if(!b)return;e.preventDefault();
+// статус заказа поменялся, пока окно открыто (админ отметил «Выдан» или вернул монеты)
+function paintOrd(){const m=document.querySelector("#xModal.show [data-ordm]");if(!m||!S.shop)return;const o=S.shop.orders.find(x=>String(x.n)===m.dataset.ordm),st=m.querySelector(".sh-rc .sh-ost");if(o&&st&&st.outerHTML!==ostHtml(o.st))st.outerHTML=ostHtml(o.st)}
+document.addEventListener("click",async e=>{const b=e.target.closest("[data-buy],[data-notify],[data-copyc],[data-ord]");if(!b)return;e.preventDefault();
   if(b.dataset.copyc!=null)return copyTxt(b.dataset.copyc,"Код скопирован");
+  if(b.dataset.ord){const o=S.shop&&S.shop.orders.find(x=>String(x.n)===b.dataset.ord);if(o)openOrd(o);return}
   if(b.dataset.buy){const x=S.shop&&S.shop.items.find(i=>i.id===b.dataset.buy);if(x)openBuy(x);return}
   if(b.disabled)return;b.disabled=true;const on=b.dataset.on==="1";
-  try{const r=await api("/api/shop/notify",{method:"POST",body:JSON.stringify({item:b.dataset.notify,on})});onShop(r.state);toast(on?"Готово — сообщим в Telegram, когда промокоды появятся":"Хорошо, не будем сообщать")}
+  try{const r=await api("/api/shop/notify",{method:"POST",body:JSON.stringify({item:b.dataset.notify,on})});onShop(r.state);toast(on?"Готово — сообщим в Telegram, когда товар появится":"Хорошо, не будем сообщать")}
   catch(err){toast(err.message);if(b.isConnected)b.disabled=false}});
 /* ===== Правила ===== */
 function pageRules(sec){
+  if(!S.shop)loadShop();   // ник для связи по промокодам
   const li=a=>`<ul>${a.map(x=>`<li>${x}</li>`).join("")}</ul>`;
   app.innerHTML=`<div class="wrap"><h1 class="h">Правила StandHub</h1><div class="doc">
    <p class="lead">Играем честно и уважаем друг друга. За нарушения — ограничения поиска матчей.</p>
@@ -1993,7 +2050,7 @@ function pageRules(sec){
      <div class="pen"><div><span>1-й пропуск за сутки</span><b>Предупреждение</b></div><div><span>2-й пропуск</span><b>Поиск закрыт на 5 минут</b></div><div><span>3-й пропуск</span><b>30 минут</b></div><div><span>4-й и дальше</span><b>2 часа</b></div></div></div>
    <div class="card" id="r-match"><h2>${ic("swords")}Матч</h2>${li(["Хост создаёт лобби в StandLeo на выбранной карте — 13 раундов до победы.","Игроки находят хоста по ID и пишут ему «.» в личные сообщения — он приглашает в лобби.","Играйте за свою команду до конца матча. Уходить из матча нельзя.","Если лобби так и не собралось — проголосуйте «Матч не состоялся», ELO не изменится.","После игры капитан отмечает результат на сайте: «Мы победили» или «Мы проиграли». Кнопки открываются через 10 минут после начала игры.","Соперники подтверждают результат или оспаривают его в течение 30 минут. Не ответили — результат засчитывается.","Оспоренный матч проверяет администратор. Записывайте экран во время игры: запись или скриншот итогового счёта — лучшее доказательство, его можно отправить нашему Telegram-боту.","Ложный результат или ложный спор — запрет поиска на 7 дней."])}</div>
    <div class="card" id="r-anticheat"><h2>${ic("shield")}Античит и честная игра</h2>${li(["Запрещены читы, макросы, изменённые версии игры и любые программы, дающие преимущество.","Запрещены договорные матчи и намеренный проигрыш.","Запрещены оскорбления, угрозы, спам и реклама — в том числе в чате матча.","Заметили нарушение — после матча нажмите «Жалоба» рядом с игроком в комнате матча. Администратор проверит."])}</div>
-   <div class="card" id="r-shop"><h2>${ic("shop")}Монеты и магазин</h2>${li(["Монеты даются за ежедневные задания и бонус за вход. Купить монеты или передать их другому игроку нельзя.","В магазине монеты меняются на награды — например, на промокод на 1000 голды для StandLeo. Код выдаётся сразу после покупки и хранится в разделе «Мои покупки».","Чтобы активировать код, в StandLeo на главном экране нажмите «События» → «Секретный код» и вставьте промокод.","Покупку нельзя отменить, монеты не возвращаются. Если код не сработал — напишите в поддержку, тема «Магазин и промокоды».","Фарм монет с нескольких аккаунтов или договорными матчами запрещён — за это закрываем поиск матчей."])}</div>
+   <div class="card" id="r-shop"><h2>${ic("shop")}Монеты и магазин</h2>${li(["Монеты даются за ежедневные задания и бонус за вход. Купить монеты или передать их другому игроку нельзя.","В магазине монеты меняются на награды — например, на промокод на 1000 голды для StandLeo.","После покупки напишите в Telegram "+tgw()+" и пришлите скриншот заказа — вам выдадут промокод. Номер и статус заказа видны в «Магазине», в разделе «Мои покупки».","Чтобы активировать код, в StandLeo на главном экране нажмите «События» → «Секретный код» и вставьте промокод.","Один заказ — один промокод. Покупку нельзя отменить, монеты не возвращаются. Если промокод не выдали или он не сработал — напишите в поддержку, тема «Магазин и промокоды».","Фарм монет с нескольких аккаунтов, договорные матчи и поддельные скриншоты заказов запрещены — за это закрываем поиск матчей."])}</div>
    <div class="card" id="r-penalties"><h2>${ic("crown")}Наказания</h2>${li(["Предупреждение или запрет поиска матчей на 1 день или на 7 дней — решает администратор.","Ложный результат матча или ложный спор — запрет поиска на 7 дней.","За серьёзные и повторные нарушения ограничения могут быть дольше.","Считаете наказание ошибкой — напишите в <a href='#/support' style='color:var(--orange2)'>поддержку</a>."])}</div>
    <div class="card" id="r-privacy"><h2>${ic("help")}Конфиденциальность</h2>${li(["Мы храним ник, email, игровой ID, регион, аватар, историю матчей, покупки в магазине и Telegram-чат для уведомлений и восстановления пароля.","Скриншоты профиля только распознаются и нигде не сохраняются.","Доказательства по матчам (видео и скриншоты) бот пересылает администратору в Telegram — на сайте они не хранятся.","Пароль хранится в зашифрованном виде.","Мы не передаём ваши данные третьим лицам."])}</div>
   </div></div>`;entered();
@@ -2008,8 +2065,9 @@ const FAQ=[["Бот не принимает скриншот профиля","Н
  ["Как отметить результат матча?","После игры капитан нажимает в комнате матча «Мы победили» или «Мы проиграли» — кнопки открываются через 10 минут после начала. Соперники подтверждают результат или оспаривают его в течение 30 минут. Если не ответят — результат засчитается сам."],
  ["Засчитали неверный результат","Пока результат не засчитан — нажмите «Оспорить» в комнате матча и отправьте Telegram-боту запись экрана или скриншот итогового счёта: администратор проверит матч. Если результат уже засчитан — напишите сюда и укажите номер матча (он есть в комнате матча)."],
  ["Как получить монеты?","Выполняйте ежедневные задания и забирайте бонус за вход в разделе «Задания». Тратить монеты можно в «Магазине»."],
- ["Как купить промокод на голду?","Откройте «Магазин» и нажмите «Купить». Промокод появится сразу, придёт вам в Telegram и всегда хранится в разделе «Мои покупки»."],
- ["Где ввести промокод в StandLeo?","На главном экране игры нажмите «События», затем «Секретный код» — и вставьте туда промокод. Скопировать его можно в «Магазине», в разделе «Мои покупки»."],
+ ["Как купить промокод на голду?","Откройте «Магазин» и нажмите «Купить». Затем напишите в Telegram @TG и пришлите скриншот заказа — вам выдадут промокод. Номер и статус заказа видны в разделе «Мои покупки»."],
+ ["Где ввести промокод в StandLeo?","На главном экране игры нажмите «События», затем «Секретный код» — и вставьте туда промокод, который вам прислали в Telegram."],
+ ["Мне не выдали промокод","Проверьте, что написали @TG в Telegram и прислали скриншот заказа с его номером. Статус заказа виден в «Магазине», в разделе «Мои покупки». Если ответа долго нет — напишите в поддержку, тема «Магазин и промокоды»."],
  ["Промокод не сработал","Проверьте, что вводите его в StandLeo через «События» → «Секретный код», без лишних пробелов. Если всё равно не работает — напишите в поддержку, тема «Магазин и промокоды», и укажите код: администратор проверит и поможет."],
  ["Как пожаловаться на игрока?","После матча откройте комнату матча и нажмите «Жалоба» рядом с игроком — это быстрее, чем писать в поддержку."]];
 function supHtml(list){
@@ -2024,6 +2082,7 @@ function paintSup(){const el=document.getElementById("supList");if(!el)return;co
   el.querySelectorAll("[data-tclose]").forEach(b=>b.onclick=async()=>{b.disabled=true;try{const r=await api("/api/support/close",{method:"POST",body:JSON.stringify({id:b.dataset.tclose})});S.sup=r.list;paintSup();toast("Обращение закрыто")}catch(e){toast(e.message);b.disabled=false}})}
 async function loadSup(){try{const r=await api("/api/support");S.sup=r.list;paintSup();if(r.list.some(x=>x.unread))api("/api/support/seen",{method:"POST"}).catch(()=>{})}catch{}}
 function pageSupport(){
+  if(!S.shop)loadShop();
   const u=S.user;
   app.innerHTML=`<div class="wrap"><h1 class="h">Поддержка</h1><div class="doc">
    ${u?`<div class="card hid" id="supMine"><h2>${ic("help")}Мои обращения</h2><div id="supList"></div></div>
@@ -2033,7 +2092,7 @@ function pageSupport(){
      <div><label for="supX">Сообщение</label><textarea class="txa" id="supX" maxlength="1500" rows="5" placeholder="Опишите, что случилось. Ответ придёт сюда и в Telegram."></textarea></div>
      <div><button class="btn btn-o" type="submit">Отправить</button></div></form></div>`
     :`<div class="card">${empty("Нужен аккаунт","Войдите, чтобы написать в поддержку — ответ придёт сюда и в Telegram. Забыли пароль — восстановите его через Telegram-бота.",`<div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center"><a class="btn btn-o" href="#/login">Войти</a><a class="btn btn-g" href="#/forgot">Забыли пароль?</a></div>`)}</div>`}
-   <div class="card faq"><h2>${ic("book")}Частые вопросы</h2>${FAQ.map(([q,a])=>`<details><summary>${q}</summary><p>${a}</p></details>`).join("")}</div>
+   <div class="card faq"><h2>${ic("book")}Частые вопросы</h2>${FAQ.map(([q,a])=>`<details><summary>${q}</summary><p>${a.replace(/@TG/g,tgw())}</p></details>`).join("")}</div>
   </div></div>`;entered();
   if(!u)return;
   const f=document.getElementById("supF");
