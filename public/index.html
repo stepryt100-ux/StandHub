@@ -293,8 +293,22 @@ tr.click{cursor:pointer}tr.click:hover td{background:var(--card2)}
 .idcopy{display:flex;align-items:center;gap:8px;margin-top:6px;flex-wrap:wrap}.idcopy .vcode{margin:0}
 .btn-sm{height:34px;padding:0 12px;font-size:12px}
 .row2{display:flex;gap:8px;flex-wrap:wrap}
-.testbox{margin-top:14px;padding-top:14px;border-top:1px dashed var(--line);display:grid;gap:8px}
-.scan{display:flex;align-items:center;gap:10px;padding:14px;background:var(--bg2);border-radius:6px}
+.claim{padding:12px 14px;border:1px solid var(--line);border-radius:8px;background:var(--bg2)}
+.claim.opp{border-color:rgba(255,85,0,.6);background:rgba(255,85,0,.08)}
+.cl-res{font-size:20px;font-weight:900;margin-top:2px}
+.res-card.hot{border-color:var(--orange);box-shadow:0 0 0 1px rgba(255,85,0,.25),0 0 32px -12px rgba(255,85,0,.65)}
+.resb .btn{flex:1 1 0;min-width:0;padding:0 12px;white-space:nowrap}
+.proof .btn{white-space:nowrap}
+@media(max-width:560px){.proof .btn{width:100%;font-size:12.5px;padding:0 12px}}
+.res-more{display:flex;gap:18px;flex-wrap:wrap;margin-top:14px}
+.res-wait{display:flex;gap:8px;align-items:center;margin-top:12px;font-size:13px;color:var(--muted)}.res-wait .ic{width:16px;height:16px;flex:none}
+.res-wait b,.cdw{color:#fff;font-variant-numeric:tabular-nums}
+.warn{display:flex;gap:8px;align-items:flex-start;margin-top:12px;padding:10px 12px;border-radius:6px;background:rgba(255,200,0,.07);border:1px solid rgba(255,200,0,.25);font-size:13px;color:#e8dcae}.warn .ic{width:16px;height:16px;flex:none;margin-top:1px;color:var(--yellow)}
+.proof{display:flex;gap:14px;align-items:center;justify-content:space-between;flex-wrap:wrap;margin-top:14px;padding:14px;border:1px dashed rgba(255,85,0,.55);border-radius:8px;background:rgba(255,85,0,.06)}
+.proof>div{flex:1 1 220px}.proof .btn .ic{width:16px;height:16px;margin-right:8px}
+.adm-res{font-size:14px;margin:12px 0;display:grid;gap:6px}
+.adm-d{padding:10px 12px;border-radius:6px;background:rgba(255,85,0,.08);border:1px solid rgba(255,85,0,.3)}
+.adm-pun{margin:4px 0 0}
 .spin{width:18px;height:18px;flex:none;border-radius:50%;border:3px solid var(--line);border-top-color:var(--orange);animation:sp .8s linear infinite}@keyframes sp{to{transform:rotate(360deg)}}
 .resbig{font-size:34px;font-weight:900;font-style:italic;text-transform:uppercase;line-height:1.1}
 .live-banner{display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;margin-bottom:16px;border-color:var(--orange);background:linear-gradient(90deg,rgba(255,85,0,.14),var(--card))}
@@ -428,7 +442,6 @@ body::after{width:520px;height:520px;left:140px;bottom:-220px;background:radial-
 .sk-row{display:flex;align-items:center;gap:12px;padding:10px 0}
 .sk-row+.sk-row{border-top:1px solid var(--line)}
 .sk-c{width:28px;height:28px;border-radius:50%;flex:none}
-.scan{background:linear-gradient(90deg,var(--bg2) 30%,#26262b 50%,var(--bg2) 70%);background-size:300% 100%;animation:shimmer 1.6s linear infinite}
 .empty-ic{animation:bob 3s ease-in-out infinite}
 @keyframes bob{50%{transform:translateY(-4px)}}
 .lvl.xl{box-shadow:0 0 24px -8px var(--c)}
@@ -710,7 +723,7 @@ function qHint(){
 const L=k=>`<b data-live="${k}">${S.live[k]==null?"—":fmt(S.live[k])}</b>`;
 
 /* ===== Каркас ===== */
-const ICONS={"lock":"<path fill-rule=\"evenodd\" d=\"M8 10V7a4 4 0 018 0v3h-2V7a2 2 0 00-4 0v3zM5 10h14a1 1 0 011 1v10a1 1 0 01-1 1H5a1 1 0 01-1-1V11a1 1 0 011-1zm7 3.5a1.5 1.5 0 00-.75 2.8V18h1.5v-1.7a1.5 1.5 0 00-.75-2.8z\"/>","users":"<circle cx=\"9\" cy=\"8\" r=\"3.6\"/><path d=\"M2.5 20c0-3.7 2.9-5.8 6.5-5.8s6.5 2.1 6.5 5.8z\"/><circle cx=\"16.6\" cy=\"8.8\" r=\"2.9\"/><path d=\"M16.3 13.4c3.2.1 5.2 2.1 5.2 5.4h-4.6c-.1-2.1-.9-3.9-2.3-5.2.5-.1 1.1-.2 1.7-.2z\"/>","home":"<path d=\"M3 11l9-8 9 8v10h-6v-6H9v6H3z\"/>","play":"<path d=\"M7 4l13 8-13 8z\"/>","user":"<circle cx=\"12\" cy=\"8\" r=\"4\"/><path d=\"M4 21c0-4 4-6 8-6s8 2 8 6z\"/>","swords":"<path d=\"M3 3h4l10 10-2 2-2-2-3 3-2-2 3-3zM21 3h-4l-5 5 2 2 1-1 2 2-6 6 2 2 3-3 2 2 2-2-2-2 3-3z\"/>","crown":"<path d=\"M3 7l5 4 4-7 4 7 5-4-2 12H5z\"/>","shield":"<path d=\"M12 2l8 3v6c0 5-3.5 9-8 11-4.5-2-8-6-8-11V5z\"/>","spark":"<path d=\"M12 2l2.4 6.6L21 11l-6.6 2.4L12 20l-2.4-6.6L3 11l6.6-2.4z\"/>","help":"<circle cx=\"12\" cy=\"12\" r=\"10\"/><path d=\"M9.5 9a2.5 2.5 0 115 0c0 2-2.5 2-2.5 4M12 17h0\" stroke=\"#0f0f11\" stroke-width=\"2\" fill=\"none\"/>",
+const ICONS={"alert":"<path fill-rule=\"evenodd\" d=\"M12 2.5L1.5 21h21zM11 9.5h2v6h-2zm0 7.5h2v2h-2z\"/>","lock":"<path fill-rule=\"evenodd\" d=\"M8 10V7a4 4 0 018 0v3h-2V7a2 2 0 00-4 0v3zM5 10h14a1 1 0 011 1v10a1 1 0 01-1 1H5a1 1 0 01-1-1V11a1 1 0 011-1zm7 3.5a1.5 1.5 0 00-.75 2.8V18h1.5v-1.7a1.5 1.5 0 00-.75-2.8z\"/>","users":"<circle cx=\"9\" cy=\"8\" r=\"3.6\"/><path d=\"M2.5 20c0-3.7 2.9-5.8 6.5-5.8s6.5 2.1 6.5 5.8z\"/><circle cx=\"16.6\" cy=\"8.8\" r=\"2.9\"/><path d=\"M16.3 13.4c3.2.1 5.2 2.1 5.2 5.4h-4.6c-.1-2.1-.9-3.9-2.3-5.2.5-.1 1.1-.2 1.7-.2z\"/>","home":"<path d=\"M3 11l9-8 9 8v10h-6v-6H9v6H3z\"/>","play":"<path d=\"M7 4l13 8-13 8z\"/>","user":"<circle cx=\"12\" cy=\"8\" r=\"4\"/><path d=\"M4 21c0-4 4-6 8-6s8 2 8 6z\"/>","swords":"<path d=\"M3 3h4l10 10-2 2-2-2-3 3-2-2 3-3zM21 3h-4l-5 5 2 2 1-1 2 2-6 6 2 2 3-3 2 2 2-2-2-2 3-3z\"/>","crown":"<path d=\"M3 7l5 4 4-7 4 7 5-4-2 12H5z\"/>","shield":"<path d=\"M12 2l8 3v6c0 5-3.5 9-8 11-4.5-2-8-6-8-11V5z\"/>","spark":"<path d=\"M12 2l2.4 6.6L21 11l-6.6 2.4L12 20l-2.4-6.6L3 11l6.6-2.4z\"/>","help":"<circle cx=\"12\" cy=\"12\" r=\"10\"/><path d=\"M9.5 9a2.5 2.5 0 115 0c0 2-2.5 2-2.5 4M12 17h0\" stroke=\"#0f0f11\" stroke-width=\"2\" fill=\"none\"/>",
  "tasks":"<path fill-rule=\"evenodd\" d=\"M7 2h2v2h6V2h2v2h2a2 2 0 012 2v13a2 2 0 01-2 2H5a2 2 0 01-2-2V6a2 2 0 012-2h2zM7.4 13.1l1.5-1.5 2.1 2.1 4.6-4.6 1.5 1.5-6.1 6.1z\"/>",
  "shop":"<path d=\"M3.6 8h16.8l-1.3 13H4.9zM8 8V6.5a4 4 0 018 0V8h-2V6.5a2 2 0 00-4 0V8z\"/>",
  "book":"<path d=\"M5 3.5A1.5 1.5 0 016.5 2H20v15H6.6a1.6 1.6 0 000 3.2H20V22H6.5A2.5 2.5 0 014 19.5v-15c0-.4.4-1 1-1zM8 6v2h8V6z\"/>",
@@ -778,7 +791,7 @@ function toast(t){const e=document.getElementById("toast");e.textContent=t;e.cla
 function needAuth(){if(!S.user){location.hash="#/login";toast("Войдите, чтобы продолжить");return true}return false}
 function empty(title,text,btn){return `<div class="empty"><div class="empty-ic">${ic("crown")}</div><b>${title}</b><p class="muted">${text}</p>${btn||""}</div>`}
 /* ===== Анимации ===== */
-const APP_V="1.7";
+const APP_V="1.8";
 // анимации включены всегда; выключить можно кнопкой «Анимации» (меню слева / низ главной)
 const RM=()=>document.documentElement.classList.contains("no-motion");
 function paintMotion(){document.querySelectorAll("[data-motion] b").forEach(b=>b.textContent=RM()?"выкл":"вкл")}
@@ -1099,7 +1112,7 @@ function pageLobby(){
   if(needAuth())return;const u=S.user;const m=S.match&&["veto","live"].includes(S.match.state)?S.match:null;
   const pt=S.party,mem=pMember(),ban=banNow(),miss=S.misses||0;
   app.innerHTML=`<div class="wrap"><h1 class="h">Матчмейкинг</h1>
-  ${m?`<div class="card pad live-banner"><div><div class="tag live">Ваш матч идёт</div><b style="font-size:18px">${MODE_NAME[m.mode]}${m.map?" · "+esc(m.map):""}${m.test?" · тест":""}</b><div class="muted" style="font-size:14px">${m.state==="veto"?"Капитаны выбирают карту":"Игра идёт — после неё капитаны загружают скриншот счёта"}</div></div><a class="btn btn-o" href="#/match/${m.id}">В комнату матча</a></div>`:""}
+  ${m?`<div class="card pad live-banner"><div><div class="tag live">Ваш матч идёт</div><b style="font-size:18px">${MODE_NAME[m.mode]}${m.map?" · "+esc(m.map):""}${m.test?" · тест":""}</b><div class="muted" style="font-size:14px">${liveNote(m)}</div></div><a class="btn btn-o" href="#/match/${m.id}">${needOk(m)?"Подтвердить результат":"В комнату матча"}</a></div>`:""}
   ${ban?banCard(ban,miss):""}
   <div class="lobby">
    <div class="card pad">
@@ -1121,7 +1134,7 @@ function pageLobby(){
        <li><span>Нажмите «Найти матч» и примите его за <b>15 секунд</b>. Не приняли — поиск закроется на время</span></li>
        <li><span>Капитаны по очереди убирают карты — остаётся одна</span></li>
        <li><span>Найдите хоста в StandLeo по ID и напишите ему «.» в личку</span></li>
-       <li><span>После игры капитаны загружают скриншот счёта — ELO пересчитается сам</span></li></ol></div>
+       <li><span>После игры капитан отмечает результат, соперники подтверждают — ELO пересчитается сам</span></li></ol></div>
      <div class="card pad"><h3>Сейчас на сайте</h3>
        <div class="qrow"><span class="muted">Онлайн</span>${L("online")}</div>
        <div class="qrow"><span class="muted">В поиске матча</span>${L("searching")}</div>
@@ -1139,7 +1152,7 @@ function pageLobby(){
 }
 const lobbyMsHtml=ms=>ms.length?ms.slice(0,4).map(mini).join(""):"Вы ещё не сыграли ни одного матча";
 // лобби перерисовывается только когда что-то важное изменилось — без мерцания
-const lobbyKey=()=>JSON.stringify([S.mode,S.searching,S.match&&[S.match.id,S.match.state,S.match.map],S.user&&[S.user.nick,S.user.elo,S.user.admin],S.party&&[S.party.leader,S.party.members.length],banNow()&&S.ban.until,S.misses]);
+const lobbyKey=()=>JSON.stringify([S.mode,S.searching,S.match&&[S.match.id,S.match.state,S.match.map,S.match.claim&&S.match.claim.at],S.user&&[S.user.nick,S.user.elo,S.user.admin],S.party&&[S.party.leader,S.party.members.length],banNow()&&S.ban.until,S.misses]);
 /* ===== Запрет поиска за непринятые матчи ===== */
 const PEN=[0,5,30,120]; // минуты: 1-й пропуск за сутки — предупреждение, 2-й — 5 мин, 3-й — 30 мин, дальше — 2 часа
 const minStr=n=>n>=60?Math.floor(n/60)+" ч"+(n%60?" "+n%60+" мин":""):n+" мин";
@@ -1294,7 +1307,7 @@ function applyState(d,fromAction){
   refreshLobby();
 }
 function onMatch(m,silent,force){
-  const prev=S.mv[m.id]?S.mv[m.id].state:null;
+  const old=S.mv[m.id],prev=old?old.state:null,oc=old&&old.claim?old.claim.at:null,nc=m.claim?m.claim.at:null;
   S.skew=m.now-Date.now();S.mv[m.id]=m;
   if(BUSY.includes(m.state)&&m.me){S.match=m;S.searching=false;stopQTimer()}else if(S.match&&S.match.id===m.id)S.match=null;
   if(m.state==="accept"&&m.me){showAccept(m);if(prev!=="accept"&&!silent){beep();flash("Матч найден!")}}
@@ -1307,8 +1320,10 @@ function onMatch(m,silent,force){
   if(prev==="veto"&&m.state==="live"){beep(true);toast("Карта матча: "+m.map)}
   if(prev&&prev!=="finished"&&m.state==="finished"){refreshMe();const me=m.players.find(p=>p.me);if(me){toast(m.winner==="draw"?"Ничья":m.winner===me.team?"Победа! ELO "+fmtD(me.delta):"Поражение. ELO "+fmtD(me.delta));if(m.winner===me.team)setTimeout(confetti,200)}}
   if(prev&&prev!=="cancelled"&&prev!=="accept"&&m.state==="cancelled")toast("Матч отменён");
+  if(old&&nc&&nc!==oc&&needOk(m)&&!silent){toast("Капитан соперников отметил результат — подтвердите или оспорьте");beep(true);flash("Подтвердите результат")}
+  if(prev==="live"&&m.state==="dispute"&&m.me&&!m.disputedMe)toast("Результат оспорен — администратор проверит матч");
   if(curHash()==="/match/"+m.id){if(force||mSig(m)!==renderMatch.sig)renderMatch(m)}
-  else if(prev!==m.state)refreshLobby();
+  else if(prev!==m.state||nc!==oc)refreshLobby();
 }
 async function act(id,a,b){
   try{const r=await api(`/api/match/${id}/${a}`,{method:"POST",body:JSON.stringify(b||{})});if(r.match)onMatch(r.match);return r}
@@ -1464,7 +1479,7 @@ function center(m){
   const mapCard=`<div class="mapbig" style="background:${mapBg(m.map)}"><div><div class="tag" style="color:#fff">Карта матча</div><b>${esc(m.map)}</b></div></div>`;
   if(m.state==="live"){
     let guide;
-    if(!me)guide=`<div class="card pad"><h3>Идёт игра</h3><p class="muted">Хост матча: <b style="color:#fff">${esc(h.nick||"")}</b>. Результат появится, когда капитаны загрузят скриншот счёта.</p></div>`;
+    if(!me)guide=`<div class="card pad"><h3>Идёт игра</h3><p class="muted">Хост матча: <b style="color:#fff">${esc(h.nick||"")}</b>. ${m.claim?`Капитан ${esc(m.claim.nick)} отметил: <b style="color:#fff">${outFor(m,claimW(m.claim))}</b> — ждём подтверждения соперников.`:"Результат появится, когда капитан отметит его, а соперники подтвердят."}</p></div>`;
     else if(me.host)guide=`<div class="card pad"><h3>Вы — хост матча</h3><ol class="steps">
       <li><b>Создайте лобби в StandLeo</b><span class="muted">Карта ${esc(m.map)} · ${MODE_NAME[m.mode]} · <b style="color:#fff">13 раундов до победы</b></span></li>
       <li><b>Ждите сообщений «.» в личке</b><span class="muted">Игроки найдут вас по вашему ID <b style="color:#fff">${esc(h.soid||"")}</b> и напишут «.» — пригласите каждого в лобби</span></li>
@@ -1475,13 +1490,13 @@ function center(m){
       <li><b>Играйте за свою команду</b><span class="muted">Карта ${esc(m.map)} · 13 раундов до победы</span></li></ol></div>`;
     return mapCard+guide+resultCard(m)+chatPh(m)+(me?`<div class="card pad"><h3>Матч не состоялся?</h3><p class="muted" style="font-size:14px">Если лобби так и не собралось — проголосуйте. Когда наберётся ${m.cancelNeed} из ${m.total} голосов, матч отменится без изменения ELO.</p><button class="btn btn-g" style="margin-top:12px" id="voteC">${me.votedCancel?"Отозвать голос":"Матч не состоялся"} · ${m.cancelVotes}/${m.cancelNeed}</button></div>`:"");
   }
-  if(m.state==="dispute")return mapCard+`<div class="card pad"><h3>Результат проверяется</h3><p class="muted">Капитаны прислали разные результаты. Администратор проверит матч и выставит итог. ELO пока не меняется.</p></div>`+chatPh(m);
+  if(m.state==="dispute")return mapCard+disputeCard(m)+chatPh(m);
   // finished
   const p=m.players.find(x=>x.me);
   const big=p?(m.winner==="draw"?"Ничья":m.winner===p.team?`<span class="w">Победа</span>`:`<span class="l">Поражение</span>`):(m.winner==="draw"?"Ничья":`Победила команда ${esc(capName(m,m.winner))}`);
   return mapCard+`<div class="card pad"><h3>Итог матча</h3><div class="resbig">${big}</div>${m.scoreA!=null?`<div class="muted" style="margin-top:4px">Счёт ${m.scoreA} : ${m.scoreB}</div>`:""}
     ${p?`<div style="margin-top:12px;font-size:18px">Ваш ELO: <b class="${p.delta>=0?"w":"l"}"${p.delta!=null?` data-count="${p.delta}" data-sign="1"`:""}>${fmtD(p.delta)}</b></div>`:""}
-    ${m.test?`<p class="muted" style="font-size:13px;margin-top:8px">Тестовый матч — рейтинг игроков не изменился.</p>`:""}
+    ${m.test?`<p class="muted" style="font-size:13px;margin-top:8px">Тестовый матч — рейтинг игроков не изменился.</p>`:HOWS[m.how]?`<p class="muted" style="font-size:13px;margin-top:8px">${HOWS[m.how]}</p>`:""}
     ${p?`<a class="btn btn-o" style="margin-top:16px" href="#/lobby">Найти новый матч</a>`:""}</div>`+fbCard(m)+chatPh(m);
 }
 /* ----- «Спасибо» и жалобы после матча ----- */
@@ -1551,43 +1566,78 @@ function addMsg(c,x,force){if(c.msgs.some(y=>y.id===x.id))return;c.msgs.push(x);
 function onChat(d){const c=S.chat;
   if(c&&c.mid===d.mid)addMsg(c,d.msg);
   if(!d.msg.me&&curHash()!=="/match/"+d.mid&&Date.now()-(S.chatT||0)>8000){S.chatT=Date.now();toast(`💬 ${d.msg.nick}: ${d.msg.t.length>70?d.msg.t.slice(0,70)+"…":d.msg.t}`)}}
+/* ----- Результат матча: капитан отмечает, соперники подтверждают или оспаривают ----- */
+const RES_BTN={win:"Мы победили",loss:"Мы проиграли",draw:"Ничья 12 : 12"};
+const HOWS={agree:"Соперники подтвердили результат.",both:"Оба капитана отметили одинаковый результат.",timeout:"Соперники не оспорили результат за 30 минут.",admin:"Итог выставил администратор после проверки."};
+function otherT(t){return t==="A"?"B":"A"}
+function claimW(c){return c.result==="draw"?"draw":c.result==="win"?c.team:otherT(c.team)}
+// исход словами: для игрока команды t — «Победа вашей команды», для зрителя — «Победа: команда Fl4mus»
+function outFor(m,w,t){return w==="draw"?"Ничья 12 : 12":w==="cancel"?"Матч не состоялся":t?(w===t?"Победа вашей команды":"Поражение вашей команды"):"Победа: команда "+esc(capName(m,w))}
+// капитан соперников отметил результат — этому игроку нужно подтвердить или оспорить
+function needOk(m){return !!(m&&m.state==="live"&&m.claim&&m.me&&m.me.team&&m.me.team!==m.claim.team)}
+function liveNote(m){return m.state==="veto"?"Капитаны выбирают карту":needOk(m)?`<b style="color:var(--orange2)">Капитан соперников отметил результат — подтвердите или оспорьте</b>`:m.claim?"Результат отмечен — ждём подтверждения соперников":"Игра идёт — после неё капитан отметит результат на сайте"}
 function resultCard(m){
-  const me=m.me;if(!me)return "";
-  const caps=["A","B"].map(t=>`<div class="qrow"><span class="muted">Капитан ${esc(capName(m,t))}</span>${m.reports[t]?`<span class="w">✓ загрузил</span>`:`<span class="muted">ждём</span>`}</div>`).join("");
-  let b;
-  if(!me.captain)b=`<p class="muted">После игры капитаны загружают скриншот со счётом — ELO пересчитается автоматически.</p>`;
-  else if(m.myReport)b=`<p>Вы отправили: <b>${resName(m.myReport.result)}${m.myReport.score?" · "+m.myReport.score.join(" : "):""}</b></p><p class="muted" style="font-size:14px">Ждём капитана соперников. Если он не загрузит скриншот за 30 минут, засчитается ваш результат.</p><label class="btn btn-g btn-sm" style="margin-top:12px">Загрузить другой скриншот<input type="file" accept="image/*" class="sr" data-shot></label>`;
-  else if(m.pendingScore)b=`<p>На скриншоте счёт <b>${m.pendingScore.join(" : ")}</b>, но не видно, кто победил.</p><p class="muted">Ваша команда выиграла?</p><div class="row2" style="margin-top:12px"><button class="btn btn-o" data-res="win">Да, мы победили</button><button class="btn btn-g" data-res="loss">Нет, проиграли</button></div>`;
-  else b=`<p class="muted" style="font-size:14px">Вы капитан. После игры сделайте скриншот итогового экрана со счётом и загрузите сюда — сайт сам определит победителя. Скриншот нигде не сохраняется.</p><label class="btn btn-o" style="margin-top:12px;width:100%">Загрузить скриншот счёта<input type="file" accept="image/*" class="sr" data-shot></label>`;
-  if(me.captain&&m.test&&!m.myReport)b+=`<div class="testbox"><div class="muted" style="font-size:13px">Тестовый матч: можно без скриншота</div><div class="row2"><button class="btn btn-g btn-sm" data-res="win">Мы победили</button><button class="btn btn-g btn-sm" data-res="loss">Мы проиграли</button></div></div>`;
-  return `<div class="card pad" id="resBox"><h3>Результат матча</h3>${b}<div style="margin-top:12px">${caps}</div></div>`;
+  const me=m.me;if(!me||!me.team)return "";
+  const c=m.claim,now=Date.now()+S.skew,chg=!!(c&&c.mine&&S.chgM===m.id);
+  if(c&&!chg){
+    const w=claimW(c),opp=me.team!==c.team;
+    const said=`<div class="claim${opp?" opp":""}"><div class="muted" style="font-size:13px">${c.mine?"Вы отметили":"Капитан "+esc(c.nick)+" отметил"}${c.n>1?" (результат изменён)":""}</div><div class="cl-res ${w==="draw"?"":w===me.team?"w":"l"}">${outFor(m,w,me.team)}</div></div>`;
+    if(opp)return `<div class="card pad res-card hot" id="resBox"><h3>Подтвердите результат</h3>${said}
+      <p class="muted" style="font-size:14px;margin-top:12px">Если результат правильный — нажмите «Всё верно». Если нет — «Оспорить», и администратор проверит матч. Без ответа результат засчитается через <b class="cdw" data-cd="${c.until}">${cdStr(c.until-now)}</b>.</p>
+      <div class="row2 resb" style="margin-top:14px"><button class="btn btn-o" data-agree>Всё верно</button><button class="btn btn-g" data-disp>Оспорить</button></div></div>`;
+    return `<div class="card pad" id="resBox"><h3>Результат матча</h3>${said}
+      <p class="muted" style="font-size:14px;margin-top:12px">${m.test?"Тестовый матч: боты-соперники сейчас подтвердят результат.":`Ждём соперников: они подтвердят результат или оспорят его. Если не ответят — он засчитается через <b class="cdw" data-cd="${c.until}">${cdStr(c.until-now)}</b>.`}</p>
+      ${m.test?"":me.captain?(c.mine&&c.left>0?`<button class="btn btn-g btn-sm" style="margin-top:12px" data-chg>Изменить результат</button>`:""):`<button class="btn btn-g btn-sm" style="margin-top:12px" data-disp>Не согласен — оспорить</button>`}</div>`;
+  }
+  if(!me.captain)return `<div class="card pad" id="resBox"><h3>Результат матча</h3><p class="muted" style="font-size:14px">После игры результат отметит капитан — <b style="color:#fff">${esc(capName(m,me.team))}</b> из вашей команды или капитан соперников. Если он будет неверным, его можно оспорить.</p></div>`;
+  const wait=!!(m.claimFrom&&m.claimFrom>now),cur=chg?c.result:null,dis=r=>wait||cur===r?" disabled":"";
+  return `<div class="card pad" id="resBox"><h3>${chg?"Изменить результат":"Чем закончился матч?"}</h3><p class="muted" style="font-size:14px">${chg?"Выберите правильный результат — соперники увидят изменение.":`Вы капитан. Когда игра закончится, отметьте результат — соперники подтвердят его${m.test?"":" или оспорят"}.`}</p>
+   <div class="row2 resb" style="margin-top:14px">${["win","loss"].map(r=>`<button class="btn ${r==="win"?"btn-o":"btn-g"}" data-res="${r}"${dis(r)}>${RES_BTN[r]}</button>`).join("")}</div>
+   <div class="res-more"><button class="lnk" data-res="draw"${dis("draw")}>${RES_BTN.draw}</button>${chg?`<button class="lnk" data-chgx>Оставить как есть</button>`:""}</div>
+   ${wait?`<div class="res-wait">${ic("lock")}<span>Кнопки откроются через <b data-cd="${m.claimFrom}">${cdStr(m.claimFrom-now)}</b> — сначала сыграйте матч</span></div>`:""}</div>`;
+}
+function disputeCard(m){
+  const me=m.me,t=me&&me.team,pr=m.proofs||[];
+  const said=(m.said||[]).map(x=>`<div class="qrow"><span class="muted">${x.cap?"Капитан "+esc(x.nick):"Оспорил(а) "+esc(x.nick)}</span><b>${outFor(m,x.w,t)}</b></div>`).join("");
+  return `<div class="card pad"><h3>Результат проверяется</h3><p class="muted" style="font-size:14px">${esc(m.disputeReason||"Результат оспорен")}. Администратор проверит матч и выставит итог — ELO пока не меняется.</p>
+   ${said?`<div style="margin-top:8px">${said}</div>`:""}
+   ${me?`<div class="proof"><div><b>Есть запись экрана или скриншот счёта?</b><div class="muted" style="font-size:13px;margin-top:2px">Отправьте их администратору через Telegram-бота — так он быстрее разберётся. На сайте файлы не сохраняются.</div></div><a class="btn btn-o" data-botl="?start=proof_${m.id}" href="https://t.me/${esc(S.bot||"")}?start=proof_${m.id}" target="_blank" rel="noopener">${ic("send")}Отправить доказательства</a></div>`:""}
+   ${pr.length?`<div class="muted" style="font-size:13px;margin-top:12px">📎 Доказательства получены: ${pr.map(x=>`<b style="color:#fff">${esc(x.nick)}</b>${x.me?" (вы)":""} — ${x.n}`).join(", ")}</div>`:""}</div>`;
+}
+function openClaim(m,res){
+  openX(`<div class="card pm" role="dialog" aria-modal="true" aria-labelledby="xH"><button type="button" class="pm-x" data-x aria-label="Закрыть">×</button><h3 id="xH">${res==="win"?"🏆 ":""}${RES_BTN[res]}?</h3>
+   <p class="muted pm-sub">${m.test?"Тестовый матч: боты-соперники сразу подтвердят результат.":"Соперники увидят результат и подтвердят его или оспорят. Если за 30 минут не оспорят — результат засчитается и ELO пересчитается."}</p>
+   ${m.test?"":`<div class="warn">${ic("alert")}<span>Отмечайте честно: за ложный результат — запрет поиска на 7 дней.</span></div>`}
+   <div class="row2" style="margin-top:16px"><button class="btn btn-o" id="clYes">Да, отметить</button><button class="btn btn-g" type="button" data-x>Отмена</button></div></div>`);
+  const y=document.getElementById("clYes");
+  y.onclick=async()=>{y.disabled=true;const r=await act(m.id,"claim",{result:res});if(!r){y.disabled=false;return}
+    S.chgM=null;closeX();toast(m.test?"Результат отмечен":"Результат отмечен — ждём ответа соперников");const x=S.mv[m.id];if(x&&curHash()==="/match/"+m.id)renderMatch(x)};
+}
+function openDispute(m){
+  const c=m.claim,me=m.me;if(!c||!me||!me.team)return;const w=claimW(c);
+  const opts=[["us","Победили мы",me.team],["them","Победили соперники",otherT(me.team)],["draw","Ничья 12 : 12","draw"],["none","Матч не состоялся","cancel"]].filter(o=>o[2]!==w);
+  openX(`<form class="card pm" id="dispF" role="dialog" aria-modal="true" aria-labelledby="xH"><button type="button" class="pm-x" data-x aria-label="Закрыть">×</button><h3 id="xH">Оспорить результат</h3>
+   <p class="muted pm-sub">Капитан ${esc(c.nick)} отметил: <b style="color:#fff">${outFor(m,w,me.team)}</b>. Как было на самом деле?</p>
+   <div class="rsn" role="radiogroup" aria-label="Чем закончился матч">${opts.map((o,i)=>`<label><input type="radio" name="sy" value="${o[0]}"${i?"":" checked"}>${o[1]}</label>`).join("")}</div>
+   <textarea class="txa" name="t" maxlength="300" placeholder="Что произошло? (необязательно)" aria-label="Комментарий"></textarea>
+   <div class="warn">${ic("alert")}<span>Матч проверит администратор. Потом отправьте ему запись экрана или скриншот итогового счёта через Telegram-бота. За ложный спор — запрет поиска на 7 дней.</span></div>
+   <div class="row2" style="margin-top:16px"><button class="btn btn-o" type="submit">Оспорить</button><button class="btn btn-g" type="button" data-x>Отмена</button></div></form>`);
+  const f=document.getElementById("dispF");f.onsubmit=async e=>{e.preventDefault();const b=f.querySelector("[type=submit]");b.disabled=true;
+    const r=await act(m.id,"dispute",{says:f.sy.value,text:f.t.value});if(r){closeX();toast("Результат оспорен — администратор проверит матч")}else b.disabled=false};
 }
 function bindMatch(m){
   app.querySelectorAll("[data-ban]").forEach(x=>x.onclick=()=>{app.querySelectorAll("[data-ban]").forEach(y=>y.disabled=true);act(m.id,"ban",{map:x.dataset.ban})});
-  app.querySelectorAll("[data-res]").forEach(x=>x.onclick=()=>{x.disabled=true;act(m.id,"confirm",{result:x.dataset.res})});
+  app.querySelectorAll("[data-res]").forEach(x=>x.onclick=()=>openClaim(m,x.dataset.res));
+  app.querySelectorAll("[data-agree]").forEach(x=>x.onclick=()=>{x.disabled=true;act(m.id,"agree")});
+  app.querySelectorAll("[data-disp]").forEach(x=>x.onclick=()=>openDispute(S.mv[m.id]||m));
+  app.querySelectorAll("[data-chg],[data-chgx]").forEach(x=>x.onclick=()=>{S.chgM="chg" in x.dataset?m.id:null;renderMatch(S.mv[m.id]||m)});
   app.querySelectorAll("[data-acc]").forEach(x=>x.onclick=()=>{x.disabled=true;act(m.id,"accept")});
-  app.querySelectorAll("[data-shot]").forEach(x=>x.onchange=()=>uploadShot(m.id,x.files[0]));
   app.querySelectorAll("[data-copy]").forEach(x=>x.onclick=()=>{navigator.clipboard.writeText(x.dataset.copy).then(()=>toast("ID скопирован"),()=>toast("Не удалось скопировать"))});
   const v=document.getElementById("voteC");if(v)v.onclick=()=>{v.disabled=true;act(m.id,"cancel")};
-}
-// готовим скриншот: уменьшаем до 2000px + делаем контрастную ч/б копию для распознавания
-async function prepShot(file){
-  const img=await createImageBitmap(file);const k=Math.min(1,2000/Math.max(img.width,img.height));
-  const w=Math.round(img.width*k),h=Math.round(img.height*k),c=document.createElement("canvas");c.width=w;c.height=h;
-  const x=c.getContext("2d");x.drawImage(img,0,0,w,h);const orig=c.toDataURL("image/jpeg",.85);
-  const d=x.getImageData(0,0,w,h),p=d.data;let sum=0;
-  for(let i=0;i<p.length;i+=4){const g=.299*p[i]+.587*p[i+1]+.114*p[i+2];p[i]=g;sum+=g}
-  const inv=sum/(p.length/4)<128; // тёмный экран — инвертируем, чтобы текст стал тёмным на светлом
-  for(let i=0;i<p.length;i+=4){let g=inv?255-p[i]:p[i];g=Math.max(0,Math.min(255,(g-128)*1.6+128));p[i]=p[i+1]=p[i+2]=g}
-  x.putImageData(d,0,0);return [orig,c.toDataURL("image/jpeg",.85)];
-}
-async function uploadShot(id,file){
-  if(!file)return;if(!/^image\//.test(file.type))return toast("Выберите картинку");
-  const box=document.getElementById("resBox");if(box)box.innerHTML=`<h3>Результат матча</h3><div class="scan"><span class="spin"></span>Распознаём скриншот… Это может занять до 30 секунд</div>`;
-  let imgs;try{imgs=await prepShot(file)}catch{toast("Не удалось прочитать картинку");return renderMatch(S.mv[id])}
-  const r=await act(id,"report",{image:imgs[0],image2:imgs[1]});
-  if(r&&r.needResult)toast("Счёт распознан — подтвердите результат");else if(r&&r.ok&&r.match.state==="live")toast("Результат отправлен");
-  if(!r&&curHash()==="/match/"+id)renderMatch(S.mv[id]);
+  if(app.querySelector("[data-botl]"))paintBot();
+  // кнопки результата открываются через 10 минут после начала игры — перерисуем комнату в этот момент
+  clearTimeout(S.enT);const now=Date.now()+S.skew;
+  if(m.state==="live"&&m.claimFrom&&m.claimFrom>now)S.enT=setTimeout(()=>{const x=S.mv[m.id];if(x&&curHash()==="/match/"+m.id)renderMatch(x)},m.claimFrom-now+300);
 }
 /* ----- Админка ----- */
 const ADM_TABS=[["","Матчи"],["reports","Жалобы","admR"],["support","Поддержка","admT"]];
@@ -1598,17 +1648,25 @@ async function pageAdmin(tab){
   if(needAuth())return;
   if(!S.user.admin){app.innerHTML=`<div class="wrap">${empty("Нет доступа","Эта страница только для администраторов")}</div>`;return}
   tab=["reports","support"].includes(tab)?tab:"";
-  const sub={"":"Идущие и спорные матчи. Спорный — когда капитаны прислали разные результаты.",reports:"Жалобы игроков после матчей. Можно закрыть жалобу или закрыть нарушителю поиск матчей.",support:"Обращения в поддержку. Ответ придёт игроку на сайт и в Telegram."}[tab];
+  const sub={"":"Идущие и спорные матчи. Спорный — когда результат оспорили или капитаны отметили разное. Доказательства от игроков приходят вам в Telegram.",reports:"Жалобы игроков после матчей. Можно закрыть жалобу или закрыть нарушителю поиск матчей.",support:"Обращения в поддержку. Ответ придёт игроку на сайт и в Telegram."}[tab];
   app.innerHTML=`<div class="wrap"><h1 class="h">Админка</h1><div class="tabs" id="admTabs" style="margin-top:-6px">${ADM_TABS.map(([k,t])=>`<a href="#/admin${k?"/"+k:""}" data-tab="${k}" class="${tab===k?"on":""}">${t}<span class="nb z">0</span></a>`).join("")}</div><p class="muted" style="margin:-6px 0 20px">${sub}</p><div id="adm" class="grid"><div class="card">${skel(3)}</div></div></div>`;entered();paintAdmTabs();
   if(tab==="reports")return admReports();if(tab==="support")return admSupport();
   const list=await api("/api/admin/matches").catch(()=>[]);const el=document.getElementById("adm");if(!el)return;
-  if(!list.length){el.innerHTML=`<div class="card">${empty("Сейчас нет идущих матчей","Здесь появятся идущие матчи и матчи, где капитаны не сошлись в результате")}</div>`;return}
-  const rep=(m,t)=>m.reports[t]?`${resName(m.reports[t].result)}${m.reports[t].score?" "+m.reports[t].score.join(":"):""}`:"ещё нет";
-  el.innerHTML=list.map(m=>`<div class="card pad"><div class="adm-h"><div><span class="st st-${m.state}" style="display:inline-block;font-size:12px;font-weight:800;padding:4px 10px;border-radius:4px;background:var(--card2);text-transform:uppercase">${ST[m.state]}</span> <b>${MODE_NAME[m.mode]} · ${esc(m.map||"карта ещё выбирается")}</b>${m.test?' <span class="pill">тест</span>':""}<div class="muted" style="font-size:13px;margin-top:4px">Матч #${m.id} · ${new Date(m.created).toLocaleString("ru-RU")}</div></div><a class="btn btn-g btn-sm" href="#/match/${m.id}">Открыть</a></div>
-    <div style="font-size:14px;margin:12px 0">Капитан ${esc(capName(m,"A"))}: <b>${rep(m,"A")}</b><span class="muted"> · </span>Капитан ${esc(capName(m,"B"))}: <b>${rep(m,"B")}</b></div>
-    <div class="row2">${m.map?`<button class="btn btn-o btn-sm" data-w="A" data-id="${m.id}">Победа: команда ${esc(capName(m,"A"))}</button><button class="btn btn-o btn-sm" data-w="B" data-id="${m.id}">Победа: команда ${esc(capName(m,"B"))}</button><button class="btn btn-g btn-sm" data-w="draw" data-id="${m.id}">Ничья</button>`:""}<button class="btn btn-g btn-sm" data-w="cancel" data-id="${m.id}">Отменить матч</button></div></div>`).join("");
+  if(!list.length){el.innerHTML=`<div class="card">${empty("Сейчас нет идущих матчей","Здесь появятся идущие матчи и матчи, где результат оспорили")}</div>`;return}
+  const ow=(m,w)=>w==="draw"?"Ничья":w==="cancel"?"Матч не состоялся":"Победа команды "+esc(capName(m,w));
+  const rep=(m,t)=>{const r=m.reports[t];return r?`<b>${resName(r.result)}</b> <span class="muted">· отметил в ${cmTime(r.at)}${r.n>1?", менял результат":""}</span>`:`<span class="muted">ещё не отмечал</span>`};
+  el.innerHTML=list.map(m=>{const d=m.disputedBy,pr=m.proofs||[],any=Object.keys(m.reports||{}).length||d;
+    return `<div class="card pad"><div class="adm-h"><div><span class="st st-${m.state}" style="display:inline-block;font-size:12px;font-weight:800;padding:4px 10px;border-radius:4px;background:var(--card2);text-transform:uppercase">${ST[m.state]}</span> <b>${MODE_NAME[m.mode]} · ${esc(m.map||"карта ещё выбирается")}</b>${m.test?' <span class="pill">тест</span>':""}<div class="muted" style="font-size:13px;margin-top:4px">Матч #${m.id} · ${new Date(m.created).toLocaleString("ru-RU")}</div></div><a class="btn btn-g btn-sm" href="#/match/${m.id}">Открыть</a></div>
+    ${m.map?`<div class="adm-res"><div>Капитан ${esc(capName(m,"A"))}: ${rep(m,"A")}</div><div>Капитан ${esc(capName(m,"B"))}: ${rep(m,"B")}</div>
+      ${m.until?`<div class="muted">Соперники могут оспорить ещё <b class="cdw" data-cd="${m.until}">${cdStr(m.until-Date.now()-S.skew)}</b>, потом результат засчитается сам</div>`:""}
+      ${d?`<div class="adm-d"><b>⚠️ Оспорил(а) ${esc(d.nick)}</b> <span class="muted">· команда ${esc(capName(m,d.team))}, в ${cmTime(d.at)}</span><div style="margin-top:4px">Говорит: <b>${ow(m,d.says)}</b></div>${d.text?`<div class="msg">${esc(d.text)}</div>`:""}</div>`:""}
+      ${m.state==="dispute"||pr.length?`<div>📎 Доказательства: ${pr.length?pr.map(x=>`<b>${esc(x.nick)}</b> — ${x.n}`).join(", ")+` <span class="muted">· файлы пришли вам в Telegram</span>`:`<span class="muted">пока нет — игроки отправляют их боту, файлы придут вам в Telegram</span>`}</div>`:""}</div>`:`<div style="height:12px"></div>`}
+    ${any&&!m.test?`<label class="chk adm-pun"><input type="checkbox" data-pun><span>Наказать за ложный результат — запрет поиска на 7 дней тем, кто указал другой итог</span></label>`:""}
+    <div class="row2" style="margin-top:12px">${m.map?`<button class="btn btn-o btn-sm" data-w="A" data-id="${m.id}">Победа: команда ${esc(capName(m,"A"))}</button><button class="btn btn-o btn-sm" data-w="B" data-id="${m.id}">Победа: команда ${esc(capName(m,"B"))}</button><button class="btn btn-g btn-sm" data-w="draw" data-id="${m.id}">Ничья</button>`:""}<button class="btn btn-g btn-sm" data-w="cancel" data-id="${m.id}">Отменить матч</button></div></div>`}).join("");
   rise(el.children,60,400);
-  el.querySelectorAll("[data-w]").forEach(b=>b.onclick=async()=>{if(!confirm(b.dataset.w==="cancel"?"Отменить матч? ELO не изменится.":"Выставить результат: «"+b.textContent+"»?"))return;try{await api(`/api/admin/match/${b.dataset.id}/resolve`,{method:"POST",body:JSON.stringify({winner:b.dataset.w})});toast("Готово");pageAdmin()}catch(e){toast(e.message)}});
+  el.querySelectorAll("[data-w]").forEach(b=>b.onclick=async()=>{const pc=b.closest(".card").querySelector("[data-pun]"),pun=!!(pc&&pc.checked);
+    if(!confirm((b.dataset.w==="cancel"?"Отменить матч? ELO не изменится.":"Выставить результат: «"+b.textContent+"»?")+(pun?"\n\nТем, кто указал другой итог, поиск закроется на 7 дней.":"")))return;
+    try{const r=await api(`/api/admin/match/${b.dataset.id}/resolve`,{method:"POST",body:JSON.stringify({winner:b.dataset.w,punish:pun})});toast(r.punished&&r.punished.length?"Готово. Поиск закрыт на 7 дней: "+r.punished.join(", "):"Готово");pageAdmin()}catch(e){toast(e.message)}});
 }
 async function admReports(){
   const d=await api("/api/admin/reports").catch(()=>null),el=document.getElementById("adm");if(!el||curHash()!=="/admin/reports")return;
@@ -1679,10 +1737,10 @@ function pageRules(sec){
    <div class="card" id="r-account"><h2>${ic("user")}Аккаунт</h2>${li(["Один игрок — один аккаунт. Привязывайте только свой игровой ID.","Аккаунт подтверждается скриншотом экрана «Мой профиль» через Telegram-бота.","Забыли пароль — на странице входа нажмите «Забыли пароль?»: код придёт от нашего Telegram-бота. Не помните email — напишите боту /password.","Нельзя играть с чужого аккаунта или давать играть другим со своего (бустинг)."])}</div>
    <div class="card" id="r-accept"><h2>${ic("play")}Поиск и принятие матча</h2>${li(["Найденный матч нужно принять за <b>15 секунд</b>. Не приняли или отклонили — штраф: поиск матчей закрывается на время.","Пропуски считаются за последние 24 часа. Тестовые матчи не считаются.","Если сайт обновлялся, пока шло принятие, — штрафа нет."])}
      <div class="pen"><div><span>1-й пропуск за сутки</span><b>Предупреждение</b></div><div><span>2-й пропуск</span><b>Поиск закрыт на 5 минут</b></div><div><span>3-й пропуск</span><b>30 минут</b></div><div><span>4-й и дальше</span><b>2 часа</b></div></div></div>
-   <div class="card" id="r-match"><h2>${ic("swords")}Матч</h2>${li(["Хост создаёт лобби в StandLeo на выбранной карте — 13 раундов до победы.","Игроки находят хоста по ID и пишут ему «.» в личные сообщения — он приглашает в лобби.","Играйте за свою команду до конца матча. Уходить из матча нельзя.","Если лобби так и не собралось — проголосуйте «Матч не состоялся», ELO не изменится.","После игры капитаны загружают честный скриншот итогового экрана. Подделка результата — запрет поиска."])}</div>
+   <div class="card" id="r-match"><h2>${ic("swords")}Матч</h2>${li(["Хост создаёт лобби в StandLeo на выбранной карте — 13 раундов до победы.","Игроки находят хоста по ID и пишут ему «.» в личные сообщения — он приглашает в лобби.","Играйте за свою команду до конца матча. Уходить из матча нельзя.","Если лобби так и не собралось — проголосуйте «Матч не состоялся», ELO не изменится.","После игры капитан отмечает результат на сайте: «Мы победили» или «Мы проиграли». Кнопки открываются через 10 минут после начала игры.","Соперники подтверждают результат или оспаривают его в течение 30 минут. Не ответили — результат засчитывается.","Оспоренный матч проверяет администратор. Записывайте экран во время игры: запись или скриншот итогового счёта — лучшее доказательство, его можно отправить нашему Telegram-боту.","Ложный результат или ложный спор — запрет поиска на 7 дней."])}</div>
    <div class="card" id="r-anticheat"><h2>${ic("shield")}Античит и честная игра</h2>${li(["Запрещены читы, макросы, изменённые версии игры и любые программы, дающие преимущество.","Запрещены договорные матчи и намеренный проигрыш.","Запрещены оскорбления, угрозы, спам и реклама — в том числе в чате матча.","Заметили нарушение — после матча нажмите «Жалоба» рядом с игроком в комнате матча. Администратор проверит."])}</div>
-   <div class="card" id="r-penalties"><h2>${ic("crown")}Наказания</h2>${li(["Предупреждение или запрет поиска матчей на 1 день или на 7 дней — решает администратор.","За серьёзные и повторные нарушения ограничения могут быть дольше.","Считаете наказание ошибкой — напишите в <a href='#/support' style='color:var(--orange2)'>поддержку</a>."])}</div>
-   <div class="card" id="r-privacy"><h2>${ic("help")}Конфиденциальность</h2>${li(["Мы храним ник, email, игровой ID, регион, аватар, историю матчей и Telegram-чат для уведомлений и восстановления пароля.","Скриншоты профиля и результатов только распознаются и нигде не сохраняются.","Пароль хранится в зашифрованном виде.","Мы не передаём ваши данные третьим лицам."])}</div>
+   <div class="card" id="r-penalties"><h2>${ic("crown")}Наказания</h2>${li(["Предупреждение или запрет поиска матчей на 1 день или на 7 дней — решает администратор.","Ложный результат матча или ложный спор — запрет поиска на 7 дней.","За серьёзные и повторные нарушения ограничения могут быть дольше.","Считаете наказание ошибкой — напишите в <a href='#/support' style='color:var(--orange2)'>поддержку</a>."])}</div>
+   <div class="card" id="r-privacy"><h2>${ic("help")}Конфиденциальность</h2>${li(["Мы храним ник, email, игровой ID, регион, аватар, историю матчей и Telegram-чат для уведомлений и восстановления пароля.","Скриншоты профиля только распознаются и нигде не сохраняются.","Доказательства по матчам (видео и скриншоты) бот пересылает администратору в Telegram — на сайте они не хранятся.","Пароль хранится в зашифрованном виде.","Мы не передаём ваши данные третьим лицам."])}</div>
   </div></div>`;entered();
   const t=sec&&document.getElementById("r-"+sec);if(t){setTimeout(()=>{t.scrollIntoView({behavior:RM()?"auto":"smooth",block:"start"});t.classList.add("hl")},60)}
 }
@@ -1692,7 +1750,8 @@ const FAQ=[["Бот не принимает скриншот профиля","Н
  ["Забыл пароль или email","На странице входа нажмите «Забыли пароль?» — код придёт в Telegram от нашего бота (того, через которого вы подтверждали аккаунт). Не помните email — напишите боту команду /password: он покажет email для входа и пришлёт ссылку для нового пароля."],
  ["Почему у меня закрыт поиск матчей?","Скорее всего, вы не приняли несколько найденных матчей за сутки. 1-й пропуск — предупреждение, 2-й — 5 минут, 3-й — 30 минут, дальше — 2 часа. Сколько осталось, видно в «Играть»."],
  ["Как зайти в матч?","Когда карта выбрана, в комнате матча появится ID хоста. Найдите его в StandLeo, напишите «.» в личные сообщения — хост пригласит вас в лобби."],
- ["Засчитали неверный результат","Если капитаны прислали разные результаты, матч проверит администратор. Если результат уже засчитан неверно — напишите сюда и укажите номер матча (он есть в комнате матча)."],
+ ["Как отметить результат матча?","После игры капитан нажимает в комнате матча «Мы победили» или «Мы проиграли» — кнопки открываются через 10 минут после начала. Соперники подтверждают результат или оспаривают его в течение 30 минут. Если не ответят — результат засчитается сам."],
+ ["Засчитали неверный результат","Пока результат не засчитан — нажмите «Оспорить» в комнате матча и отправьте Telegram-боту запись экрана или скриншот итогового счёта: администратор проверит матч. Если результат уже засчитан — напишите сюда и укажите номер матча (он есть в комнате матча)."],
  ["Как получить монеты?","Выполняйте ежедневные задания и забирайте бонус за вход в разделе «Задания». Монеты пригодятся в магазине — он скоро откроется."],
  ["Как пожаловаться на игрока?","После матча откройте комнату матча и нажмите «Жалоба» рядом с игроком — это быстрее, чем писать в поддержку."]];
 function supHtml(list){
@@ -1759,7 +1818,7 @@ async function pageLeaderboard(){
 function route(){
   S.enter=true;
   const h=location.hash.slice(1)||"/";const [,a,b]=h.split("/");
-  renderChrome("/"+(a||""));window.scrollTo(0,0);clearInterval(matchPoll);closeInvite();closeX();closeMore();
+  renderChrome("/"+(a||""));window.scrollTo(0,0);clearInterval(matchPoll);clearTimeout(S.enT);S.chgM=null;closeInvite();closeX();closeMore();
   if(!a)pageHome();else if(a==="login")pageAuth("login");else if(a==="register")pageAuth("register");else if(a==="verify")pageVerify();
   else if(a==="forgot")pageForgot();else if(a==="reset")pageReset(b);else if(a==="password")pagePassword();
   else if(a==="lobby")pageLobby();else if(a==="profile")pageProfile();else if(a==="player")pageProfile(decodeURIComponent(b));

@@ -143,7 +143,7 @@ async function handlePhoto(msg) {
   const chatId = msg.chat.id;
   const u = db.users.find(x => x.tgChat === chatId && !x.verified);
   const done = !u && verified().find(x => x.tgChat === chatId);
-  if (done) return say(chatId, `✅ Аккаунт <b>${escH(done.nick)}</b> уже подтверждён — скриншоты профиля больше не нужны.\n\nЗабыли пароль? Отправьте /password`);
+  if (done) return say(chatId, `✅ Аккаунт <b>${escH(done.nick)}</b> уже подтверждён — скриншоты профиля больше не нужны.\n\n${proofs.HINT}\nЗабыли пароль? Отправьте /password`);
   if (!u) return say(chatId, 'Сначала зарегистрируйтесь на сайте и нажмите кнопку «Открыть бота» на странице подтверждения, или пришлите сюда 6-значный код с сайта.\n' + go('/#/register'));
   if (botBusy.has(chatId)) return say(chatId, '⏳ Ещё проверяю предыдущий скриншот — подождите несколько секунд.');
   botBusy.add(chatId);
@@ -180,8 +180,12 @@ async function handlePhoto(msg) {
 async function onUpdate(upd) {
   const msg = upd.message; if (!msg || msg.chat.type !== 'private') return;
   const text = (msg.text || '').trim();
-  if (msg.photo || (msg.document && /^image\//.test(msg.document.mime_type || ''))) return handlePhoto(msg);
+  // доказательства по матчу: кнопка «Отправить доказательства» на сайте открывает бота с /start proof_<id>
+  const pf = text.match(/^\/start\s+proof_([a-f0-9]{4,20})$/i);
+  if (pf) return proofs.start(msg.chat.id, pf[1].toLowerCase());
   if (account.isCmd(text)) return account.botReset(msg.chat.id);
+  if (await proofs.handle(msg)) return;
+  if (msg.photo || (msg.document && /^image\//.test(msg.document.mime_type || ''))) return handlePhoto(msg);
   const m = text.match(/^\/start\s+(\d{6})$/) || text.match(/^(\d{6})$/);
   if (m) return linkChat(msg.chat.id, m[1]);
   const mine = verified().filter(x => x.tgChat === msg.chat.id);
@@ -214,11 +218,12 @@ const account = require('./account')({ db, save, hash, check, say, escH, siteUrl
 const tasks = require('./tasks')({ db, save, sendTo });
 // ---------- матчи ----------
 let party = null; // модуль пати (подключается ниже)
-match = require('./match')({ db, save, sendTo, broadcast, siteUrl: SITE_URL,
-  ocr: buf => ocr(buf, 'eng+rus'), avatarOf: u => pub(u).avatar, tell: tgUser, alertAdmins,
+match = require('./match')({ db, save, sendTo, broadcast, siteUrl: SITE_URL, avatarOf: u => pub(u).avatar, tell: tgUser, alertAdmins,
   partyOf: uid => (party ? party.partyOf(uid) : null), isOnline,
   pushState: (uid, extra) => sendTo(uid, { ...stateOf(uid), ...extra }), onPartyChange: pt => party && party.pushParty(pt),
   isAdminId: uid => isAdmin(db.users.find(u => u.id === uid)), adminIds: () => adminUsers().map(u => u.id), onFinish: m => tasks.onFinish(m) });
+// ---------- доказательства по матчам: файлы из бота пересылаются администраторам ----------
+const proofs = require('./proofs')({ db, tg, say, escH, go, match, isCmd: account.isCmd, adminChats: () => [...new Set(adminUsers().map(u => u.tgChat).filter(Boolean))] });
 // ---------- друзья ----------
 const friends = require('./friends')({ db, save, sendTo, tell: tgUser, go, pub, isOnline, matchOf: uid => match.matchOf(uid) });
 // ---------- пати ----------
@@ -235,8 +240,6 @@ support = require('./support')({ db, save, sendTo, tell: tgUser, go, escH, alert
 const send = (res, code, obj) => { res.writeHead(code, { 'Content-Type': 'application/json; charset=utf-8' }); res.end(JSON.stringify(obj)); };
 // тело запроса; слишком большое не читаем дальше и возвращаем { tooBig: true }
 const body = (req, max = 8e5) => new Promise(r => { let b = '', big = false; req.on('data', c => { if (big) return; b += c; if (b.length > max) { big = true; b = ''; } }); req.on('end', () => { if (big) return r({ tooBig: true }); try { r(JSON.parse(b || '{}')); } catch { r({}); } }); req.on('error', () => r({})); });
-const ocrBusy = new Set(); // один скриншот за раз от каждого игрока
-const dataImg = s => { const m = /^data:image\/(jpeg|png|webp);base64,([A-Za-z0-9+/=]+)$/.exec(String(s || '')); return m ? Buffer.from(m[2], 'base64') : null; };
 const authUser = req => { const t = (req.headers.authorization || '').replace('Bearer ', ''); const id = sessions.get(t); return db.users.find(u => u.id === id && u.verified); };
 const MIME = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript; charset=utf-8', '.css': 'text/css', '.png': 'image/png', '.svg': 'image/svg+xml', '.webmanifest': 'application/manifest+json; charset=utf-8', '.json': 'application/json; charset=utf-8', '.ico': 'image/x-icon' };
 
@@ -324,7 +327,7 @@ http.createServer(async (req, res) => {
   if (p === '/api/search') { const q = (url.searchParams.get('q') || '').toLowerCase(); return send(res, 200, verified().filter(u => u.nick.toLowerCase().includes(q)).slice(0, 10).map(pub)); }
   // ---------- матчи ----------
   if (p === '/api/matches') { const n = (url.searchParams.get('player') || '').toLowerCase(); return send(res, 200, match.history(n || null, isAdmin(authUser(req)))); }
-  const mm = p.match(/^\/api\/match\/([a-f0-9]+)(?:\/(accept|decline|ban|report|confirm|cancel|chat|commend|flag))?$/);
+  const mm = p.match(/^\/api\/match\/([a-f0-9]+)(?:\/(accept|decline|ban|claim|confirm|agree|dispute|cancel|chat|commend|flag))?$/);
   if (mm) {
     const m = match.find(mm[1]); if (!m) return send(res, 404, { error: 'Матч не найден' });
     const u = authUser(req);
@@ -338,22 +341,17 @@ http.createServer(async (req, res) => {
     }
     if (req.method !== 'POST') return send(res, 405, { error: 'Нужен POST' });
     if (!u) return send(res, 401, { error: 'Войдите в аккаунт' });
-    const b = await body(req, mm[2] === 'report' ? 6e6 : 8e5);
+    const b = await body(req, 2e4);
     let r = { ok: true };
     if (mm[2] === 'accept') match.accept(m.id, u.id);
     else if (mm[2] === 'decline') match.decline(m.id, u.id);
     else if (mm[2] === 'ban') r = match.ban(m.id, u.id, String(b.map || ''));
-    else if (mm[2] === 'confirm') r = match.confirm(m.id, u.id, String(b.result || ''));
+    else if (mm[2] === 'claim' || mm[2] === 'confirm') r = match.claim(m.id, u.id, String(b.result || '')); // confirm — старое название
+    else if (mm[2] === 'agree') r = match.agree(m.id, u.id);
+    else if (mm[2] === 'dispute') r = match.dispute(m.id, u.id, String(b.says || ''), b.text);
     else if (mm[2] === 'cancel') r = match.voteCancel(m.id, u.id);
     else if (mm[2] === 'commend') r = feedback.commend(u, m.id, b.nick);
     else if (mm[2] === 'flag') r = feedback.flag(u, m.id, b.nick, String(b.reason || ''), b.text);
-    else {
-      if (b.tooBig) return send(res, 413, { error: 'Картинка слишком большая' });
-      const imgs = [b.image2, b.image].map(dataImg).filter(Boolean); // сначала контрастная копия, потом оригинал
-      if (!imgs.length) return send(res, 400, { error: 'Неверный формат картинки' });
-      if (ocrBusy.has(u.id)) return send(res, 429, { error: 'Предыдущий скриншот ещё распознаётся, подождите' });
-      ocrBusy.add(u.id); try { r = await match.report(m.id, u.id, imgs); } finally { ocrBusy.delete(u.id); }
-    }
     return send(res, r.error ? 400 : 200, { ...r, match: match.view(match.find(m.id), u.id) });
   }
   if (p === '/api/friends' || p.startsWith('/api/friends/')) {
@@ -420,7 +418,7 @@ http.createServer(async (req, res) => {
   const am = p.match(/^\/api\/admin\/match\/([a-f0-9]+)\/resolve$/);
   if (am && req.method === 'POST') {
     const u = authUser(req); if (!isAdmin(u)) return send(res, 403, { error: 'Только для администратора' });
-    const r = match.adminResolve(am[1], String((await body(req)).winner || '')); return send(res, r.error ? 400 : 200, r);
+    const b = await body(req, 2e3), r = match.adminResolve(am[1], String(b.winner || ''), !!b.punish); return send(res, r.error ? 400 : 200, r);
   }
 
   let f = path.join(PUB, p === '/' ? 'index.html' : path.normalize(p).replace(/^(\.\.[\/\\])+/, ''));

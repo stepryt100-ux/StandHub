@@ -1,11 +1,17 @@
-// match.js — очередь, «матч найден», команды, вето карт, хост, результаты по скриншотам, ELO
+// match.js — очередь, «матч найден», команды, вето карт, хост, результат (капитан отмечает — соперники подтверждают или оспаривают), ELO
 const crypto = require('crypto');
 const MODES = { '5v5': 10, '2v2': 4, '1v1': 2 };
 const MODE_NAME = { '5v5': '5 на 5', '2v2': '2 на 2', '1v1': '1 на 1' };
 const MAPS = ['Sandstone', 'Rust', 'Province', 'Zone 7', 'Hanami', 'Breeze', 'Dune', 'Sakura'];
 const ACCEPT_SEC = 15, BAN_SEC = 20;
-const SINGLE_REPORT_WAIT = 30 * 60e3; // если загрузил только один капитан — ждём второго 30 минут
+const CLAIM_MIN = 10 * 60e3;           // отметить результат можно через 10 минут после начала игры (тестовые матчи — сразу)
+const CLAIM_WAIT = 30 * 60e3;          // соперники могут оспорить результат 30 минут, потом он засчитывается
+const REMIND_LEFT = 10 * 60e3;         // за 10 минут до конца — напоминание соперникам
+const CAP_REMIND = 60 * 60e3;          // через час игры без результата — напоминание капитанам
 const MATCH_TTL = 3 * 3600e3;          // матч без результата отменяется через 3 часа
+const FALSE_BAN = 7 * 24 * 3600e3;     // ложный результат или ложный спор — запрет поиска на 7 дней
+const CHANGES = 3;                     // капитан может отметить результат максимум 3 раза (2 изменения)
+const PROOF_MAX = 10;                  // доказательств от одного игрока по одному матчу
 const K = 50;                          // равные команды: +25 / −25
 const DAY = 24 * 3600e3;
 // штраф за непринятый матч (считаем пропуски за последние сутки): 1-й — предупреждение, 2-й — 5 минут, 3-й — 30 минут, дальше — 2 часа
@@ -20,9 +26,11 @@ const leftStr = ts => { const m = Math.max(1, Math.ceil((ts - Date.now()) / 60e3
 const rnd = (a, b) => a + Math.floor(Math.random() * (b - a + 1));
 const other = t => (t === 'A' ? 'B' : 'A');
 const players = n => n + ' ' + (n % 10 === 1 && n % 100 !== 11 ? 'игрок' : n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 12 || n % 100 > 14) ? 'игрока' : 'игроков');
+const esc = s => String(s).replace(/[&<>]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c]));
+const clean = (s, n) => String(s || '').replace(/[\u0000-\u0009\u000b-\u001f\u007f\u200b-\u200f\u202a-\u202e\u2066-\u2069]/g, ' ').replace(/[ \t]+/g, ' ').replace(/\n{3,}/g, '\n\n').trim().slice(0, n);
 
 module.exports = function (ctx) {
-  const { db, save, sendTo, broadcast, ocr, avatarOf } = ctx;
+  const { db, save, sendTo, broadcast, avatarOf } = ctx;
   const tell = ctx.tell || (() => {}), alertAdmins = ctx.alertAdmins || (() => {}), site = ctx.siteUrl || '';
   // пати: кто с кем в одной группе (модуль party.js подключается позже), кто на сайте, отправка состояния игроку
   const partyOf = uid => (ctx.partyOf ? ctx.partyOf(uid) : null);
@@ -160,7 +168,7 @@ module.exports = function (ctx) {
       players: users.map(u => ({ id: u.id, nick: u.nick, elo: u.elo, soid: u.soid, avatar: u.bot ? null : avatarOf(u), bot: !!u.bot, team: null })),
       groups: groups && groups.some(g => g.length > 1) ? groups : null, // пати в этом матче (играют в одной команде)
       captains: {}, host: null, maps: MAPS.slice(), bans: [], turn: null, turnDeadline: null, map: null,
-      reports: {}, pending: {}, cancelVotes: [], scoreA: null, scoreB: null, winner: null, deltas: null,
+      reports: {}, cancelVotes: [], scoreA: null, scoreB: null, winner: null, deltas: null,
     };
     db.matches.push(m); save(); notify(m); broadcast();
     for (const p of real(m)) tell(p.id, `🎮 <b>Матч найден!</b> (${MODE_NAME[mode]})\nПримите его на сайте за ${ACCEPT_SEC} секунд:\n${link(m)}`);
@@ -236,61 +244,71 @@ module.exports = function (ctx) {
     setTimeout(() => { const x = find(m.id); if (x && x.state === 'veto' && x.turn === t && x.bans.length === n) { const r = remaining(x); ban(x.id, c.id, r[rnd(0, r.length - 1)]); } }, rnd(1500, 3000));
   }
 
-  // ---------- результат по скриншоту ----------
-  function parseResult(text) {
-    const T = text.toUpperCase().replace(/Ё/g, 'Е');
-    const win = /(ПОБЕД|VICTORY|\bWIN\b|\bWON\b|\bWINNER)/.test(T), loss = /(ПОРАЖЕН|ПРОИГР|DEFEAT|\bLOSE\b|\bLOST\b)/.test(T), draw = /(НИЧЬЯ|\bDRAW\b)/.test(T);
-    let result = draw ? 'draw' : win && !loss ? 'win' : loss && !win ? 'loss' : null;
-    const ok = (a, b) => (a === 13 && b <= 12) || (b === 13 && a <= 12) || (a === 12 && b === 12);
-    let score = null;
-    const N = s => s.replace(/[OОoо]/g, '0').replace(/[IlІ|]/g, '1');
-    for (const line of T.split('\n')) { const x = N(line).match(/(\d{1,2})\s*[:\-–—]\s*(\d{1,2})/); if (x && ok(+x[1], +x[2])) { score = [+x[1], +x[2]]; break; } }
-    if (!score) { const nums = (N(T).match(/\b\d{1,2}\b/g) || []).map(Number); for (let i = 0; i < nums.length - 1; i++) if (ok(nums[i], nums[i + 1])) { score = [nums[i], nums[i + 1]]; break; } }
-    if (!result && score && score[0] === 12 && score[1] === 12) result = 'draw';
-    return { result, score };
-  }
-  async function report(mid, uid, bufs) {
-    let m = find(mid); if (!m || m.state !== 'live') return { error: 'Сейчас нельзя загрузить результат' };
-    const team = ['A', 'B'].find(t => m.captains[t] === uid); if (!team) return { error: 'Скриншот загружают только капитаны' };
-    const parsed = { result: null, score: null };
-    try {
-      for (const b of bufs) { const r = parseResult(await ocr(b)); parsed.result = parsed.result || r.result; parsed.score = parsed.score || r.score; if (parsed.result && parsed.score) break; }
-    } catch (e) { console.error(e); return { error: 'Не удалось обработать картинку, попробуйте ещё раз' }; }
-    // сам скриншот нигде не сохраняется — дальше работаем только с распознанным результатом
-    m = find(mid); if (!m || m.state !== 'live') return { error: 'Матч уже завершён' };
-    if (!parsed.result && !parsed.score) return { error: 'Не получилось распознать счёт. Загрузите чёткий скриншот итогового экрана матча целиком.' };
-    if (!parsed.result) { m.pending[team] = { score: parsed.score }; save(); notify(m); return { needResult: true, score: parsed.score }; }
-    return submit(m, team, parsed.result, parsed.score);
-  }
-  function confirm(mid, uid, result) {
-    const m = find(mid); if (!m || m.state !== 'live') return { error: 'Сейчас нельзя отправить результат' };
-    const team = ['A', 'B'].find(t => m.captains[t] === uid); if (!team) return { error: 'Результат отправляют только капитаны' };
-    if (!['win', 'loss'].includes(result)) return { error: 'Неверный ответ' };
-    if (m.pending[team]) { const sc = m.pending[team].score; return submit(m, team, result, sc); }
-    if (m.test) return submit(m, team, result, [13, rnd(3, 11)]); // тестовый матч: можно без скриншота
-    return { error: 'Сначала загрузите скриншот' };
-  }
-  function submit(m, team, result, score) {
-    m.reports[team] = { result, score, at: Date.now() }; delete m.pending[team];
-    const oc = cap(m, other(team));
-    if (m.test && oc.bot) m.reports[other(team)] = { result: result === 'draw' ? 'draw' : result === 'win' ? 'loss' : 'win', score, at: Date.now() };
-    resolve(m, false); return { ok: true };
-  }
+  // ---------- результат: капитан отмечает, соперники подтверждают или оспаривают ----------
+  // m.reports[team] = { result: 'win'|'loss'|'draw', score, at, by, n } — что отметил капитан команды (n — сколько раз отмечал)
   const winnerOf = (team, r) => (r.result === 'draw' ? 'draw' : r.result === 'win' ? team : other(team));
-  function resolve(m, force) {
-    const A = m.reports.A, B = m.reports.B;
-    if (A && B) {
-      const wa = winnerOf('A', A), wb = winnerOf('B', B);
-      if (wa === wb) return finish(m, wa, A.score || B.score);
-      m.state = 'dispute'; m.disputeReason = 'Результаты капитанов не совпадают'; save(); notify(m); broadcast();
-      alertAdmins(`⚠️ Спорный матч ${m.id} (${MODE_NAME[m.mode]}, ${m.map}): капитаны прислали разные результаты.\n${go('/#/admin')}`);
-      return;
-    }
-    if (force && (A || B)) { const t = A ? 'A' : 'B'; return finish(m, winnerOf(t, m.reports[t]), m.reports[t].score); }
+  const claimOf = m => { const ts = ['A', 'B'].filter(t => m.reports[t]); return ts.length === 1 ? { team: ts[0], ...m.reports[ts[0]] } : null; };
+  const teamName = (m, t) => 'команда ' + ((cap(m, t) || {}).nick || t);
+  // исход словами: для игрока команды t — «победа вашей команды», без t — «победа: команда Fl4mus»
+  const outWord = (m, w, t) => (w === 'draw' ? 'ничья 12 : 12' : w === 'cancel' ? 'матч не состоялся' : t ? (w === t ? 'победа вашей команды' : 'поражение вашей команды') : 'победа: ' + teamName(m, w));
+  const PROOF_HINT = '📎 Есть запись экрана или скриншот итогового счёта? Пришлите прямо сюда, в этот чат, — я передам администратору.';
+  function claim(mid, uid, result) {
+    const m = find(mid); if (!m || m.state !== 'live') return { error: 'Сейчас нельзя отметить результат' };
+    const team = ['A', 'B'].find(t => m.captains[t] === uid); if (!team) return { error: 'Результат отмечает капитан команды' };
+    if (!['win', 'loss', 'draw'].includes(result)) return { error: 'Неверный ответ' };
+    const wait = (m.liveAt || 0) + CLAIM_MIN - Date.now();
+    if (!m.test && wait > 0) return { error: `Результат можно отметить через ${minStr(Math.ceil(wait / 60e3))} — сначала сыграйте матч. Если лобби не собралось, нажмите «Матч не состоялся».` };
+    const was = m.reports[team];
+    if (was && was.result === result) return { error: 'Вы уже отметили этот результат' };
+    if (was && (was.n || 1) >= CHANGES) return { error: 'Результат уже менялся два раза. Если ошиблись — напишите в чат матча, соперники смогут его оспорить.' };
+    m.reports[team] = { result, score: result === 'draw' ? [12, 12] : null, at: Date.now(), by: uid, n: (was ? was.n || 1 : 0) + 1 };
+    m.remindLeft = false;
+    if (m.reports[other(team)]) { resolve(m); return { ok: true }; } // оба капитана отметили сами
     save(); notify(m);
+    const c = cap(m, team), w = winnerOf(team, m.reports[team]);
+    if (m.test) { // тестовый матч: боты-соперники подтверждают через пару секунд
+      const at = m.reports[team].at;
+      setTimeout(() => { const x = find(m.id), cl = x && x.state === 'live' && claimOf(x); if (cl && cl.at === at) finish(x, w, cl.score, 'agree'); }, rnd(1200, 2500));
+    } else for (const p of real(m)) if (p.team !== team) tell(p.id, `${was ? '🔁 Капитан соперников <b>' + esc(c.nick) + '</b> изменил результат' : '🏁 Капитан соперников <b>' + esc(c.nick) + '</b> отметил результат'} матча (${m.map}): <b>${outWord(m, w, p.team)}</b>.\n\nЕсли всё верно — нажмите на сайте «Всё верно». Если нет — «Оспорить» в течение 30 минут, иначе результат засчитается.\n${link(m)}`);
+    return { ok: true };
   }
-  function finish(m, winner, score) {
-    m.winner = winner;
+  // соперник подтверждает отмеченный результат — матч сразу завершается
+  function agree(mid, uid) {
+    const m = find(mid); if (!m || m.state !== 'live') return { error: 'Сейчас нельзя подтвердить результат' };
+    const p = P(m, uid), c = claimOf(m);
+    if (!c) return { error: 'Капитан ещё не отметил результат' };
+    if (!p || p.bot || p.team === c.team) return { error: 'Результат подтверждают игроки команды соперников' };
+    m.agreedBy = uid; finish(m, winnerOf(c.team, c), c.score, 'agree'); return { ok: true };
+  }
+  // любой игрок матча (кроме того, кто отметил) может оспорить результат: says — 'us' | 'them' | 'draw' | 'none' (матч не состоялся)
+  function dispute(mid, uid, says, text) {
+    const m = find(mid); if (!m || m.state !== 'live') return { error: 'Сейчас нельзя оспорить результат' };
+    const p = P(m, uid), c = claimOf(m);
+    if (!p || p.bot) return { error: 'Оспорить результат могут только игроки матча' };
+    if (!c) return { error: 'Результат ещё не отмечен' };
+    if (c.by === uid) return { error: 'Это ваш результат — его можно изменить' };
+    const w = { us: p.team, them: other(p.team), draw: 'draw', none: 'cancel' }[says];
+    if (!w) return { error: 'Выберите, чем закончился матч' };
+    if (w === winnerOf(c.team, c)) return { error: 'Капитан отметил то же самое' + (p.team !== c.team ? ' — нажмите «Всё верно»' : '') };
+    const t = clean(text, 300);
+    m.state = 'dispute'; m.disputeReason = `${p.nick} оспорил(а) результат`; m.disputedAt = Date.now();
+    m.disputedBy = { uid, nick: p.nick, team: p.team, says: w, text: t, at: Date.now() };
+    save(); notify(m); broadcast();
+    alertAdmins(`⚠️ <b>Результат оспорен</b> · матч #${m.id} (${MODE_NAME[m.mode]}, ${m.map})\nКапитан ${esc(cap(m, c.team).nick)} отметил: <b>${outWord(m, winnerOf(c.team, c))}</b>\n${esc(p.nick)} говорит: <b>${outWord(m, w)}</b>${t ? `\nКомментарий: «${esc(t)}»` : ''}\nДоказательства от игроков придут сюда, в этот чат.\n${go('/#/admin')}`);
+    for (const x of real(m)) tell(x.id, `⚠️ Результат матча (${m.map}) оспорен — ${x.id === uid ? 'вы не согласились с капитаном' : esc(p.nick) + ' не согласен(на) с ним'}. Администратор проверит матч и выставит итог, ELO пока не меняется.\n\n${PROOF_HINT}\n${link(m)}`);
+    return { ok: true };
+  }
+  // оба капитана отметили результат сами: совпало — матч завершён, нет — спор
+  function resolve(m) {
+    const A = m.reports.A, B = m.reports.B, wa = winnerOf('A', A), wb = winnerOf('B', B);
+    if (wa === wb) return finish(m, wa, A.score || B.score, 'both');
+    m.state = 'dispute'; m.disputeReason = 'Капитаны отметили разные результаты'; m.disputedAt = Date.now(); save(); notify(m); broadcast();
+    alertAdmins(`⚠️ <b>Спорный матч</b> #${m.id} (${MODE_NAME[m.mode]}, ${m.map}): капитаны отметили разные результаты.\n${esc(cap(m, 'A').nick)}: <b>${outWord(m, wa)}</b>\n${esc(cap(m, 'B').nick)}: <b>${outWord(m, wb)}</b>\nДоказательства от игроков придут сюда, в этот чат.\n${go('/#/admin')}`);
+    for (const x of real(m)) tell(x.id, `⚠️ Капитаны отметили разные результаты матча (${m.map}). Администратор проверит матч и выставит итог, ELO пока не меняется.\n\n${PROOF_HINT}\n${link(m)}`);
+  }
+  const HOW = { timeout: 'Соперники не оспорили результат за 30 минут.', admin: 'Итог выставил администратор после проверки.' };
+  function finish(m, winner, score, how) {
+    m.winner = winner; m.how = how || null;
     if (score) { const hi = Math.max(...score), lo = Math.min(...score); [m.scoreA, m.scoreB] = winner === 'A' ? [hi, lo] : winner === 'B' ? [lo, hi] : [score[0], score[1]]; }
     const avg = t => { const ps = m.players.filter(p => p.team === t); return ps.reduce((a, p) => a + p.elo, 0) / ps.length; };
     const expA = 1 / (1 + Math.pow(10, (avg('B') - avg('A')) / 400));
@@ -304,7 +322,7 @@ module.exports = function (ctx) {
     if (!m.test) try { onFinish(m); } catch (e) { console.error('onFinish', e); }
     for (const p of real(m)) {
       const d = m.deltas[p.id], res = winner === 'draw' ? 'Ничья' : winner === p.team ? '🏆 Победа' : 'Поражение';
-      tell(p.id, `${res}${m.scoreA != null ? ` ${p.team === 'A' ? m.scoreA + ':' + m.scoreB : m.scoreB + ':' + m.scoreA}` : ''} · ${m.map}\nELO: ${d >= 0 ? '+' : ''}${d}${m.test ? ' (тестовый матч — рейтинг не меняется)' : ''}\n${link(m)}`);
+      tell(p.id, `${res}${m.scoreA != null ? ` ${p.team === 'A' ? m.scoreA + ':' + m.scoreB : m.scoreB + ':' + m.scoreA}` : ''} · ${m.map}\nELO: ${d >= 0 ? '+' : ''}${d}${m.test ? ' (тестовый матч — рейтинг не меняется)' : ''}${HOW[how] ? '\n' + HOW[how] : ''}\n${link(m)}`);
     }
   }
   function cancel(m, reason) { m.state = 'cancelled'; m.cancelReason = reason; m.endedAt = Date.now(); save(); notify(m); broadcast(); }
@@ -318,11 +336,43 @@ module.exports = function (ctx) {
     else { save(); notify(m); }
     return { ok: true };
   }
-  function adminResolve(mid, winner) {
+  // решение администратора: 'A' | 'B' | 'draw' | 'cancel'. punish — запрет поиска на 7 дней тем, кто указал другой итог
+  function adminResolve(mid, winner, punish) {
     const m = find(mid); if (!m || !['live', 'dispute', 'veto', 'accept'].includes(m.state)) return { error: 'Матч уже завершён' };
-    if (winner === 'cancel') { cancel(m, 'Матч отменён администратором'); return { ok: true }; }
-    if (!['A', 'B', 'draw'].includes(winner) || !m.map) return { error: 'Неверный победитель' };
-    const r = m.reports.A || m.reports.B; finish(m, winner, r && r.score); return { ok: true };
+    if (!['A', 'B', 'draw', 'cancel'].includes(winner) || (winner !== 'cancel' && !m.map)) return { error: 'Неверный победитель' };
+    const liars = new Set();
+    if (punish && !m.test) {
+      for (const t of ['A', 'B']) { const r = m.reports[t]; if (r && winnerOf(t, r) !== winner) liars.add(r.by || m.captains[t]); }
+      const d = m.disputedBy; if (d && d.says !== winner) liars.add(d.uid);
+    }
+    if (winner === 'cancel') cancel(m, 'Матч отменён администратором');
+    else finish(m, winner, winner === 'draw' ? [12, 12] : null, 'admin');
+    const punished = [], until = Date.now() + FALSE_BAN;
+    for (const id of liars) {
+      const u = userById(id), p = P(m, id); if (!u || !p || p.bot) continue;
+      if (!(u.banUntil > until)) setBan(id, until, 'ложный результат матча');
+      punished.push(u.nick);
+      tell(id, `⛔ Администратор проверил матч (${m.map}): итог — <b>${outWord(m, winner, p.team)}</b>, а вы указали другой. Поиск матчей на StandHub закрыт на <b>7 дней</b>.\nЕсли это ошибка — напишите в поддержку: ${go('/#/support')}`);
+    }
+    if (punished.length) { m.punished = punished; save(); }
+    return { ok: true, punished };
+  }
+
+  // ---------- доказательства: игроки присылают видео и скриншоты боту, бот пересылает их администраторам ----------
+  const proofsBy = m => { const c = {}; for (const x of m.proofs || []) c[x.uid] = (c[x.uid] || 0) + 1; return Object.entries(c).map(([id, n]) => ({ id, nick: nickOf(id), n })); };
+  // можно ли прислать доказательства по матчу: игрок матча, матч идёт / оспорен или закончился меньше суток назад
+  function proofCheck(mid, uid) {
+    const m = find(mid), p = m && P(m, uid);
+    if (!m || !p || p.bot || !hasTeams(m)) return { error: 'not_player' };
+    if (!['live', 'dispute'].includes(m.state) && !(endedAt(m) && Date.now() - endedAt(m) < DAY)) return { error: 'old' };
+    return { ok: true, m, left: PROOF_MAX - (m.proofs || []).filter(x => x.uid === uid).length };
+  }
+  // спорный матч игрока (самый свежий) — туда идут файлы, присланные боту без ссылки
+  const disputedOf = uid => db.matches.filter(m => m.state === 'dispute' && m.players.some(p => p.id === uid)).sort((a, b) => (b.disputedAt || 0) - (a.disputedAt || 0))[0] || null;
+  function addProof(mid, uid, kind) {
+    const m = find(mid); if (!m) return 0;
+    m.proofs = (m.proofs || []).concat({ uid, kind, at: Date.now() }).slice(-100); saveSoon(); notify(m);
+    return m.proofs.filter(x => x.uid === uid).length;
   }
 
   // таймеры: принятие, ход в вето, ожидание результата
@@ -332,9 +382,19 @@ module.exports = function (ctx) {
       if (m.state === 'accept' && now > m.acceptDeadline) cancelAccept(m, m.players.filter(p => !m.accepted.includes(p.id)).map(p => p.id));
       else if (m.state === 'veto' && now > m.turnDeadline) { const r = remaining(m); ban(m.id, null, r[rnd(0, r.length - 1)], true); }
       else if (m.state === 'live') {
-        const reps = Object.values(m.reports);
-        if (reps.length === 1 && now - reps[0].at > SINGLE_REPORT_WAIT) resolve(m, true);
-        else if (!reps.length && now - m.liveAt > MATCH_TTL) cancel(m, 'Капитаны не загрузили результат');
+        const c = claimOf(m);
+        if (c) {
+          const left = c.at + CLAIM_WAIT - now, w = winnerOf(c.team, c);
+          if (left <= 0) finish(m, w, c.score, 'timeout');
+          else if (left <= REMIND_LEFT && !m.remindLeft && !m.test) {
+            m.remindLeft = true; save();
+            for (const p of real(m)) if (p.team !== c.team) tell(p.id, `⏰ Осталось 10 минут, чтобы оспорить результат матча (${m.map}): <b>${outWord(m, w, p.team)}</b>.\nЕсли всё верно — ничего делать не нужно, результат засчитается сам.\n${link(m)}`);
+          }
+        } else if (now - m.liveAt > MATCH_TTL) cancel(m, 'Капитаны не отметили результат');
+        else if (now - m.liveAt > CAP_REMIND && !m.capRemind && !m.test) {
+          m.capRemind = true; save();
+          for (const t of ['A', 'B']) { const c2 = cap(m, t); if (c2 && !c2.bot) tell(c2.id, `⏰ Матч на карте ${m.map} идёт уже час. Если он закончился — отметьте результат на сайте: «Мы победили» или «Мы проиграли». Если лобби не собралось — нажмите «Матч не состоялся».\nБез результата матч отменится через 2 часа.\n${link(m)}`); }
+        }
       }
     }
   }, 1000);
@@ -379,8 +439,10 @@ module.exports = function (ctx) {
   // ---------- что видит игрок ----------
   function view(m, vid) {
     const me = P(m, vid), host = P(m, m.host), myTeam = me && me.team;
-    const rep = r => r && { result: r.result, score: r.score };
-    const votes = m.cancelVotes || [];
+    const votes = m.cancelVotes || [], c = m.state === 'live' ? claimOf(m) : null, d = m.disputedBy;
+    // что сказали игроки, когда результат оспорен: капитаны (отметили) и тот, кто оспорил
+    const said = m.state === 'dispute' ? ['A', 'B'].filter(t => m.reports[t]).map(t => ({ nick: nickOf(m.reports[t].by || m.captains[t]), w: winnerOf(t, m.reports[t]), cap: true }))
+      .concat(d ? [{ nick: d.nick, w: d.says, cap: false }] : []) : null;
     // кто пришёл в матч пати: «Пати» (или «Пати 1», «Пати 2», если их несколько)
     const gl = {}; let gn = 0; for (const g of groupsOf(m)) if (g.length > 1) { gn++; for (const id of g) gl[id] = gn; }
     return {
@@ -392,8 +454,11 @@ module.exports = function (ctx) {
       maps: m.maps, bans: m.bans, turn: m.turn, turnDeadline: m.turnDeadline, map: m.map, liveAt: m.liveAt || null,
       host: host ? { nick: host.nick, soid: me ? host.soid : null } : null,
       me: me ? { team: myTeam, captain: !!myTeam && m.captains[myTeam] === vid, host: m.host === vid, votedCancel: votes.includes(vid) } : null,
-      reports: { A: !!m.reports.A, B: !!m.reports.B }, myReport: me && myTeam ? rep(m.reports[myTeam]) : null,
-      pendingScore: me && myTeam && m.pending[myTeam] ? m.pending[myTeam].score : null,
+      reports: { A: !!m.reports.A, B: !!m.reports.B },
+      claim: c ? { team: c.team, result: c.result, nick: nickOf(c.by || m.captains[c.team]), at: c.at, until: c.at + CLAIM_WAIT, mine: c.by === vid, n: c.n || 1, left: CHANGES - (c.n || 1) } : null,
+      claimFrom: m.state === 'live' && !m.test && m.liveAt ? m.liveAt + CLAIM_MIN : null,
+      said, disputedMe: !!(d && d.uid === vid), how: m.how || null,
+      proofs: hasTeams(m) && (me || isAdminId(vid)) ? proofsBy(m).map(x => ({ nick: x.nick, n: x.n, me: x.id === vid })) : [],
       cancelVotes: votes.length, cancelNeed: Math.floor(m.players.length / 2) + 1,
       scoreA: m.scoreA, scoreB: m.scoreB, winner: m.winner, cancelReason: m.cancelReason || null, disputeReason: m.disputeReason || null, finishedAt: m.finishedAt || null,
       missedMe: m.missed && vid && vid in m.missed ? m.missed[vid] : null,
@@ -416,8 +481,12 @@ module.exports = function (ctx) {
   }
   // для админки: идущие и спорные матчи
   const adminList = () => open().filter(m => m.state !== 'accept').sort((a, b) => (a.state === 'dispute' ? -1 : 0) - (b.state === 'dispute' ? -1 : 0) || b.created - a.created)
-    .map(m => ({ ...summary(m), state: m.state, created: m.created, reports: m.reports, disputeReason: m.disputeReason || null }));
+    .map(m => { const c = m.state === 'live' ? claimOf(m) : null, d = m.disputedBy;
+      return { ...summary(m), state: m.state, created: m.created, liveAt: m.liveAt || null, disputeReason: m.disputeReason || null,
+        reports: Object.fromEntries(['A', 'B'].filter(t => m.reports[t]).map(t => [t, { result: m.reports[t].result, at: m.reports[t].at, nick: nickOf(m.reports[t].by || m.captains[t]), n: m.reports[t].n || 1 }])),
+        until: c ? c.at + CLAIM_WAIT : null, disputedBy: d ? { nick: d.nick, team: d.team, says: d.says, text: d.text, at: d.at } : null,
+        proofs: proofsBy(m).map(x => ({ nick: x.nick, n: x.n })) }; });
 
-  return { join, leave, stopFor, inQueue, queueEntry, searching, searchingBy, liveCount, matchOf, find, view, accept, decline, ban, report, confirm, voteCancel, adminResolve, history, testMatch, adminList,
-    banOf, missCount, setBan, chatList, chatSend, fbOpen, P, MAPS, MODES, MODE_NAME };
+  return { join, leave, stopFor, inQueue, queueEntry, searching, searchingBy, liveCount, matchOf, find, view, accept, decline, ban, claim, agree, dispute, voteCancel, adminResolve, history, testMatch, adminList,
+    proofCheck, disputedOf, addProof, banOf, missCount, setBan, chatList, chatSend, fbOpen, P, MAPS, MODES, MODE_NAME, PROOF_MAX };
 };
