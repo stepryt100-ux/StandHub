@@ -106,6 +106,10 @@ footer a{display:block;margin:4px 0}footer a:hover{color:#fff}
 .modes{display:flex;gap:8px;flex-wrap:wrap}
 .chip{height:40px;padding:0 16px;border-radius:4px;background:var(--bg2);border:1px solid var(--line);color:var(--muted);font-weight:700}
 .chip.on{border-color:var(--orange);color:#fff;background:rgba(255,85,0,.12)}
+.mq{display:inline-grid;place-items:center;min-width:18px;height:18px;padding:0 5px;margin-left:8px;border-radius:9px;background:var(--orange);color:#fff;font-size:11px;font-weight:800;line-height:1;vertical-align:1px}
+.mq.z{display:none}
+.qhint{margin-top:8px;font-size:13px;font-weight:600;color:#ffb37a;max-width:440px}
+.qhint:empty{display:none}
 .findbox{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-top:24px;padding-top:24px;border-top:1px solid var(--line)}
 .btn-find{height:64px;min-width:280px;font-size:20px;font-style:italic;font-weight:900}
 .btn-find.searching{background:var(--card2);border:1px solid var(--orange)}
@@ -432,6 +436,16 @@ function paintLive(){
   const v=k=>S.live[k]==null?"—":fmt(S.live[k]);
   document.querySelectorAll("[data-live]").forEach(el=>{const t=v(el.dataset.live),was=el.textContent;if(was===t)return;el.textContent=t;
     if(was!=="—"&&!RM()){el.classList.remove("bump");void el.offsetWidth;el.classList.add("bump")}});
+  document.querySelectorAll("[data-mq]").forEach(el=>{const n=(S.live.modes||{})[el.dataset.mq]||0;if(el.textContent!==String(n))el.textContent=n;el.classList.toggle("z",!n)});
+  const h=document.getElementById("qhint");if(h){const t=qHint();if(h.textContent!==t)h.textContent=t}
+}
+// подсказка: игроки ищут в другом режиме — в один матч попадают только при одинаковом режиме
+function qHint(){
+  const md=S.live.modes;if(!md||!S.user||(S.match&&["accept","veto","live"].includes(S.match.state)))return "";
+  if((md[S.mode]||0)-(S.searching?1:0)>0)return "";
+  const oth=Object.keys(MODE_NAME).filter(k=>k!==S.mode&&md[k]>0);if(!oth.length)return "";
+  const names=oth.map(k=>"«"+MODE_NAME[k]+"»").join(" и ");
+  return S.searching?`Другие игроки сейчас ищут в режиме ${names}. Чтобы попасть в один матч, отмените поиск и выберите тот же режим.`:`Сейчас ищут матч в режиме ${names} — выберите его, чтобы сыграть вместе.`;
 }
 const L=k=>`<b data-live="${k}">${S.live[k]==null?"—":fmt(S.live[k])}</b>`;
 
@@ -462,7 +476,7 @@ function toast(t){const e=document.getElementById("toast");e.textContent=t;e.cla
 function needAuth(){if(!S.user){location.hash="#/login";toast("Войдите, чтобы продолжить");return true}return false}
 function empty(title,text,btn){return `<div class="empty"><div class="empty-ic">${ic("crown")}</div><b>${title}</b><p class="muted">${text}</p>${btn||""}</div>`}
 /* ===== Анимации ===== */
-const APP_V="1.3.1";
+const APP_V="1.3.2";
 // анимации включены всегда; выключить можно кнопкой «Анимации» (меню слева / низ главной)
 const RM=()=>document.documentElement.classList.contains("no-motion");
 function paintMotion(){document.querySelectorAll("[data-motion] b").forEach(b=>b.textContent=RM()?"выкл":"вкл")}
@@ -623,11 +637,11 @@ function pageLobby(){
    <div class="card pad">
      <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px">
        <div><div class="tag">StandLeo</div><h3 style="margin:4px 0 0;font-size:20px">Твоё пати</h3></div>
-       <div class="modes" role="radiogroup" aria-label="Режим">${["5v5","2v2","1v1"].map(x=>`<button class="chip ${S.mode===x?"on":""}" data-mode="${x}" role="radio" aria-checked="${S.mode===x}">${MODE_NAME[x]}</button>`).join("")}</div>
+       <div class="modes" role="radiogroup" aria-label="Режим">${["5v5","2v2","1v1"].map(x=>`<button class="chip ${S.mode===x?"on":""}" data-mode="${x}" role="radio" aria-checked="${S.mode===x}">${MODE_NAME[x]}<span class="mq${(S.live.modes||{})[x]?"":" z"}" data-mq="${x}" title="Сейчас в поиске">${(S.live.modes||{})[x]||0}</span></button>`).join("")}</div>
      </div>
      <div class="party" id="party"></div>
      <div class="findbox">
-       <div><div class="muted" style="font-size:13px">Подбор: все регионы · по уровню ELO</div><div id="qstatus" style="font-weight:700;margin-top:4px">Готов к поиску</div></div>
+       <div><div class="muted" style="font-size:13px">Подбор: все регионы · по уровню ELO</div><div id="qstatus" style="font-weight:700;margin-top:4px">Готов к поиску</div><div id="qhint" class="qhint">${m?"":qHint()}</div></div>
        <button class="btn btn-o btn-find ${S.searching?"searching":""}" id="find" ${m?"disabled":""}>${S.searching?"Отменить поиск":"Найти матч"}</button>
      </div>
      ${u.admin?`<div class="admin-box"><div><b>Тестовый матч с ботами</b><div class="muted" style="font-size:13px;max-width:440px">Видно только администратору. Боты сами примут матч и будут убирать карты. Рейтинг не меняется.</div></div><button class="btn btn-g" id="testM" ${m||S.searching?"disabled":""}>Тест · ${MODE_NAME[S.mode]}</button></div>`:""}

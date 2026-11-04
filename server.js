@@ -35,7 +35,7 @@ const meOf = u => ({ ...pub(u), admin: isAdmin(u) });
 const clients = new Map(); // res -> {visitorId, userId}
 let match = null; // модуль матчей (подключается ниже)
 const sse = (r, obj) => r.write(`data: ${JSON.stringify(obj)}\n\n`);
-function stats() { const v = new Set([...clients.values()].map(c => c.visitorId)); return { type: 'stats', online: v.size, searching: match ? match.searching() : 0, live: match ? match.liveCount() : 0 }; }
+function stats() { const v = new Set([...clients.values()].map(c => c.visitorId)); return { type: 'stats', online: v.size, searching: match ? match.searching() : 0, modes: match ? match.searchingBy() : {}, live: match ? match.liveCount() : 0 }; }
 let bTimer = null; // рассылаем счётчики не чаще раза в 150 мс
 function broadcast() { if (bTimer) return; bTimer = setTimeout(() => { bTimer = null; const d = `data: ${JSON.stringify(stats())}\n\n`; for (const r of clients.keys()) r.write(d); }, 150); }
 function sendTo(uid, obj) { const d = `data: ${JSON.stringify(obj)}\n\n`; for (const [r, c] of clients) if (c.userId === uid) r.write(d); }
@@ -66,19 +66,22 @@ function findIds(text) {
 const tg = (method, body) => fetch(`https://api.telegram.org/bot${TG_TOKEN}/${method}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) }).then(r => r.json());
 const say = (chat_id, text, extra = {}) => tg('sendMessage', { chat_id, text, parse_mode: 'HTML', disable_web_page_preview: true, ...extra });
 const escH = s => String(s).replace(/[&<>]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c]));
+// вместо длинного адреса в сообщениях — слово «StandHub», нажатие открывает сайт
+const siteA = (path = '') => `<a href="${SITE_URL}${path}">StandHub</a>`;
+const go = path => '👉 ' + siteA(path);
 
 function linkChat(chatId, code) {
   cleanup();
   const u = db.users.find(x => x.vcode === code);
-  if (!u) return say(chatId, '❌ Код не найден или устарел. Зарегистрируйтесь на сайте заново:\n' + SITE_URL + '/#/register');
-  if (u.verified) return say(chatId, `✅ Аккаунт <b>${escH(u.nick)}</b> уже подтверждён. Можно входить на сайт:\n${SITE_URL}/#/login`);
+  if (!u) return say(chatId, '❌ Код не найден или устарел. Зарегистрируйтесь на сайте заново:\n' + go('/#/register'));
+  if (u.verified) return say(chatId, `✅ Аккаунт <b>${escH(u.nick)}</b> уже подтверждён. Можно входить на сайт:\n${go('/#/login')}`);
   u.tgChat = chatId; save();
   return say(chatId, `👋 Аккаунт <b>${escH(u.nick)}</b> найден.\n\nТеперь пришлите <b>скриншот своего профиля в StandLeo</b>, где виден ваш ID.\nНа сайте вы указали ID: <code>${escH(u.soid)}</code>`);
 }
 async function handlePhoto(msg) {
   const chatId = msg.chat.id;
   const u = db.users.find(x => x.tgChat === chatId && !x.verified);
-  if (!u) return say(chatId, 'Сначала зарегистрируйтесь на сайте и нажмите кнопку «Открыть бота» на странице подтверждения, или пришлите сюда 6-значный код с сайта.\n' + SITE_URL + '/#/register');
+  if (!u) return say(chatId, 'Сначала зарегистрируйтесь на сайте и нажмите кнопку «Открыть бота» на странице подтверждения, или пришлите сюда 6-значный код с сайта.\n' + go('/#/register'));
   const fileId = msg.photo ? msg.photo[msg.photo.length - 1].file_id : msg.document.file_id;
   await say(chatId, '🔍 Проверяю скриншот…');
   try {
@@ -91,7 +94,7 @@ async function handlePhoto(msg) {
       u.verified = true; u.tgId = msg.from.id; u.vcode = null;
       db.users = db.users.filter(x => x === u || x.verified || (x.soid !== u.soid && x.nick.toLowerCase() !== u.nick.toLowerCase() && x.email !== u.email));
       save();
-      return say(chatId, `✅ <b>Всё верно!</b> ID <code>${escH(u.soid)}</code> совпадает.\n\nАккаунт <b>${escH(u.nick)}</b> подтверждён — теперь можно войти на сайт:\n${SITE_URL}/#/login`);
+      return say(chatId, `✅ <b>Всё верно!</b> ID <code>${escH(u.soid)}</code> совпадает.\n\nАккаунт <b>${escH(u.nick)}</b> подтверждён — теперь можно войти на сайт:\n${go('/#/login')}`);
     }
     return say(chatId, ids.length
       ? `❌ ID не совпадает.\nНа скриншоте найдено: <code>${ids.map(escH).join(', ')}</code>\nНа сайте указано: <code>${escH(u.soid)}</code>\n\nПроверьте ID или пришлите другой скриншот.`
@@ -104,7 +107,7 @@ async function onUpdate(upd) {
   if (msg.photo || (msg.document && /^image\//.test(msg.document.mime_type || ''))) return handlePhoto(msg);
   const m = text.match(/^\/start\s+(\d{6})$/) || text.match(/^(\d{6})$/);
   if (m) return linkChat(msg.chat.id, m[1]);
-  return say(msg.chat.id, `Привет! Это бот подтверждения аккаунтов <b>StandHub</b>.\n\n1. Зарегистрируйтесь на сайте: ${SITE_URL}/#/register\n2. Нажмите «Открыть бота» или пришлите сюда 6-значный код с сайта\n3. Пришлите скриншот профиля StandLeo с вашим ID`);
+  return say(msg.chat.id, `Привет! Это бот подтверждения аккаунтов <b>StandHub</b>.\n\n1. Зарегистрируйтесь на сайте ${siteA('/#/register')}\n2. Нажмите «Открыть бота» или пришлите сюда 6-значный код с сайта\n3. Пришлите скриншот профиля StandLeo с вашим ID`);
 }
 async function startBot() {
   if (!TG_TOKEN) return console.log('TELEGRAM_BOT_TOKEN не задан — бот выключен');

@@ -22,12 +22,15 @@ module.exports = function (ctx) {
   const queueEntry = uid => { for (const k in queues) { const q = queues[k].find(x => x.uid === uid); if (q) return { mode: k, waited: Date.now() - q.joined }; } return null; };
   const inQueue = uid => (queueEntry(uid) || {}).mode || null;
   const searching = () => Object.values(queues).reduce((a, q) => a + q.length, 0);
+  const searchingBy = () => Object.fromEntries(Object.keys(queues).map(k => [k, queues[k].length])); // сколько ищут в каждом режиме
   const liveCount = () => db.matches.filter(m => !m.test && ['veto', 'live'].includes(m.state)).length;
   const find = id => db.matches.find(m => m.id === id);
   const P = (m, id) => m.players.find(p => p.id === id);
   const cap = (m, t) => P(m, m.captains[t]);
   const real = m => m.players.filter(p => !p.bot);
-  const link = m => `${site}/#/match/${m.id}`;
+  // ссылка словом «StandHub» вместо длинного адреса
+  const go = path => `👉 <a href="${site}${path}">StandHub</a>`;
+  const link = m => go('/#/match/' + m.id);
 
   // ---------- очередь ----------
   function join(u, mode) {
@@ -176,7 +179,7 @@ module.exports = function (ctx) {
       const wa = winnerOf('A', A), wb = winnerOf('B', B);
       if (wa === wb) return finish(m, wa, A.score || B.score);
       m.state = 'dispute'; m.disputeReason = 'Результаты капитанов не совпадают'; save(); notify(m); broadcast();
-      alertAdmins(`⚠️ Спорный матч ${m.id} (${MODE_NAME[m.mode]}, ${m.map}): капитаны прислали разные результаты.\n${site}/#/admin`);
+      alertAdmins(`⚠️ Спорный матч ${m.id} (${MODE_NAME[m.mode]}, ${m.map}): капитаны прислали разные результаты.\n${go('/#/admin')}`);
       return;
     }
     if (force && (A || B)) { const t = A ? 'A' : 'B'; return finish(m, winnerOf(t, m.reports[t]), m.reports[t].score); }
@@ -269,5 +272,5 @@ module.exports = function (ctx) {
   const adminList = () => open().filter(m => m.state !== 'accept').sort((a, b) => (a.state === 'dispute' ? -1 : 0) - (b.state === 'dispute' ? -1 : 0) || b.created - a.created)
     .map(m => ({ ...summary(m), state: m.state, created: m.created, reports: m.reports, disputeReason: m.disputeReason || null }));
 
-  return { join, leave, inQueue, queueEntry, searching, liveCount, matchOf, find, view, accept, decline, ban, report, confirm, voteCancel, adminResolve, history, testMatch, adminList, MAPS };
+  return { join, leave, inQueue, queueEntry, searching, searchingBy, liveCount, matchOf, find, view, accept, decline, ban, report, confirm, voteCancel, adminResolve, history, testMatch, adminList, MAPS };
 };
