@@ -1,6 +1,6 @@
 // support.js — обращения в поддержку: игрок пишет на сайте, админ отвечает в админке, ответ приходит игроку в Telegram
 const crypto = require('crypto');
-const TOPICS = { question: 'Вопрос', match: 'Проблема с матчем', account: 'Аккаунт и подтверждение', player: 'Жалоба на игрока', idea: 'Предложение', other: 'Другое' };
+const TOPICS = { question: 'Вопрос', match: 'Проблема с матчем', account: 'Аккаунт и подтверждение', player: 'Жалоба на игрока', idea: 'Предложение', shop: 'Магазин и промокоды', other: 'Другое' };
 const clean = (t, max) => String(t || '').replace(/\r/g, '').replace(/[\u0000-\u0009\u000b-\u001f\u007f]/g, ' ').replace(/\n{3,}/g, '\n\n').trim().slice(0, max);
 
 module.exports = function ({ db, save, sendTo, tell, go, escH, alertAdmins, onChange }) {

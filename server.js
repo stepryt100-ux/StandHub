@@ -46,6 +46,7 @@ function stats() { const v = new Set([...clients.values()].map(c => c.visitorId)
 let bTimer = null; // рассылаем счётчики не чаще раза в 150 мс
 function broadcast() { if (bTimer) return; bTimer = setTimeout(() => { bTimer = null; const d = `data: ${JSON.stringify(stats())}\n\n`; for (const r of clients.keys()) r.write(d); }, 150); }
 function sendTo(uid, obj) { const d = `data: ${JSON.stringify(obj)}\n\n`; for (const [r, c] of clients) if (c.userId === uid) r.write(d); }
+function sendAll(obj) { const d = `data: ${JSON.stringify(obj)}\n\n`; for (const r of clients.keys()) r.write(d); }
 const isOnline = uid => [...clients.values()].some(c => c.userId === uid);
 // состояние игрока: поиск, активный матч, запрет поиска (за непринятые матчи или от админа)
 const stateOf = uid => { const am = match.matchOf(uid); return { type: 'state', queue: match.queueEntry(uid), match: am ? match.view(am, uid) : null, ban: match.banOf(db.users.find(u => u.id === uid)), misses: match.missCount(uid), now: Date.now() }; };
@@ -235,6 +236,8 @@ const pushBadges = uid => { for (const id of new Set([uid, ...adminUsers().map(u
 // ---------- «Спасибо» и жалобы после матча, поддержка ----------
 feedback = require('./feedback')({ db, save, sendTo, tell: tgUser, go, escH, alertAdmins, match, tasks, onChange: () => pushBadges(null) });
 support = require('./support')({ db, save, sendTo, tell: tgUser, go, escH, alertAdmins, onChange: uid => pushBadges(uid) });
+// ---------- магазин: монеты → промокоды ----------
+const shop = require('./shop')({ db, save, sendTo, sendAll, tell: tgUser, alertAdmins, go, escH, onCoins: uid => sendTo(uid, tasks.state(uid)) });
 
 // ---------- http ----------
 const send = (res, code, obj) => { res.writeHead(code, { 'Content-Type': 'application/json; charset=utf-8' }); res.end(JSON.stringify(obj)); };
@@ -380,6 +383,24 @@ http.createServer(async (req, res) => {
     if (req.method !== 'POST') return send(res, 405, { error: 'Нужен POST' });
     const r = tasks.claim(u, String((await body(req, 2e3)).id || ''));
     return send(res, r.error ? 400 : 200, { ...r, state: tasks.state(u.id) });
+  }
+  // ---------- магазин ----------
+  if (p === '/api/shop' || p.startsWith('/api/shop/')) {
+    const u = authUser(req);
+    if (p === '/api/shop') return send(res, 200, shop.state(u && u.id));
+    if (req.method !== 'POST') return send(res, 405, { error: 'Нужен POST' });
+    if (!u) return send(res, 401, { error: 'Войдите в аккаунт' });
+    const b = await body(req, 2e3), act = p.slice(10), id = String(b.item || '');
+    const r = act === 'buy' ? shop.buy(u, id) : act === 'notify' ? shop.notify(u, id, !!b.on) : { error: 'Неизвестное действие' };
+    return send(res, r.error ? 400 : 200, { ...r, state: shop.state(u.id) });
+  }
+  if (p === '/api/admin/shop') {
+    const u = authUser(req); if (!isAdmin(u)) return send(res, 403, { error: 'Только для администратора' });
+    if (req.method !== 'POST') return send(res, 200, shop.adminState());
+    const b = await body(req, 1e5), act = String(b.act || ''), id = String(b.item || '');
+    if (b.tooBig) return send(res, 400, { error: 'Слишком много текста — добавляйте коды частями' });
+    const r = act === 'add' ? shop.addCodes(id, b.text) : act === 'remove' ? shop.removeCode(id, String(b.code || '')) : act === 'cfg' ? shop.setCfg(id, b) : { error: 'Неизвестное действие' };
+    return send(res, r.error ? 400 : 200, { ...r, admin: shop.adminState() });
   }
   // ---------- поддержка ----------
   if (p === '/api/support' || p.startsWith('/api/support/')) {
