@@ -60,9 +60,10 @@ h1.h{font-size:30px;font-weight:900;text-transform:uppercase;font-style:italic;m
  radial-gradient(600px 300px at 10% 90%,rgba(255,85,0,.12),transparent 60%),#0c0c0e;border-bottom:1px solid var(--line)}
 .hero .wrap{position:relative;z-index:2;width:100%}
 .hero h1{font-size:72px;line-height:.95;font-weight:900;font-style:italic;text-transform:uppercase}
-.hero h1 .rot{color:var(--orange);display:block;height:72px;overflow:hidden}
-.hero h1 .rot span{display:block;animation:rot 14s infinite}
-@keyframes rot{0%,12%{transform:translateY(0)}14%,26%{transform:translateY(-100%)}28%,40%{transform:translateY(-200%)}42%,54%{transform:translateY(-300%)}56%,68%{transform:translateY(-400%)}70%,82%{transform:translateY(-500%)}84%,100%{transform:translateY(-600%)}}
+.hero h1 .rot{color:var(--orange);display:block;height:1.25em;line-height:1.25em;overflow:hidden;margin-top:-.08em}
+.hero h1 .rot span{display:block;animation:rot 14s cubic-bezier(.7,0,.3,1) infinite}
+.hero h1 .rot i{display:block;height:1.25em;font-style:inherit}
+@keyframes rot{0%,12.1%{transform:translateY(0)}14.3%,26.4%{transform:translateY(-1.25em)}28.6%,40.7%{transform:translateY(-2.5em)}42.9%,55%{transform:translateY(-3.75em)}57.1%,69.3%{transform:translateY(-5em)}71.4%,83.6%{transform:translateY(-6.25em)}85.7%,97.9%{transform:translateY(-7.5em)}100%{transform:translateY(-8.75em)}}
 .no-motion .hero h1 .rot span{animation:none}
 .hero p{max-width:520px;color:#d0d0d6;font-size:18px;margin:24px 0 32px}
 .hero .stripes{position:absolute;right:-80px;top:0;bottom:0;width:55%;overflow:hidden;-webkit-mask:linear-gradient(90deg,transparent,#000 40%);mask:linear-gradient(90deg,transparent,#000 40%)}
@@ -366,7 +367,7 @@ body::after{width:520px;height:520px;left:140px;bottom:-220px;background:radial-
  main{margin-left:0;padding-bottom:64px}
  .search{display:none}.top .right .btn-g,.top .right a[href="#/lobby"]{display:none}.top{padding:0 12px}.logo{font-size:18px}
  .wrap{padding:20px 16px}
- .hero{min-height:480px}.hero h1{font-size:44px}.hero h1 .rot{height:44px}
+ .hero{min-height:480px}.hero h1{font-size:44px}
  .feat,footer{grid-template-columns:1fr}
  .party{grid-template-columns:repeat(5,minmax(0,1fr));gap:6px}.slot{padding:4px;overflow:hidden}.slot b{max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.slot .ava{width:36px;height:36px;font-size:14px}.slot{font-size:10px}.slot .plus{width:32px;height:32px}
  .maps{grid-template-columns:repeat(2,1fr)}
@@ -461,7 +462,7 @@ function toast(t){const e=document.getElementById("toast");e.textContent=t;e.cla
 function needAuth(){if(!S.user){location.hash="#/login";toast("Войдите, чтобы продолжить");return true}return false}
 function empty(title,text,btn){return `<div class="empty"><div class="empty-ic">${ic("crown")}</div><b>${title}</b><p class="muted">${text}</p>${btn||""}</div>`}
 /* ===== Анимации ===== */
-const APP_V="1.3";
+const APP_V="1.3.1";
 // анимации включены всегда; выключить можно кнопкой «Анимации» (меню слева / низ главной)
 const RM=()=>document.documentElement.classList.contains("no-motion");
 function paintMotion(){document.querySelectorAll("[data-motion] b").forEach(b=>b.textContent=RM()?"выкл":"вкл")}
@@ -514,7 +515,7 @@ async function pageHome(){
     <circle cx="100" cy="100" r="92" fill="none" stroke="rgba(255,85,0,.25)" stroke-width="2"/><circle class="spin-slow" cx="100" cy="100" r="70" fill="none" stroke="rgba(255,85,0,.15)" stroke-width="10" stroke-dasharray="6 10"/>
     <path d="M40 40h120l-30 40h30L70 170l20-55H50z" fill="url(#g)"/></svg>
    <div class="wrap">
-    <h1>Прокачай<span class="rot"><span>${words.map(w=>w+"<br>").join("")}${words[0]}</span></span></h1>
+    <h1 aria-label="Прокачай свою игру">Прокачай<span class="rot" aria-hidden="true"><span>${[...words,words[0]].map(w=>`<i>${w}</i>`).join("")}</span></span></h1>
     <p>Соревновательный StandLeo на максимуме. Матчмейкинг 5 на 5, ELO-рейтинг, турниры и команды — без потолка для роста.</p>
     <a class="btn btn-o btn-lg" href="${S.user?"#/lobby":"#/register"}">Играть сейчас</a>
     <div class="online-big"><span class="dot"></span>${L("online")} на сайте прямо сейчас</div>
