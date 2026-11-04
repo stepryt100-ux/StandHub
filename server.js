@@ -19,7 +19,7 @@ const sessions = { get: t => (t ? db.sessions[t] : undefined), set: (t, id) => {
 const hash = (pw, salt = crypto.randomBytes(16).toString('hex')) => salt + ':' + crypto.scryptSync(pw, salt, 32).toString('hex');
 const check = (pw, stored) => { const [salt] = stored.split(':'); return hash(pw, salt) === stored; };
 const pub = u => u && ({ nick: u.nick, region: u.region, elo: u.elo, matches: u.matches, wins: u.wins,
-  kills: u.kills, deaths: u.deaths, assists: u.assists, hsKills: u.hsKills, created: u.created,
+  kills: u.kills, deaths: u.deaths, assists: u.assists, hsKills: u.hsKills, created: u.created, commends: u.commends || 0,
   avatar: u.avatar ? `/api/avatar/${encodeURIComponent(u.nick)}?v=${u.avatarV}` : null });
 const verified = () => db.users.filter(u => u.verified);
 function cleanup() { const n = db.users.length; db.users = db.users.filter(u => u.verified || Date.now() - new Date(u.created) < PENDING_TTL); if (db.users.length !== n) save(); }
@@ -40,7 +40,8 @@ let bTimer = null; // рассылаем счётчики не чаще раза
 function broadcast() { if (bTimer) return; bTimer = setTimeout(() => { bTimer = null; const d = `data: ${JSON.stringify(stats())}\n\n`; for (const r of clients.keys()) r.write(d); }, 150); }
 function sendTo(uid, obj) { const d = `data: ${JSON.stringify(obj)}\n\n`; for (const [r, c] of clients) if (c.userId === uid) r.write(d); }
 const isOnline = uid => [...clients.values()].some(c => c.userId === uid);
-const stateOf = uid => { const am = match.matchOf(uid); return { type: 'state', queue: match.queueEntry(uid), match: am ? match.view(am, uid) : null }; };
+// состояние игрока: поиск, активный матч, запрет поиска (за непринятые матчи или от админа)
+const stateOf = uid => { const am = match.matchOf(uid); return { type: 'state', queue: match.queueEntry(uid), match: am ? match.view(am, uid) : null, ban: match.banOf(db.users.find(u => u.id === uid)), misses: match.missCount(uid), now: Date.now() }; };
 setInterval(() => { for (const r of clients.keys()) r.write(': ping\n\n'); }, 25000);
 
 // ---------- Telegram-бот: проверка ID по скриншоту ----------
@@ -190,18 +191,29 @@ async function startBot() {
 }
 startBot();
 const tgUser = (uid, text) => { const u = db.users.find(x => x.id === uid); if (TG_TOKEN && u && u.tgChat) say(u.tgChat, text).catch(() => {}); };
+const adminUsers = () => db.users.filter(u => u.verified && isAdmin(u));
+const alertAdmins = text => adminUsers().forEach(u => tgUser(u.id, text));
 
+// ---------- ежедневные задания и монеты ----------
+const tasks = require('./tasks')({ db, save, sendTo });
 // ---------- матчи ----------
 let party = null; // модуль пати (подключается ниже)
 match = require('./match')({ db, save, sendTo, broadcast, siteUrl: SITE_URL,
-  ocr: buf => ocr(buf, 'eng+rus'), avatarOf: u => pub(u).avatar, tell: tgUser,
-  alertAdmins: text => db.users.filter(u => u.verified && isAdmin(u)).forEach(u => tgUser(u.id, text)),
+  ocr: buf => ocr(buf, 'eng+rus'), avatarOf: u => pub(u).avatar, tell: tgUser, alertAdmins,
   partyOf: uid => (party ? party.partyOf(uid) : null), isOnline,
-  pushState: (uid, extra) => sendTo(uid, { ...stateOf(uid), ...extra }), onPartyChange: pt => party && party.pushParty(pt) });
+  pushState: (uid, extra) => sendTo(uid, { ...stateOf(uid), ...extra }), onPartyChange: pt => party && party.pushParty(pt),
+  isAdminId: uid => isAdmin(db.users.find(u => u.id === uid)), adminIds: () => adminUsers().map(u => u.id), onFinish: m => tasks.onFinish(m) });
 // ---------- друзья ----------
 const friends = require('./friends')({ db, save, sendTo, tell: tgUser, go, pub, isOnline, matchOf: uid => match.matchOf(uid) });
 // ---------- пати ----------
 party = require('./party')({ db, save, sendTo, tell: tgUser, go, pub, isOnline, match });
+// ---------- значки в меню: ответы поддержки, у админа — новые жалобы и обращения ----------
+let support = null, feedback = null;
+const badges = uid => { const u = db.users.find(x => x.id === uid); return { type: 'badges', sup: support.unread(uid), ...(isAdmin(u) ? { admR: feedback.openCount(), admT: support.waiting() } : {}) }; };
+const pushBadges = uid => { for (const id of new Set([uid, ...adminUsers().map(u => u.id)])) if (id && isOnline(id)) sendTo(id, badges(id)); };
+// ---------- «Спасибо» и жалобы после матча, поддержка ----------
+feedback = require('./feedback')({ db, save, sendTo, tell: tgUser, go, escH, alertAdmins, match, tasks, onChange: () => pushBadges(null) });
+support = require('./support')({ db, save, sendTo, tell: tgUser, go, escH, alertAdmins, onChange: uid => pushBadges(uid) });
 
 // ---------- http ----------
 const send = (res, code, obj) => { res.writeHead(code, { 'Content-Type': 'application/json; charset=utf-8' }); res.end(JSON.stringify(obj)); };
@@ -210,7 +222,7 @@ const body = (req, max = 8e5) => new Promise(r => { let b = '', big = false; req
 const ocrBusy = new Set(); // один скриншот за раз от каждого игрока
 const dataImg = s => { const m = /^data:image\/(jpeg|png|webp);base64,([A-Za-z0-9+/=]+)$/.exec(String(s || '')); return m ? Buffer.from(m[2], 'base64') : null; };
 const authUser = req => { const t = (req.headers.authorization || '').replace('Bearer ', ''); const id = sessions.get(t); return db.users.find(u => u.id === id && u.verified); };
-const MIME = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript', '.css': 'text/css', '.png': 'image/png', '.svg': 'image/svg+xml' };
+const MIME = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript; charset=utf-8', '.css': 'text/css', '.png': 'image/png', '.svg': 'image/svg+xml', '.webmanifest': 'application/manifest+json; charset=utf-8', '.json': 'application/json; charset=utf-8', '.ico': 'image/x-icon' };
 
 http.createServer(async (req, res) => {
   const url = new URL(req.url, 'http://x'); const p = url.pathname;
@@ -219,7 +231,7 @@ http.createServer(async (req, res) => {
     res.writeHead(200, { 'Content-Type': 'text/event-stream', 'Cache-Control': 'no-cache', Connection: 'keep-alive', 'X-Accel-Buffering': 'no' });
     const userId = sessions.get(url.searchParams.get('token')) || null;
     clients.set(res, { visitorId: url.searchParams.get('vid') || crypto.randomUUID(), userId });
-    if (userId) { sse(res, party.state(userId)); sse(res, stateOf(userId)); sse(res, friends.state(userId)); party.touch(userId); }
+    if (userId) { sse(res, party.state(userId)); sse(res, stateOf(userId)); sse(res, friends.state(userId)); sse(res, tasks.state(userId)); sse(res, badges(userId)); party.touch(userId); }
     sse(res, stats()); broadcast();
     // закрыл сайт — через 20 секунд убираем из поиска (если не вернулся); если искало пати — поиск останавливается у всех
     req.on('close', () => {
@@ -285,11 +297,18 @@ http.createServer(async (req, res) => {
   if (p === '/api/search') { const q = (url.searchParams.get('q') || '').toLowerCase(); return send(res, 200, verified().filter(u => u.nick.toLowerCase().includes(q)).slice(0, 10).map(pub)); }
   // ---------- матчи ----------
   if (p === '/api/matches') { const n = (url.searchParams.get('player') || '').toLowerCase(); return send(res, 200, match.history(n || null, isAdmin(authUser(req)))); }
-  const mm = p.match(/^\/api\/match\/([a-f0-9]+)(?:\/(accept|decline|ban|report|confirm|cancel))?$/);
+  const mm = p.match(/^\/api\/match\/([a-f0-9]+)(?:\/(accept|decline|ban|report|confirm|cancel|chat|commend|flag))?$/);
   if (mm) {
     const m = match.find(mm[1]); if (!m) return send(res, 404, { error: 'Матч не найден' });
     const u = authUser(req);
     if (!mm[2]) return send(res, 200, match.view(m, u && u.id));
+    // чат матча: GET — сообщения, POST — отправить
+    if (mm[2] === 'chat') {
+      if (!u) return send(res, 401, { error: 'Войдите в аккаунт' });
+      if (req.method !== 'POST') { const r = match.chatList(m.id, u.id); return send(res, r.error ? 403 : 200, r); }
+      const b = await body(req, 4e3); const r = match.chatSend(m.id, u, b.text, String(b.ch || 'all'));
+      return send(res, r.error ? 400 : 200, r);
+    }
     if (req.method !== 'POST') return send(res, 405, { error: 'Нужен POST' });
     if (!u) return send(res, 401, { error: 'Войдите в аккаунт' });
     const b = await body(req, mm[2] === 'report' ? 6e6 : 8e5);
@@ -299,6 +318,8 @@ http.createServer(async (req, res) => {
     else if (mm[2] === 'ban') r = match.ban(m.id, u.id, String(b.map || ''));
     else if (mm[2] === 'confirm') r = match.confirm(m.id, u.id, String(b.result || ''));
     else if (mm[2] === 'cancel') r = match.voteCancel(m.id, u.id);
+    else if (mm[2] === 'commend') r = feedback.commend(u, m.id, b.nick);
+    else if (mm[2] === 'flag') r = feedback.flag(u, m.id, b.nick, String(b.reason || ''), b.text);
     else {
       if (b.tooBig) return send(res, 413, { error: 'Картинка слишком большая' });
       const imgs = [b.image2, b.image].map(dataImg).filter(Boolean); // сначала контрастная копия, потом оригинал
@@ -326,6 +347,36 @@ http.createServer(async (req, res) => {
       : act === 'cancel' ? party.cancel(u, id) : act === 'leave' ? party.leave(u) : act === 'kick' ? party.kick(u, b.nick)
       : act === 'mode' ? party.setMode(u, String(b.mode || '')) : { error: 'Неизвестное действие' };
     return send(res, r.error ? 400 : 200, { ...r, state: party.state(u.id) });
+  }
+  // ---------- задания ----------
+  if (p === '/api/tasks' || p === '/api/tasks/claim') {
+    const u = authUser(req); if (!u) return send(res, 401, { error: 'Войдите в аккаунт' });
+    if (p === '/api/tasks') return send(res, 200, tasks.state(u.id));
+    if (req.method !== 'POST') return send(res, 405, { error: 'Нужен POST' });
+    const r = tasks.claim(u, String((await body(req, 2e3)).id || ''));
+    return send(res, r.error ? 400 : 200, { ...r, state: tasks.state(u.id) });
+  }
+  // ---------- поддержка ----------
+  if (p === '/api/support' || p.startsWith('/api/support/')) {
+    const u = authUser(req); if (!u) return send(res, 401, { error: 'Войдите в аккаунт' });
+    if (p === '/api/support') return send(res, 200, { list: support.mine(u.id) });
+    if (req.method !== 'POST') return send(res, 405, { error: 'Нужен POST' });
+    const b = await body(req, 2e4), act = p.slice(13), id = String(b.id || '');
+    const r = act === 'new' ? support.create(u, String(b.topic || ''), b.text, b.mid) : act === 'reply' ? support.reply(u, id, b.text)
+      : act === 'close' ? support.closeMine(u, id) : act === 'seen' ? support.seen(u) : { error: 'Неизвестное действие' };
+    return send(res, r.error ? 400 : 200, { ...r, list: support.mine(u.id) });
+  }
+  // ---------- админка: жалобы и обращения ----------
+  if (p === '/api/admin/reports' || p === '/api/admin/tickets') {
+    const u = authUser(req); if (!isAdmin(u)) return send(res, 403, { error: 'Только для администратора' });
+    return send(res, 200, p === '/api/admin/reports' ? feedback.adminList() : support.adminList());
+  }
+  const ar = p.match(/^\/api\/admin\/(report|ticket)\/([a-f0-9]+)$/);
+  if (ar && req.method === 'POST') {
+    const u = authUser(req); if (!isAdmin(u)) return send(res, 403, { error: 'Только для администратора' });
+    const b = await body(req, 2e4), act = String(b.act || '');
+    const r = ar[1] === 'report' ? feedback.adminAct(ar[2], act) : act === 'reply' ? support.adminReply(ar[2], b.text) : act === 'close' ? support.adminClose(ar[2]) : { error: 'Неизвестное действие' };
+    return send(res, r.error ? 400 : 200, r);
   }
   if (p === '/api/queue/join' && req.method === 'POST') {
     const u = authUser(req); if (!u) return send(res, 401, { error: 'Войдите в аккаунт' });

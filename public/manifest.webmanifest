@@ -1,0 +1,23 @@
+{
+  "id": "/",
+  "name": "StandHub — соревновательный StandLeo",
+  "short_name": "StandHub",
+  "description": "Матчмейкинг, ELO-рейтинг, пати с друзьями и ежедневные задания для StandLeo",
+  "lang": "ru",
+  "dir": "ltr",
+  "start_url": "/?source=app",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#141416",
+  "theme_color": "#0f0f11",
+  "categories": ["games", "sports"],
+  "icons": [
+    { "src": "/icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "/icons/maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ],
+  "shortcuts": [
+    { "name": "Играть", "short_name": "Играть", "url": "/?source=app#/lobby", "icons": [{ "src": "/icons/icon-192.png", "sizes": "192x192" }] },
+    { "name": "Задания", "short_name": "Задания", "url": "/?source=app#/tasks", "icons": [{ "src": "/icons/icon-192.png", "sizes": "192x192" }] }
+  ]
+}

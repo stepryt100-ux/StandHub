@@ -7,6 +7,16 @@ const ACCEPT_SEC = 15, BAN_SEC = 20;
 const SINGLE_REPORT_WAIT = 30 * 60e3; // если загрузил только один капитан — ждём второго 30 минут
 const MATCH_TTL = 3 * 3600e3;          // матч без результата отменяется через 3 часа
 const K = 50;                          // равные команды: +25 / −25
+const DAY = 24 * 3600e3;
+// штраф за непринятый матч (считаем пропуски за последние сутки): 1-й — предупреждение, 2-й — 5 минут, 3-й — 30 минут, дальше — 2 часа
+const MISS_BAN = [0, 5, 30, 120];
+const CHAT_MAX = 300, CHAT_LEN = 300, CHAT_USER = 80; // сообщений в матче, символов в сообщении, сообщений от одного игрока
+const AFTER = 30 * 60e3;               // в чат можно писать ещё 30 минут после конца матча
+const FB_TTL = DAY;                    // «Спасибо» и жалобы — сутки после матча
+const minStr = n => (n >= 60 ? Math.floor(n / 60) + ' ч' + (n % 60 ? ' ' + (n % 60) + ' мин' : '') : n + ' мин');
+// сколько осталось до конца запрета: «4 мин», «1 ч 20 мин», «6 дн. 23 ч»
+const plural = (n, a, b, c) => { const k = n % 100, j = n % 10; return n + ' ' + (k >= 11 && k <= 14 ? c : j === 1 ? a : j >= 2 && j <= 4 ? b : c); };
+const leftStr = ts => { const m = Math.max(1, Math.ceil((ts - Date.now()) / 60e3)); if (m < 24 * 60) return minStr(m); const d = Math.floor(m / 1440), h = Math.floor((m % 1440) / 60); return plural(d, 'день', 'дня', 'дней') + (h ? ' ' + h + ' ч' : ''); };
 const rnd = (a, b) => a + Math.floor(Math.random() * (b - a + 1));
 const other = t => (t === 'A' ? 'B' : 'A');
 const players = n => n + ' ' + (n % 10 === 1 && n % 100 !== 11 ? 'игрок' : n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 12 || n % 100 > 14) ? 'игрока' : 'игроков');
@@ -17,6 +27,9 @@ module.exports = function (ctx) {
   // пати: кто с кем в одной группе (модуль party.js подключается позже), кто на сайте, отправка состояния игроку
   const partyOf = uid => (ctx.partyOf ? ctx.partyOf(uid) : null);
   const isOnline = ctx.isOnline || (() => true), pushState = ctx.pushState || (() => {}), onParty = ctx.onPartyChange || (() => {});
+  const isAdminId = ctx.isAdminId || (() => false), adminIds = ctx.adminIds || (() => []), onFinish = ctx.onFinish || (() => {});
+  // чат пишем на диск не на каждое сообщение, а раз в пару секунд
+  let saveT = null; const saveSoon = () => { if (!saveT) saveT = setTimeout(() => { saveT = null; save(); }, 2000); };
   // в очереди стоят группы: один игрок или пати целиком — { uids, pid, joined, prio }
   const queues = { '5v5': [], '2v2': [], '1v1': [] };
   const userById = id => db.users.find(u => u.id === id);
@@ -40,11 +53,33 @@ module.exports = function (ctx) {
   const go = path => `👉 <a href="${site}${path}">StandHub</a>`;
   const link = m => go('/#/match/' + m.id);
 
+  // ---------- штрафы: запрет поиска ----------
+  const missesOf = u => (u.misses || []).filter(t => Date.now() - t < DAY);
+  const missCount = uid => { const u = userById(uid); return u ? missesOf(u).length : 0; };
+  const banOf = u => (u && u.banUntil > Date.now() ? { until: u.banUntil, why: u.banWhy || '', kind: u.banKind || 'miss' } : null);
+  function penalize(uid, m) {
+    const u = userById(uid); if (!u) return null;
+    const ms = missesOf(u); ms.push(Date.now()); u.misses = ms;
+    const n = ms.length, min = MISS_BAN[Math.min(n, MISS_BAN.length) - 1], next = MISS_BAN[Math.min(n + 1, MISS_BAN.length) - 1];
+    if (min) { const until = Date.now() + min * 60e3; if (!(u.banUntil > until)) Object.assign(u, { banUntil: until, banWhy: 'не принят матч', banKind: 'miss' }); }
+    tell(uid, min ? `⛔ Вы не приняли матч (${MODE_NAME[m.mode]}) — поиск на StandHub закрыт на <b>${minStr(min)}</b>.\nЭто ${n}-й пропуск за сутки, следующий — ${minStr(next)}.\nПравила: ${go('/#/rules')}`
+      : `⚠️ Вы не приняли матч (${MODE_NAME[m.mode]}). Это предупреждение: если за сутки пропустить ещё один, поиск закроется на 5 минут.\nПравила: ${go('/#/rules')}`);
+    return min;
+  }
+  // запрет от администратора (или снятие: until = 0)
+  function setBan(uid, until, why) {
+    const u = userById(uid); if (!u) return;
+    if (until > Date.now()) { Object.assign(u, { banUntil: until, banWhy: why, banKind: 'admin' }); stopFor([uid], `Поиск остановлен: ${u.nick} не может искать матч`); }
+    else { u.banUntil = 0; u.banWhy = ''; u.misses = []; }
+    save(); pushState(uid);
+  }
+
   // ---------- очередь ----------
   const drop = uids => { for (const k in queues) queues[k] = queues[k].filter(x => !x.uids.some(id => uids.includes(id))); };
   function join(u, mode) {
     if (!MODES[mode]) return { error: 'Неизвестный режим' };
     const am = matchOf(u.id); if (am) return { error: 'У вас уже есть активный матч', match: am.id };
+    const bn = banOf(u); if (bn) return { error: `Поиск закрыт ещё ${leftStr(bn.until)}: ${bn.why}`, code: 'ban' };
     // пати ищет матч целиком: запускает лидер, все должны быть на сайте и не в матче
     const pt = partyOf(u.id), uids = pt ? pt.members.slice() : [u.id], half = MODES[mode] / 2;
     if (pt) {
@@ -52,6 +87,7 @@ module.exports = function (ctx) {
       if (uids.length > half) return { error: half === 1 ? 'В режиме «1 на 1» играют без пати — выберите «2 на 2» или «5 на 5»' : `В пати ${players(uids.length)} — в режиме «${MODE_NAME[mode]}» можно максимум ${half}` };
       for (const id of uids) if (id !== u.id) {
         if (matchOf(id)) return { error: `${nickOf(id)} ещё в матче — подождите, пока он закончится` };
+        const b2 = banOf(userById(id)); if (b2) return { error: `${nickOf(id)} не может искать матч ещё ${leftStr(b2.until)}: ${b2.why}`, code: 'ban' };
         if (!isOnline(id)) return { error: `${nickOf(id)} сейчас не на сайте — подождите его или исключите из пати`, code: 'offline' };
       }
     }
@@ -138,7 +174,9 @@ module.exports = function (ctx) {
   }
   function decline(mid, uid) { const m = find(mid); if (m && m.state === 'accept' && P(m, uid)) cancelAccept(m, [uid]); }
   function cancelAccept(m, bad) {
-    m.state = 'cancelled'; m.cancelReason = 'Не все игроки приняли матч'; m.requeued = [];
+    m.state = 'cancelled'; m.cancelReason = 'Не все игроки приняли матч'; m.requeued = []; m.missed = {};
+    // кто не принял — штраф (кроме тестовых матчей и матчей, которые прервал перезапуск сайта)
+    if (!m.test && !m.noPenalty) for (const id of bad) { const p = P(m, id); if (p && !p.bot) m.missed[id] = penalize(id, m); }
     // принявшие — снова в поиск, впереди очереди. Пати возвращается, только если приняли все её игроки и состав не менялся
     if (!m.test) for (const g of groupsOf(m)) {
       const ids = g.filter(id => P(m, id) && !P(m, id).bot);
@@ -148,6 +186,7 @@ module.exports = function (ctx) {
       drop(ids); queues[m.mode].push({ uids: ids, pid: ids.length > 1 ? pt.id : null, joined: Date.now(), prio: Date.now() - 120e3 }); m.requeued.push(...ids);
     }
     save(); notify(m); broadcast(); setTimeout(tick, 500);
+    for (const id in m.missed) pushState(id); // показать запрет поиска
   }
   // делим поровну по ELO (перебор всех вариантов); игроки одного пати всегда в одной команде
   function balance(m) {
@@ -261,13 +300,14 @@ module.exports = function (ctx) {
       const u = userById(p.id); if (!u) continue;
       u.elo = Math.max(100, u.elo + m.deltas[p.id]); u.matches += 1; if (winner === p.team) u.wins += 1;
     }
-    m.state = 'finished'; m.finishedAt = Date.now(); save(); notify(m); broadcast();
+    m.state = 'finished'; m.finishedAt = m.endedAt = Date.now(); save(); notify(m); broadcast();
+    if (!m.test) try { onFinish(m); } catch (e) { console.error('onFinish', e); }
     for (const p of real(m)) {
       const d = m.deltas[p.id], res = winner === 'draw' ? 'Ничья' : winner === p.team ? '🏆 Победа' : 'Поражение';
       tell(p.id, `${res}${m.scoreA != null ? ` ${p.team === 'A' ? m.scoreA + ':' + m.scoreB : m.scoreB + ':' + m.scoreA}` : ''} · ${m.map}\nELO: ${d >= 0 ? '+' : ''}${d}${m.test ? ' (тестовый матч — рейтинг не меняется)' : ''}\n${link(m)}`);
     }
   }
-  function cancel(m, reason) { m.state = 'cancelled'; m.cancelReason = reason; save(); notify(m); broadcast(); }
+  function cancel(m, reason) { m.state = 'cancelled'; m.cancelReason = reason; m.endedAt = Date.now(); save(); notify(m); broadcast(); }
   // «Матч не состоялся»: если больше половины игроков согласны — отмена без изменения ELO
   function voteCancel(mid, uid) {
     const m = find(mid); if (!m || m.state !== 'live' || !P(m, uid)) return { error: 'Сейчас нельзя отменить матч' };
@@ -299,6 +339,42 @@ module.exports = function (ctx) {
     }
   }, 1000);
   setInterval(tick, 2000);
+  // матч, который ждал принятия во время перезапуска сайта, отменится без штрафа
+  for (const m of db.matches) if (m.state === 'accept') m.noPenalty = true;
+  // переписку старых матчей (старше 14 дней) удаляем
+  const pruneChat = () => { let n = 0; for (const m of db.matches) if (m.chat && endedAt(m) && Date.now() - endedAt(m) > 14 * DAY) { delete m.chat; n++; } if (n) save(); };
+  setInterval(pruneChat, 3600e3); setTimeout(pruneChat, 5000);
+
+  // ---------- чат матча ----------
+  const endedAt = m => m.endedAt || m.finishedAt || null;
+  const hasTeams = m => m.players.some(p => p.team);
+  const chatOpen = m => hasTeams(m) && (['veto', 'live', 'dispute'].includes(m.state) || (['finished', 'cancelled'].includes(m.state) && !!endedAt(m) && Date.now() - endedAt(m) < AFTER));
+  const chatSees = (m, uid, x) => x.ch === 'all' || isAdminId(uid) || (P(m, uid) || {}).team === x.ch;
+  const chatView = (m, x, uid) => ({ id: x.id, nick: x.nick, t: x.t, ch: x.ch, at: x.at, tm: x.tm || null, me: x.uid === uid, adm: !!x.adm });
+  const chatAt = new Map();
+  function chatList(mid, uid) {
+    const m = find(mid); if (!m) return { error: 'Матч не найден' };
+    if (!P(m, uid) && !isAdminId(uid)) return { error: 'Чат матча видят только его игроки' };
+    return { open: chatOpen(m), msgs: (m.chat || []).filter(x => chatSees(m, uid, x)).map(x => chatView(m, x, uid)) };
+  }
+  function chatSend(mid, u, text, ch) {
+    const m = find(mid); if (!m) return { error: 'Матч не найден' };
+    const me = P(m, u.id), adm = isAdminId(u.id);
+    if (!me && !adm) return { error: 'Писать в чат могут только игроки матча' };
+    if (!chatOpen(m)) return { error: 'Чат этого матча уже закрыт', closed: true };
+    const t = String(text || '').replace(/[\u0000-\u001f\u007f\u200b-\u200f\u202a-\u202e\u2066-\u2069]/g, ' ').replace(/\s+/g, ' ').trim().slice(0, CHAT_LEN);
+    if (!t) return { error: 'Напишите сообщение' };
+    const now = Date.now();
+    if (now - (chatAt.get(u.id) || 0) < 1000) return { error: 'Не так быстро — подождите секунду' };
+    if ((m.chat || []).filter(x => x.uid === u.id).length >= CHAT_USER) return { error: 'Слишком много сообщений в этом матче' };
+    chatAt.set(u.id, now);
+    const x = { id: (m.chatSeq = (m.chatSeq || 0) + 1), uid: u.id, nick: u.nick, t, ch: ch === 'team' && me && me.team ? me.team : 'all', tm: me ? me.team : null, at: now, adm: !me ? 1 : 0 };
+    m.chat = (m.chat || []).concat(x).slice(-CHAT_MAX); saveSoon();
+    for (const id of new Set([...real(m).map(p => p.id), ...adminIds()])) if (chatSees(m, id, x)) sendTo(id, { type: 'chat', mid: m.id, msg: chatView(m, x, id) });
+    return { ok: true, msg: chatView(m, x, u.id) };
+  }
+  // «Спасибо» и жалобы доступны сутки после матча, который дошёл хотя бы до выбора карты (не тестовый)
+  const fbOpen = m => !m.test && hasTeams(m) && ['finished', 'cancelled'].includes(m.state) && !!endedAt(m) && Date.now() - endedAt(m) < FB_TTL;
 
   // ---------- что видит игрок ----------
   function view(m, vid) {
@@ -320,6 +396,9 @@ module.exports = function (ctx) {
       pendingScore: me && myTeam && m.pending[myTeam] ? m.pending[myTeam].score : null,
       cancelVotes: votes.length, cancelNeed: Math.floor(m.players.length / 2) + 1,
       scoreA: m.scoreA, scoreB: m.scoreB, winner: m.winner, cancelReason: m.cancelReason || null, disputeReason: m.disputeReason || null, finishedAt: m.finishedAt || null,
+      missedMe: m.missed && vid && vid in m.missed ? m.missed[vid] : null,
+      chat: chatOpen(m) ? 'open' : m.chat && m.chat.length ? 'read' : null,
+      fb: me && fbOpen(m) ? { until: endedAt(m) + FB_TTL, c: ((m.fb || {}).c || []).filter(x => x[0] === vid).map(x => nickOf(x[1])), r: ((m.fb || {}).r || []).filter(x => x[0] === vid).map(x => nickOf(x[1])) } : null,
     };
   }
   function notify(m) { for (const p of real(m)) sendTo(p.id, { type: 'match', match: view(m, p.id) }); }
@@ -339,5 +418,6 @@ module.exports = function (ctx) {
   const adminList = () => open().filter(m => m.state !== 'accept').sort((a, b) => (a.state === 'dispute' ? -1 : 0) - (b.state === 'dispute' ? -1 : 0) || b.created - a.created)
     .map(m => ({ ...summary(m), state: m.state, created: m.created, reports: m.reports, disputeReason: m.disputeReason || null }));
 
-  return { join, leave, stopFor, inQueue, queueEntry, searching, searchingBy, liveCount, matchOf, find, view, accept, decline, ban, report, confirm, voteCancel, adminResolve, history, testMatch, adminList, MAPS, MODES, MODE_NAME };
+  return { join, leave, stopFor, inQueue, queueEntry, searching, searchingBy, liveCount, matchOf, find, view, accept, decline, ban, report, confirm, voteCancel, adminResolve, history, testMatch, adminList,
+    banOf, missCount, setBan, chatList, chatSend, fbOpen, P, MAPS, MODES, MODE_NAME };
 };

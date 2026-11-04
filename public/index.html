@@ -3,6 +3,16 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#0f0f11">
+<meta name="description" content="StandHub — соревновательный StandLeo: матчмейкинг, ELO-рейтинг, пати с друзьями и ежедневные задания">
+<link rel="manifest" href="/manifest.webmanifest">
+<link rel="icon" href="/icons/icon.svg" type="image/svg+xml">
+<link rel="icon" href="/icons/favicon-32.png" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="StandHub">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
 <title>StandHub — соревновательный StandLeo</title>
 <script>try{if(localStorage.getItem("sh_motion")==="off")document.documentElement.classList.add("no-motion")}catch(e){}</script>
 <style>
@@ -422,6 +432,173 @@ body::after{width:520px;height:520px;left:140px;bottom:-220px;background:radial-
 @media (min-width:761px){.top{background:rgba(15,15,17,.82);-webkit-backdrop-filter:blur(12px) saturate(1.3);backdrop-filter:blur(12px) saturate(1.3)}}
 .no-motion *,.no-motion *::before,.no-motion *::after{animation-duration:.01ms!important;animation-iteration-count:1!important;animation-delay:0s!important;transition-duration:.01ms!important;transition-delay:0s!important}.no-motion .rv{opacity:1;transform:none}
 .no-motion body::before,.no-motion body::after{animation:none}
+/* ===== v1.6: монеты, меню «Ещё», запрет поиска, чат, оценки игроков, задания, магазин, правила, поддержка ===== */
+.hid{display:none!important}
+.side{overflow-y:auto;scrollbar-width:none}.side::-webkit-scrollbar{display:none}
+.side a{height:40px;flex:none}
+.side .mo{display:none}
+.side a.inst{color:var(--orange2)}
+.coins{display:inline-flex;align-items:center;gap:6px;height:34px;padding:0 12px 0 6px;border-radius:17px;background:rgba(255,200,0,.08);border:1px solid rgba(255,200,0,.28);color:#ffd84d;font-weight:800;font-size:14px;font-variant-numeric:tabular-nums;white-space:nowrap;transition:background-color .2s}
+.coins:hover{background:rgba(255,200,0,.15)}
+.coins.bump b{animation:bump .6s var(--ease)}
+.coin{width:22px;height:22px;flex:none;display:block}
+/* меню «Ещё» на телефоне */
+.more-bg{position:fixed;inset:0 0 64px 0;background:rgba(0,0,0,.6);z-index:44;opacity:0;visibility:hidden;transition:opacity .2s,visibility 0s .2s}
+.more-bg.show{opacity:1;visibility:visible;transition:opacity .2s}
+.more{position:fixed;left:0;right:0;bottom:64px;z-index:45;background:#16161a;border-top:1px solid var(--line);border-radius:16px 16px 0 0;padding:16px 12px 12px;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;transform:translateY(calc(100% + 70px));visibility:hidden;transition:transform .28s var(--ease),visibility 0s .28s;box-shadow:0 -18px 40px -20px rgba(0,0,0,.9)}
+.more.show{transform:none;visibility:visible;transition:transform .28s var(--ease)}
+.more a{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;min-height:76px;padding:10px 4px;border-radius:10px;background:var(--card);border:1px solid var(--line);color:#e6e6ea;font-size:12px;font-weight:700;text-align:center;line-height:1.2}
+.more a .ic{width:22px;height:22px;color:var(--orange2)}
+.more a.on{border-color:var(--orange);background:rgba(255,85,0,.1)}
+.more a .nb{position:absolute;top:6px;right:6px;margin:0}
+.more .mot b{color:#fff;font-weight:800}
+.nb.dot{min-width:9px;width:9px;height:9px;padding:0;font-size:0}
+@media (min-width:761px){.more,.more-bg{display:none}}
+/* запрет поиска */
+.ban-card{display:flex;gap:16px;align-items:center;justify-content:space-between;flex-wrap:wrap;margin-bottom:16px;border-color:rgba(255,77,77,.55);background:linear-gradient(90deg,rgba(255,77,77,.14),var(--card))}
+.ban-card .bt{font-size:20px;font-weight:900;margin-top:2px}
+.ban-card .bc{font-variant-numeric:tabular-nums;color:#ff8080}
+.ban-card p{font-size:14px;margin-top:4px;max-width:560px}
+.qwarn{margin-top:8px;font-size:13px;font-weight:600;color:#ffb37a;max-width:440px}
+/* чат матча */
+.chat{display:flex;flex-direction:column;overflow:hidden}
+.chat-h{display:flex;align-items:baseline;justify-content:space-between;gap:10px;padding:14px 16px;border-bottom:1px solid var(--line)}
+.chat-h h3{margin:0}
+.chat-h .muted{font-size:12px;text-align:right}
+.chat-list{height:250px;overflow-y:auto;padding:10px 16px;display:flex;flex-direction:column;gap:7px;overscroll-behavior:contain}
+.cm{font-size:14px;line-height:1.45;overflow-wrap:anywhere}
+.cm b{font-weight:800;margin-right:6px;color:var(--orange2)}
+.cm b.cA{color:#5fe08a}.cm b.cB{color:#ff7a7a}
+.cm .t2{display:inline-block;font-size:10px;font-weight:800;text-transform:uppercase;padding:0 5px;border-radius:3px;margin-right:6px;vertical-align:1px;line-height:16px}
+.cm .t2.tm{background:rgba(120,140,255,.16);color:#a9b4ff}
+.cm .t2.adm{background:rgba(255,85,0,.2);color:var(--orange2)}
+.cm time{font-size:11px;color:#6f6f78;margin-left:6px;white-space:nowrap}
+.cm.me span.tx{color:#fff}
+.cm span.tx{color:#dcdce2}
+.chat-empty{margin:auto;text-align:center;color:var(--muted);font-size:13px;padding:16px 10px;max-width:300px}
+.chat-f{display:flex;gap:8px;padding:10px 12px;border-top:1px solid var(--line);align-items:center}
+.chat-f input{flex:1;min-width:0;height:40px;background:var(--bg2);border:1px solid var(--line);border-radius:6px;color:#fff;padding:0 12px;font-size:15px;font-family:inherit}
+.chat-f input:focus{border-color:var(--orange);outline:none;box-shadow:0 0 0 3px rgba(255,85,0,.15)}
+.chat-ch{display:flex;border:1px solid var(--line);border-radius:6px;overflow:hidden;flex:none}
+.chat-ch button{height:38px;padding:0 10px;background:var(--bg2);color:var(--muted);font-size:12px;font-weight:700;transition:background-color .15s,color .15s}
+.chat-ch button.on{background:rgba(255,85,0,.18);color:#fff}
+.chat-send{width:40px;height:40px;border-radius:6px;background:linear-gradient(180deg,#ff6c22,#ff4f00);color:#fff;display:grid;place-items:center;flex:none}
+.chat-send:disabled{opacity:.5;cursor:default}
+.chat-send .ic{width:18px;height:18px}
+.chat-ro{padding:12px 16px;border-top:1px solid var(--line);font-size:13px;color:var(--muted);text-align:center}
+/* оценки после матча */
+.fbk-sub{font-size:13px;margin:-6px 0 6px}
+.fbr{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--line)}
+.fbr:last-child{border:0}
+.fbr .fn{flex:1;min-width:0}.fbr .fn b{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#fff}
+.fbr .fa{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
+.frb.thx{border-color:rgba(63,207,106,.5);color:#5fe08a}
+.frb.rep{color:var(--muted)}
+@media (hover:hover){.frb.thx:hover{background:rgba(63,207,106,.12);color:#fff}.frb.rep:hover{border-color:var(--red);color:#ff8080}}
+.pill.cmd{background:rgba(63,207,106,.14);color:#5fe08a;font-size:12px;padding:4px 10px;border-radius:14px;text-transform:none;letter-spacing:0}
+/* окно жалобы и подсказки */
+.rsn{display:grid;gap:6px;margin:14px 0 12px}
+.rsn label{display:flex;align-items:center;gap:10px;padding:10px 12px;border:1px solid var(--line);border-radius:6px;background:var(--bg2);cursor:pointer;font-size:14px;transition:border-color .15s,background-color .15s}
+.rsn label:has(input:checked){border-color:var(--orange);background:rgba(255,85,0,.1)}
+.rsn input{accent-color:var(--orange);width:16px;height:16px;flex:none}
+.txa{display:block;width:100%;min-height:84px;resize:vertical;background:var(--bg2);border:1px solid var(--line);border-radius:6px;color:#fff;padding:10px 12px;font:inherit;font-size:15px}
+.txa:focus{border-color:var(--orange);outline:none;box-shadow:0 0 0 3px rgba(255,85,0,.15)}
+.modal .card.pm .howto{margin:14px 0 0}
+/* задания */
+.tk{display:grid;gap:12px;max-width:860px}
+.tk-head{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}
+.tk-bal{display:flex;align-items:center;gap:14px}
+.tk-bal .coin{width:46px;height:46px}
+.tk-bal .v{font-size:32px;font-weight:900;line-height:1.1;font-variant-numeric:tabular-nums}
+.tk-reset{font-size:13px;color:var(--muted);text-align:right}
+.tk-reset b{color:#fff;font-size:18px;font-variant-numeric:tabular-nums}
+.tk-sub{font-size:15px;text-transform:uppercase;font-weight:800;margin:10px 0 0}
+.tk-row{display:flex;align-items:center;gap:16px;padding:16px 20px;transition:border-color .25s,box-shadow .25s,opacity .25s}
+.tk-ic{width:48px;height:48px;border-radius:12px;background:rgba(255,85,0,.12);display:grid;place-items:center;font-size:24px;flex:none}
+.tk-main{flex:1;min-width:0}
+.tk-main>b{display:block;font-size:16px}
+.tk-prog{display:flex;align-items:center;gap:10px;margin-top:8px;font-size:13px;color:var(--muted);font-variant-numeric:tabular-nums}
+.tk-prog .bar{flex:1;margin:0;height:8px;border-radius:4px;max-width:320px}
+.tk-prog .bar div{background:linear-gradient(90deg,var(--orange),var(--yellow));border-radius:4px}
+.tk-rw{display:flex;align-items:center;gap:6px;font-weight:900;color:#ffd84d;white-space:nowrap;font-size:16px}
+.tk-rw .coin{width:20px;height:20px}
+.tk-act{flex:none;min-width:124px;display:flex;justify-content:flex-end}
+.tk-done{color:var(--green);font-weight:800;font-size:13px;white-space:nowrap}
+.tk-wait{color:var(--muted);font-size:13px;white-space:nowrap}
+.tk-row.ready{border-color:rgba(255,200,0,.6);box-shadow:0 0 0 1px rgba(255,200,0,.2),0 14px 34px -20px rgba(255,200,0,.55)}
+.tk-row.got{opacity:.62}
+/* магазин */
+.shop-soon{text-align:center;padding:48px 24px;display:flex;flex-direction:column;align-items:center;gap:12px;max-width:680px}
+.shop-soon .big{font-size:26px;font-weight:900;font-style:italic;text-transform:uppercase;line-height:1.15}
+.shop-bal{display:flex;align-items:center;gap:10px;margin:6px 0 4px;font-size:15px}
+.shop-bal b{font-size:26px;font-weight:900;color:#ffd84d;font-variant-numeric:tabular-nums}
+.shop-bal .coin{width:32px;height:32px}
+/* правила и поддержка */
+.doc{max-width:860px;display:grid;gap:16px}
+.doc>.card{padding:22px 24px;scroll-margin-top:84px}
+.doc h2{font-size:17px;font-weight:900;text-transform:uppercase;margin-bottom:12px;display:flex;align-items:center;gap:10px}
+.doc h2 .ic{color:var(--orange);flex:none}
+.doc ul{padding-left:20px;display:grid;gap:7px;color:#d6d6dc;font-size:15px}
+.doc li::marker{color:var(--orange)}
+.doc .lead{color:#c9c9d0;font-size:15px;margin-top:-8px}
+.doc-nav{display:flex;gap:8px;flex-wrap:wrap}
+.doc-nav a{height:32px;padding:0 12px;border-radius:16px;background:var(--card);border:1px solid var(--line);display:inline-flex;align-items:center;font-size:13px;font-weight:700;color:var(--muted)}
+.doc-nav a:hover{color:#fff;border-color:#4a4a52}
+.pen{margin-top:14px;border:1px solid var(--line);border-radius:8px;overflow:hidden}
+.pen div{display:flex;justify-content:space-between;gap:12px;padding:10px 14px;font-size:14px}
+.pen div+div{border-top:1px solid var(--line)}
+.pen b{white-space:nowrap}
+.hl{animation:hl 1.6s var(--ease)}
+@keyframes hl{0%,30%{box-shadow:0 0 0 2px var(--orange)}}
+.faq details{border-bottom:1px solid var(--line)}
+.faq details:last-child{border:0}
+.faq summary{cursor:pointer;padding:12px 0;font-weight:700;list-style:none;display:flex;justify-content:space-between;gap:12px}
+.faq summary::-webkit-details-marker{display:none}
+.faq summary::after{content:"+";color:var(--orange);font-weight:900;font-size:18px;line-height:1}
+.faq details[open] summary::after{content:"−"}
+.faq p{padding:0 0 14px;color:#c9c9d0;font-size:14px}
+.sup-f{display:grid;gap:12px}
+.sup-f .two{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.sup-f label{display:block;font-size:13px;color:var(--muted);margin-bottom:6px;font-weight:600}
+.sup-f select,.sup-f input{width:100%;height:44px;background:var(--bg2);border:1px solid var(--line);border-radius:6px;color:#fff;padding:0 12px;font:inherit;font-size:15px}
+.sup-f select:focus,.sup-f input:focus{border-color:var(--orange);outline:none}
+.tkt{border:1px solid var(--line);border-radius:8px;padding:14px;background:var(--bg2)}
+.tkt+.tkt{margin-top:10px}
+.tkt.new{border-color:rgba(63,207,106,.55)}
+.tkt-h{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:center}
+.tkt-st{font-size:11px;font-weight:800;text-transform:uppercase;padding:2px 8px;border-radius:3px;background:var(--card2);color:var(--muted);white-space:nowrap}
+.tkt-st.ans{background:rgba(63,207,106,.15);color:var(--green)}
+.tkt-st.open{background:rgba(255,200,0,.15);color:var(--yellow)}
+.msg{margin-top:10px;padding:10px 12px;border-radius:8px;background:var(--card);font-size:14px;white-space:pre-wrap;overflow-wrap:anywhere}
+.msg.adm{background:rgba(255,85,0,.09);border:1px solid rgba(255,85,0,.3)}
+.msg .mh{font-size:12px;color:var(--muted);margin-bottom:4px;white-space:normal}
+.msg .mh b{color:#fff}.msg.adm .mh b{color:var(--orange2)}
+.tkt-f{display:flex;gap:8px;margin-top:10px;align-items:flex-end}
+.tkt-f .txa{flex:1;min-height:44px}
+.tkt-a{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+/* админка */
+.tabs a{display:inline-flex;align-items:center;gap:6px;color:var(--muted);height:46px;padding:0 18px;font-weight:700;text-transform:uppercase;font-size:14px;border-bottom:2px solid transparent;white-space:nowrap;transition:color .2s,border-color .2s}
+.tabs a.on{color:#fff;border-color:var(--orange)}
+.tabs a .nb{margin-left:2px}
+.adm-sub{font-size:14px;text-transform:uppercase;font-weight:800;color:var(--muted);margin:12px 0 -4px}
+.rep.closed{opacity:.75}
+.pill.ban{background:rgba(255,77,77,.15);color:#ff8080}
+.hero-b{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+@media (max-width:760px){
+ .side .mo{display:flex}.side .dk{display:none}
+ .side a{height:52px}
+ .coins{height:32px;padding:0 10px 0 5px;font-size:13px}.coin{width:20px;height:20px}
+ .top .right{gap:8px}
+ .tk-row{flex-wrap:wrap;padding:14px;gap:12px}.tk-ic{width:42px;height:42px;font-size:20px}.tk-act{flex-basis:100%;min-width:0}.tk-act .btn{width:100%}.tk-act .tk-done,.tk-act .tk-wait{margin:0 auto}
+ .tk-head{padding:16px}.tk-reset{text-align:left}
+ .doc>.card{padding:18px 16px}
+ .sup-f .two{grid-template-columns:1fr}
+ .fbr{flex-wrap:wrap}.fbr .fa{flex-basis:100%;justify-content:flex-start;padding-left:44px}
+ .chat-list{height:230px}
+ .chat-ch button{padding:0 8px}
+ .hero-b .btn{flex:1 1 auto}
+ .tabs a{padding:0 12px;font-size:13px}
+}
 /* Responsive */
 @media (max-width:1100px){.feat{grid-template-columns:repeat(2,1fr)}.stats{grid-template-columns:repeat(3,1fr)}.lobby,.pgrid,.room{grid-template-columns:1fr}.room .center{order:-1}.hero .emblem{opacity:.25}}
 @media (max-width:760px){
@@ -471,6 +648,9 @@ body::after{width:520px;height:520px;left:140px;bottom:-220px;background:radial-
 <div class="toast" id="toast" role="status"></div>
 <div class="modal" id="accModal"></div>
 <div class="modal" id="pModal"></div>
+<div class="modal" id="xModal"></div>
+<div class="more-bg" id="moreBg"></div>
+<nav class="more" id="more" aria-label="Ещё разделы"></nav>
 <div class="pinv-wrap" id="pInv" aria-live="polite"></div>
 
 <script>
@@ -490,7 +670,7 @@ const wr=u=>u.matches?Math.round(u.wins/u.matches*100)+"%":"—";
 const hsp=u=>u.kills?Math.round(u.hsKills/u.kills*100)+"%":"—";
 
 /* ===== Состояние и API ===== */
-const S={token:localStorage.getItem("sh_token"),user:null,searching:false,qSince:0,timer:null,mode:"5v5",match:null,mv:{},skew:0,live:{online:null,searching:null,live:null},party:null,psent:[],pinv:[]};
+const S={token:localStorage.getItem("sh_token"),user:null,searching:false,qSince:0,timer:null,mode:"5v5",match:null,mv:{},skew:0,live:{online:null,searching:null,live:null},party:null,psent:[],pinv:[],tasks:null,ban:null,misses:0,badges:{},chat:null};
 const VID=localStorage.getItem("sh_vid")||(()=>{const v=crypto.randomUUID();localStorage.setItem("sh_vid",v);return v})();
 async function api(path,opt={}){
   const r=await fetch(path,{...opt,headers:{"Content-Type":"application/json",...(S.token?{Authorization:"Bearer "+S.token}:{})}});
@@ -522,33 +702,74 @@ function qHint(){
 const L=k=>`<b data-live="${k}">${S.live[k]==null?"—":fmt(S.live[k])}</b>`;
 
 /* ===== Каркас ===== */
-const ICONS={"users":"<circle cx=\"9\" cy=\"8\" r=\"3.6\"/><path d=\"M2.5 20c0-3.7 2.9-5.8 6.5-5.8s6.5 2.1 6.5 5.8z\"/><circle cx=\"16.6\" cy=\"8.8\" r=\"2.9\"/><path d=\"M16.3 13.4c3.2.1 5.2 2.1 5.2 5.4h-4.6c-.1-2.1-.9-3.9-2.3-5.2.5-.1 1.1-.2 1.7-.2z\"/>","home":"<path d=\"M3 11l9-8 9 8v10h-6v-6H9v6H3z\"/>","play":"<path d=\"M7 4l13 8-13 8z\"/>","user":"<circle cx=\"12\" cy=\"8\" r=\"4\"/><path d=\"M4 21c0-4 4-6 8-6s8 2 8 6z\"/>","swords":"<path d=\"M3 3h4l10 10-2 2-2-2-3 3-2-2 3-3zM21 3h-4l-5 5 2 2 1-1 2 2-6 6 2 2 3-3 2 2 2-2-2-2 3-3z\"/>","crown":"<path d=\"M3 7l5 4 4-7 4 7 5-4-2 12H5z\"/>","shield":"<path d=\"M12 2l8 3v6c0 5-3.5 9-8 11-4.5-2-8-6-8-11V5z\"/>","spark":"<path d=\"M12 2l2.4 6.6L21 11l-6.6 2.4L12 20l-2.4-6.6L3 11l6.6-2.4z\"/>","help":"<circle cx=\"12\" cy=\"12\" r=\"10\"/><path d=\"M9.5 9a2.5 2.5 0 115 0c0 2-2.5 2-2.5 4M12 17h0\" stroke=\"#0f0f11\" stroke-width=\"2\" fill=\"none\"/>"};
+const ICONS={"users":"<circle cx=\"9\" cy=\"8\" r=\"3.6\"/><path d=\"M2.5 20c0-3.7 2.9-5.8 6.5-5.8s6.5 2.1 6.5 5.8z\"/><circle cx=\"16.6\" cy=\"8.8\" r=\"2.9\"/><path d=\"M16.3 13.4c3.2.1 5.2 2.1 5.2 5.4h-4.6c-.1-2.1-.9-3.9-2.3-5.2.5-.1 1.1-.2 1.7-.2z\"/>","home":"<path d=\"M3 11l9-8 9 8v10h-6v-6H9v6H3z\"/>","play":"<path d=\"M7 4l13 8-13 8z\"/>","user":"<circle cx=\"12\" cy=\"8\" r=\"4\"/><path d=\"M4 21c0-4 4-6 8-6s8 2 8 6z\"/>","swords":"<path d=\"M3 3h4l10 10-2 2-2-2-3 3-2-2 3-3zM21 3h-4l-5 5 2 2 1-1 2 2-6 6 2 2 3-3 2 2 2-2-2-2 3-3z\"/>","crown":"<path d=\"M3 7l5 4 4-7 4 7 5-4-2 12H5z\"/>","shield":"<path d=\"M12 2l8 3v6c0 5-3.5 9-8 11-4.5-2-8-6-8-11V5z\"/>","spark":"<path d=\"M12 2l2.4 6.6L21 11l-6.6 2.4L12 20l-2.4-6.6L3 11l6.6-2.4z\"/>","help":"<circle cx=\"12\" cy=\"12\" r=\"10\"/><path d=\"M9.5 9a2.5 2.5 0 115 0c0 2-2.5 2-2.5 4M12 17h0\" stroke=\"#0f0f11\" stroke-width=\"2\" fill=\"none\"/>",
+ "tasks":"<path fill-rule=\"evenodd\" d=\"M7 2h2v2h6V2h2v2h2a2 2 0 012 2v13a2 2 0 01-2 2H5a2 2 0 01-2-2V6a2 2 0 012-2h2zM7.4 13.1l1.5-1.5 2.1 2.1 4.6-4.6 1.5 1.5-6.1 6.1z\"/>",
+ "shop":"<path d=\"M3.6 8h16.8l-1.3 13H4.9zM8 8V6.5a4 4 0 018 0V8h-2V6.5a2 2 0 00-4 0V8z\"/>",
+ "book":"<path d=\"M5 3.5A1.5 1.5 0 016.5 2H20v15H6.6a1.6 1.6 0 000 3.2H20V22H6.5A2.5 2.5 0 014 19.5v-15c0-.4.4-1 1-1zM8 6v2h8V6z\"/>",
+ "download":"<path d=\"M11 3h2v9.2l3.3-3.3 1.4 1.4L12 16l-5.7-5.7 1.4-1.4 3.3 3.3zM4 18h16v3H4z\"/>",
+ "logout":"<path d=\"M10 3h9a1 1 0 011 1v16a1 1 0 01-1 1h-9v-2h8V5h-8zM8.6 7.6 10 9l-2 2H15v2H8l2 2-1.4 1.4L4.2 12z\"/>",
+ "more":"<circle cx=\"5\" cy=\"12\" r=\"2.2\"/><circle cx=\"12\" cy=\"12\" r=\"2.2\"/><circle cx=\"19\" cy=\"12\" r=\"2.2\"/>",
+ "send":"<path d=\"M3 20.5 21 12 3 3.5 3 10l12 2-12 2z\"/>"};
+const COIN=`<svg class="coin" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="11" fill="#d98e00"/><circle cx="12" cy="12" r="9.2" fill="#ffc800"/><circle cx="12" cy="12" r="7.4" fill="none" stroke="#ffe27a" stroke-opacity=".55"/><g transform="translate(12 12) scale(.36) translate(-16 -16)"><path d="M4 4h24l-6 8h6L10 28l4-11H6z" fill="#8a4b00"/></g></svg>`;
 function ic(n){return `<svg class="ic" viewBox="0 0 24 24" width="20" height="20" fill="currentColor" aria-hidden="true">${ICONS[n]}</svg>`}
 function renderChrome(route){
-  const u=S.user,tr=document.getElementById("topRight"),side=document.getElementById("side");
+  const u=S.user,tr=document.getElementById("topRight"),side=document.getElementById("side"),more=document.getElementById("more");
   const tk=u?[u.nick,u.elo,u.admin?1:0,(u.avatar||"").length,(u.avatar||"").slice(-24)].join("|"):"-";
   if(tr.dataset.k!==tk){tr.dataset.k=tk;
   tr.innerHTML=u?`
+    <a class="coins" href="#/tasks" title="Монеты — за ежедневные задания" aria-label="Монеты">${COIN}<b data-coins>${fmt(S.tasks?S.tasks.coins:0)}</b></a>
     <a class="btn btn-o" href="#/lobby">Играть</a>
     <a class="userchip" href="#/profile" aria-label="Мой профиль">${ava(u.nick,u.avatar)}<span class="nm">${esc(u.nick)}</span>${badge(u.elo,"sm")}</a>
     <button class="btn btn-g" id="logout">Выйти</button>`:`
     <a class="btn btn-g" href="#/login">Войти</a><a class="btn btn-o" href="#/register">Регистрация</a>`;
-  const lo=document.getElementById("logout");if(lo)lo.onclick=async()=>{S.searching=false;stopQTimer();try{await api("/api/logout",{method:"POST"})}catch{}S.token=null;S.user=null;S.match=null;S.lobbyMs=null;S.fr=null;S.party=null;S.psent=[];S.pinv=[];S.pSeen=false;frBadge();paintPInv();closeInvite();closeAccept();localStorage.removeItem("sh_token");connectLive();if(curHash()==="/")route();else location.hash="#/"}}
-  const items=[["#/","home","Главная"],["#/lobby","play","Играть"],["#/profile","user","Профиль"],["#/friends","users","Друзья"],["#/matches","swords","Матчи"],["#/leaderboard","crown","Рейтинг"]];
+  const lo=document.getElementById("logout");if(lo)lo.onclick=logout}
+  // в нижнем меню телефона — Главная, Играть, Друзья, Задания и «Ещё»; остальное — в «Ещё»
+  const items=[["#/","home","Главная",1],["#/lobby","play","Играть",1],["#/profile","user","Профиль"],["#/friends","users","Друзья",1],["#/matches","swords","Матчи"],["#/leaderboard","crown","Рейтинг"],["#/tasks","tasks","Задания",1],["#/shop","shop","Магазин"]];
   if(u&&u.admin)items.push(["#/admin","shield","Админ"]);
-  const sk=items.map(x=>x[0]).join();
-  if(side.dataset.k!==sk){side.dataset.k=sk;side.innerHTML=items.map(([h,i,t])=>`<a href="${h}" data-r="${h.slice(1)}">${ic(i)}${t}${h==="#/friends"?`<span class="nb z" data-frn aria-label="Новые заявки">0</span>`:""}</a>`).join("")+
-   `<div class="sep"></div><a href="#" class="hide-m">${ic("shield")}Античит</a><a href="#" class="hide-m">${ic("help")}Поддержка</a><a href="#" class="hide-m mot" data-motion>${ic("spark")}Анимации: <b>вкл</b></a>
-    <div class="online"><span class="dot"></span>${L("online")} на сайте<div class="ver">Версия ${APP_V}</div></div>`}
-  paintMotion();frBadge();
-  side.querySelectorAll("a[data-r]").forEach(a=>{const on=a.dataset.r===route;a.classList.toggle("on",on);if(on)a.setAttribute("aria-current","page");else a.removeAttribute("aria-current")});
+  const nbOf=h=>h==="#/friends"?`<span class="nb z" data-frn aria-label="Новые заявки">0</span>`:h==="#/tasks"?`<span class="nb z" data-tkn aria-label="Можно забрать награду">0</span>`:h==="#/admin"?`<span class="nb z" data-admn aria-label="Новые жалобы и обращения">0</span>`:"";
+  const sk=items.map(x=>x[0]).join()+(u?"|u":"");
+  if(side.dataset.k!==sk){side.dataset.k=sk;side.innerHTML=items.map(([h,i,t,m])=>`<a href="${h}" data-r="${h.slice(1)}"${m?"":' class="dk"'}>${ic(i)}${t}${nbOf(h)}</a>`).join("")+
+   `<a class="mo" id="moreBtn" role="button" tabindex="0" aria-expanded="false" aria-controls="more">${ic("more")}Ещё<span class="nb dot z" data-mon aria-hidden="true"></span></a>`+
+   `<div class="sep"></div><a href="#/rules" data-r="/rules" class="dk">${ic("book")}Правила</a><a href="#/support" data-r="/support" class="dk">${ic("help")}Поддержка<span class="nb z" data-supn aria-label="Ответы поддержки">0</span></a><a href="#" class="dk mot" data-motion>${ic("spark")}Анимации: <b>вкл</b></a><a href="#" class="dk inst hid" data-install>${ic("download")}<span class="il">Установить приложение</span></a>
+    <div class="online"><span class="dot"></span>${L("online")} на сайте<div class="ver">Версия ${APP_V}</div></div>`;
+   const mb=document.getElementById("moreBtn");mb.onclick=()=>toggleMore();mb.onkeydown=e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();toggleMore()}};
+   const mi=[["#/profile","user","Профиль"],["#/matches","swords","Матчи"],["#/leaderboard","crown","Рейтинг"],["#/shop","shop","Магазин"],["#/rules","book","Правила"],["#/support","help","Поддержка",`<span class="nb z" data-supn>0</span>`]];
+   if(u&&u.admin)mi.push(["#/admin","shield","Админ",`<span class="nb z" data-admn>0</span>`]);
+   more.innerHTML=mi.map(([h,i,t,b])=>`<a href="${h}" data-r="${h.slice(1)}">${ic(i)}${t}${b||""}</a>`).join("")+
+    `<a href="#" class="mot" data-motion>${ic("spark")}Анимации: <b>вкл</b></a><a href="#" class="inst hid" data-install>${ic("download")}<span class="il">Значок на экран</span></a>${u?`<a href="#" data-logout>${ic("logout")}Выйти</a>`:`<a href="#/login">${ic("user")}Войти</a>`}`}
+  paintMotion();frBadge();paintCoins();paintInstall();
+  const act=a=>{const on=a.dataset.r===route;a.classList.toggle("on",on);if(on)a.setAttribute("aria-current","page");else a.removeAttribute("aria-current")};
+  side.querySelectorAll("a[data-r]").forEach(act);more.querySelectorAll("a[data-r]").forEach(act);
+  const mb=document.getElementById("moreBtn");if(mb)mb.classList.toggle("on",!["/","/lobby","/friends","/tasks"].includes(route));
 }
+function toggleMore(force){const m=document.getElementById("more"),bg=document.getElementById("moreBg"),b=document.getElementById("moreBtn"),on=force!=null?force:!m.classList.contains("show");
+  m.classList.toggle("show",on);bg.classList.toggle("show",on);if(b)b.setAttribute("aria-expanded",on?"true":"false");if(on){const f=m.querySelector("a");if(f)f.focus({preventScroll:true})}}
+const closeMore=()=>{const m=document.getElementById("more");if(m&&m.classList.contains("show"))toggleMore(false)};
+document.getElementById("moreBg").onclick=()=>closeMore();
+document.getElementById("more").addEventListener("click",e=>{if(e.target.closest("a[href^='#/']"))closeMore()});
+async function logout(){S.searching=false;stopQTimer();try{await api("/api/logout",{method:"POST"})}catch{}
+  S.token=null;S.user=null;S.match=null;S.lobbyMs=null;S.fr=null;S.party=null;S.psent=[];S.pinv=[];S.pSeen=false;S.tasks=null;S.ban=null;S.misses=0;S.badges={};S.chat=null;S.sup=null;
+  frBadge();paintBadges();paintPInv();closeInvite();closeAccept();closeX();closeMore();localStorage.removeItem("sh_token");connectLive();if(curHash()==="/")route();else location.hash="#/"}
+document.addEventListener("click",e=>{if(!e.target.closest("[data-logout]"))return;e.preventDefault();logout()});
+// монеты и значки в меню
+function paintCoins(){const t=fmt(S.tasks?S.tasks.coins:0);document.querySelectorAll("[data-coins]").forEach(el=>{if(el.textContent===t)return;const was=el.textContent;el.textContent=t;const c=el.closest(".coins");if(c&&was&&!RM()){c.classList.remove("bump");void c.offsetWidth;c.classList.add("bump")}});paintBadges()}
+function paintBadges(){const b=S.badges||{},set=(sel,n)=>document.querySelectorAll(sel).forEach(el=>{el.textContent=n;el.classList.toggle("z",!n)});
+  set("[data-supn]",b.sup||0);set("[data-admn]",(b.admR||0)+(b.admT||0));set("[data-tkn]",S.user&&S.tasks?S.tasks.ready||0:0);
+  const more=(b.sup||0)+(b.admR||0)+(b.admT||0);document.querySelectorAll("[data-mon]").forEach(el=>el.classList.toggle("z",!more))}
+function onBadges(d){const was=S.badges||{},h=curHash();S.badges=d;paintBadges();
+  if(h.startsWith("/admin"))paintAdmTabs();
+  if(h==="/support"&&d.sup>0)loadSup();                                  // ответ поддержки пришёл, пока страница открыта
+  if(h==="/admin/support"&&(d.admT||0)>(was.admT||0))admSupport();      // новое обращение или ответ игрока
+  if(h==="/admin/reports"&&(d.admR||0)>(was.admR||0))admReports()}
+// при перерисовке списка обращений не теряем набранный текст
+function keepTx(el){const o={};el.querySelectorAll("form[data-tid],form[data-aid]").forEach(f=>{const t=f.querySelector("textarea"),a=document.activeElement===t;if(t&&(t.value||a))o[f.dataset.tid||f.dataset.aid]={v:t.value,a,s:[t.selectionStart,t.selectionEnd]}});return o}
+function restoreTx(el,o){for(const k in o){const t=el.querySelector(`form[data-tid="${k}"] textarea,form[data-aid="${k}"] textarea`);if(!t)continue;t.value=o[k].v;if(o[k].a){t.focus({preventScroll:true});try{t.setSelectionRange(...o[k].s)}catch{}}}}
 const app=document.getElementById("app");
-function toast(t){const e=document.getElementById("toast");e.textContent=t;e.classList.add("show");clearTimeout(e._t);e._t=setTimeout(()=>e.classList.remove("show"),2600)}
+function toast(t){const e=document.getElementById("toast");e.textContent=t;e.classList.add("show");clearTimeout(e._t);e._t=setTimeout(()=>e.classList.remove("show"),Math.min(7000,Math.max(2600,String(t).length*55)))}
 function needAuth(){if(!S.user){location.hash="#/login";toast("Войдите, чтобы продолжить");return true}return false}
 function empty(title,text,btn){return `<div class="empty"><div class="empty-ic">${ic("crown")}</div><b>${title}</b><p class="muted">${text}</p>${btn||""}</div>`}
 /* ===== Анимации ===== */
-const APP_V="1.5";
+const APP_V="1.6";
 // анимации включены всегда; выключить можно кнопкой «Анимации» (меню слева / низ главной)
 const RM=()=>document.documentElement.classList.contains("no-motion");
 function paintMotion(){document.querySelectorAll("[data-motion] b").forEach(b=>b.textContent=RM()?"выкл":"вкл")}
@@ -603,7 +824,7 @@ async function pageHome(){
    <div class="wrap">
     <h1 aria-label="Прокачай свою игру">Прокачай<span class="rot" aria-hidden="true"><span>${[...words,words[0]].map(w=>`<i>${w}</i>`).join("")}</span></span></h1>
     <p>Соревновательный StandLeo на максимуме. Матчмейкинг 5 на 5, ELO-рейтинг, турниры и команды — без потолка для роста.</p>
-    <a class="btn btn-o btn-lg" href="${S.user?"#/lobby":"#/register"}">Играть сейчас</a>
+    <div class="hero-b"><a class="btn btn-o btn-lg" href="${S.user?"#/lobby":"#/register"}">Играть сейчас</a><button class="btn btn-g btn-lg hid" data-install>${ic("download")}<span class="il">Значок на экран</span></button></div>
     <div class="online-big"><span class="dot"></span>${L("online")} на сайте прямо сейчас</div>
    </div></section>
   <section class="sec"><div class="wrap">
@@ -624,11 +845,11 @@ async function pageHome(){
   <section class="cta"><h2 class="rv" style="font-size:40px;font-weight:900;font-style:italic;text-transform:uppercase;margin-bottom:24px">Готов бросить вызов?</h2><div class="rv" style="--i:1"><a class="btn btn-o btn-lg" href="${S.user?"#/lobby":"#/register"}">Играть сейчас</a></div></section>
   <footer>
     <div><h4>StandHub</h4><p>Соревновательная платформа для StandLeo.</p><p class="ver">Версия ${APP_V}</p></div>
-    <div><h4>Помощь</h4><a href="#">Поддержка</a><a href="#">Античит</a><a href="#">Правила</a><a href="#" data-motion>Анимации: <b>вкл</b></a></div>
-    <div><h4>Платформа</h4><a href="#/lobby">Матчмейкинг</a><a href="#/leaderboard">Рейтинг</a><a href="#/matches">Матчи</a></div>
-    <div><h4>Документы</h4><a href="#">Условия использования</a><a href="#">Политика конфиденциальности</a></div>
+    <div><h4>Помощь</h4><a href="#/support">Поддержка</a><a href="#/rules/anticheat">Античит</a><a href="#/rules">Правила</a><a href="#" data-motion>Анимации: <b>вкл</b></a></div>
+    <div><h4>Платформа</h4><a href="#/lobby">Матчмейкинг</a><a href="#/leaderboard">Рейтинг</a><a href="#/matches">Матчи</a><a href="#/tasks">Задания</a><a href="#/shop">Магазин</a></div>
+    <div><h4>Документы</h4><a href="#/rules">Правила платформы</a><a href="#/rules/privacy">Конфиденциальность</a></div>
   </footer>`;
-  entered();reveal();paintMotion();
+  entered();reveal();paintMotion();paintInstall();
   const lb=await getLb();const hl=document.getElementById("homeLb");if(!hl)return;hl.innerHTML=lb.length?lbTable(lb.slice(0,5),true):lbEmpty();bind();
 }
 async function getLb(){try{return await api("/api/leaderboard")}catch{return[]}}
@@ -764,9 +985,10 @@ function pageFriends(){
 const MODE_NAME={"5v5":"5 на 5","2v2":"2 на 2","1v1":"1 на 1"};
 function pageLobby(){
   if(needAuth())return;const u=S.user;const m=S.match&&["veto","live"].includes(S.match.state)?S.match:null;
-  const pt=S.party,mem=pMember();
+  const pt=S.party,mem=pMember(),ban=banNow(),miss=S.misses||0;
   app.innerHTML=`<div class="wrap"><h1 class="h">Матчмейкинг</h1>
   ${m?`<div class="card pad live-banner"><div><div class="tag live">Ваш матч идёт</div><b style="font-size:18px">${MODE_NAME[m.mode]}${m.map?" · "+esc(m.map):""}${m.test?" · тест":""}</b><div class="muted" style="font-size:14px">${m.state==="veto"?"Капитаны выбирают карту":"Игра идёт — после неё капитаны загружают скриншот счёта"}</div></div><a class="btn btn-o" href="#/match/${m.id}">В комнату матча</a></div>`:""}
+  ${ban?banCard(ban,miss):""}
   <div class="lobby">
    <div class="card pad">
      <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px">
@@ -776,15 +998,15 @@ function pageLobby(){
      <div class="party" id="party"></div>
      <div class="ptbar" id="ptbar"></div>
      <div class="findbox">
-       <div><div class="muted" style="font-size:13px">Подбор: все регионы · по уровню ELO</div><div id="qstatus" style="font-weight:700;margin-top:4px">${mem?`Поиск запускает лидер пати — <span style="color:var(--orange2)">${esc(pt.leader)}</span>`:"Готов к поиску"}</div><div id="qhint" class="qhint">${m?"":qHint()}</div></div>
-       <button class="btn btn-o btn-find ${S.searching?"searching":""}" id="find" ${m||(mem&&!S.searching)?"disabled":""}>${S.searching?"Отменить поиск":mem?"Ждём лидера":"Найти матч"}</button>
+       <div><div class="muted" style="font-size:13px">Подбор: все регионы · по уровню ELO</div><div id="qstatus" style="font-weight:700;margin-top:4px">${ban&&!S.searching?`Поиск закрыт до ${new Date(ban.until-S.skew).toLocaleString("ru-RU",ban.until-Date.now()>864e5?{day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"}:{hour:"2-digit",minute:"2-digit"})}`:mem?`Поиск запускает лидер пати — <span style="color:var(--orange2)">${esc(pt.leader)}</span>`:"Готов к поиску"}</div><div id="qhint" class="qhint">${m?"":qHint()}</div>${!ban&&miss?`<div class="qwarn">⚠️ За сутки не принято матчей: ${miss}. Следующий пропуск закроет поиск на ${minStr(PEN[Math.min(miss,3)])}.</div>`:""}</div>
+       <button class="btn btn-o btn-find ${S.searching?"searching":""}" id="find" ${m||(mem&&!S.searching)||(ban&&!S.searching)?"disabled":""}>${S.searching?"Отменить поиск":ban?"Поиск закрыт":mem?"Ждём лидера":"Найти матч"}</button>
      </div>
      ${u.admin?`<div class="admin-box"><div><b>Тестовый матч с ботами</b><div class="muted" style="font-size:13px;max-width:440px">Видно только администратору. Боты сами примут матч и будут убирать карты. Рейтинг не меняется.</div></div><button class="btn btn-g" id="testM" ${m||S.searching?"disabled":""}>Тест · ${MODE_NAME[S.mode]}</button></div>`:""}
    </div>
    <div class="grid" style="align-content:start">
      <div class="card pad"><h3>Твой уровень</h3><div style="display:flex;align-items:center;gap:14px">${badge(u.elo,"xl")}<div><div style="font-size:28px;font-weight:900"><span data-count="${u.elo}">${u.elo}</span> <span class="muted" style="font-size:14px">ELO</span></div><div class="muted" style="font-size:13px">${lvlOf(u.elo)<10?`До уровня ${lvlOf(u.elo)+1}: ${TH[lvlOf(u.elo)+1]-u.elo} ELO`:"Максимальный уровень"}</div></div></div></div>
      <div class="card pad"><h3>Как проходит матч</h3><ol class="howto">
-       <li><span>Нажмите «Найти матч» и примите его за <b>15 секунд</b></span></li>
+       <li><span>Нажмите «Найти матч» и примите его за <b>15 секунд</b>. Не приняли — поиск закроется на время</span></li>
        <li><span>Капитаны по очереди убирают карты — остаётся одна</span></li>
        <li><span>Найдите хоста в StandLeo по ID и напишите ему «.» в личку</span></li>
        <li><span>После игры капитаны загружают скриншот счёта — ELO пересчитается сам</span></li></ol></div>
@@ -805,7 +1027,20 @@ function pageLobby(){
 }
 const lobbyMsHtml=ms=>ms.length?ms.slice(0,4).map(mini).join(""):"Вы ещё не сыграли ни одного матча";
 // лобби перерисовывается только когда что-то важное изменилось — без мерцания
-const lobbyKey=()=>JSON.stringify([S.mode,S.searching,S.match&&[S.match.id,S.match.state,S.match.map],S.user&&[S.user.nick,S.user.elo,S.user.admin],S.party&&[S.party.leader,S.party.members.length]]);
+const lobbyKey=()=>JSON.stringify([S.mode,S.searching,S.match&&[S.match.id,S.match.state,S.match.map],S.user&&[S.user.nick,S.user.elo,S.user.admin],S.party&&[S.party.leader,S.party.members.length],banNow()&&S.ban.until,S.misses]);
+/* ===== Запрет поиска за непринятые матчи ===== */
+const PEN=[0,5,30,120]; // минуты: 1-й пропуск за сутки — предупреждение, 2-й — 5 мин, 3-й — 30 мин, дальше — 2 часа
+const minStr=n=>n>=60?Math.floor(n/60)+" ч"+(n%60?" "+n%60+" мин":""):n+" мин";
+const banNow=()=>S.ban&&S.ban.until>Date.now()+S.skew?S.ban:null;
+function cdStr(ms){const s=Math.max(0,Math.ceil(ms/1000));if(s>=86400){const d=Math.floor(s/86400),h=Math.floor(s%86400/3600);return d+" д "+h+" ч"}const h=Math.floor(s/3600),m=Math.floor(s%3600/60),x=s%60;return (h?h+":"+String(m).padStart(2,"0"):m)+":"+String(x).padStart(2,"0")}
+function banCard(b,miss){const adm=b.kind==="admin";
+  return `<div class="card pad ban-card" id="banCard"><div><div class="tag" style="color:#ff6b6b">⛔ Поиск матчей закрыт</div><div class="bt">Осталось <span class="bc" data-cd="${b.until}">${cdStr(b.until-Date.now()-S.skew)}</span></div>
+   <p class="muted">${adm?`Причина: ${esc(b.why)}. Если это ошибка — напишите в поддержку.`:`Вы не приняли матч${miss>1?` — это ${miss}-й раз за сутки`:""}. Следующий пропуск закроет поиск на ${minStr(PEN[Math.min(miss,3)])}. Счётчик пропусков обнуляется через 24 часа.`}</p></div>
+   <a class="btn btn-g" href="${adm?"#/support":"#/rules/accept"}">${adm?"Поддержка":"Правила"}</a></div>`}
+// обратный отсчёт: запрет поиска, обновление заданий
+setInterval(()=>{const now=Date.now()+S.skew;document.querySelectorAll("[data-cd]").forEach(el=>{const t=cdStr(+el.dataset.cd-now);if(el.textContent!==t)el.textContent=t});
+  if(S.ban&&S.ban.until<=now){S.ban=null;refreshLobby()}
+  if(S.user&&S.tasks&&S.tasks.resetAt<=now&&S.tkFor!==S.tasks.resetAt){S.tkFor=S.tasks.resetAt;setTimeout(loadTasks,1500)}},500);
 /* ===== Пати ===== */
 const PMAX={"5v5":5,"2v2":2,"1v1":1};
 const igr=n=>n+" "+(n===1?"игрок":n<5?"игрока":"игроков");
@@ -927,10 +1162,16 @@ function onLive(d){
   if(d.type==="state")return applyState(d);
   if(d.type==="friends")return onFriends(d);
   if(d.type==="party")return onParty(d);
+  if(d.type==="tasks")return onTasks(d);
+  if(d.type==="badges")return onBadges(d);
+  if(d.type==="chat")return onChat(d);
+  if(d.type==="toast")return toast(d.text);
   if(d.type==="match")onMatch(d.match);
 }
 function applyState(d,fromAction){
   const was=S.searching;
+  if(d.now)S.skew=d.now-Date.now();
+  if("ban" in d){S.ban=d.ban||null;S.misses=d.misses||0}
   if(d.queue){S.searching=true;S.mode=d.queue.mode;S.qSince=Date.now()-d.queue.waited;startQTimer()}
   else if(!fromAction||d.match){S.searching=false;stopQTimer()}
   if(d.match)onMatch(d.match,!fromAction);
@@ -949,6 +1190,7 @@ function onMatch(m,silent,force){
   if(prev==="accept"&&m.state==="veto"){toast("Все приняли матч — капитаны выбирают карту");if(curHash()!=="/match/"+m.id){location.hash="#/match/"+m.id;return}}
   if(prev==="accept"&&m.state==="cancelled"){
     if(m.requeuedMe){S.searching=true;S.mode=m.mode;S.qSince=Date.now();startQTimer();toast("Не все игроки приняли матч — вы снова в поиске")}
+    else if(m.missedMe!=null)toast(m.missedMe?`Вы не приняли матч — поиск закрыт на ${minStr(m.missedMe)}`:"Вы не приняли матч. Это предупреждение: следующий пропуск за сутки закроет поиск на 5 минут");
     else toast(m.iAccepted?"Матч отменён: не все приняли":"Вы не приняли матч")}
   if(prev==="veto"&&m.state==="live"){beep(true);toast("Карта матча: "+m.map)}
   if(prev&&prev!=="finished"&&m.state==="finished"){refreshMe();const me=m.players.find(p=>p.me);if(me){toast(m.winner==="draw"?"Ничья":m.winner===me.team?"Победа! ELO "+fmtD(me.delta):"Поражение. ELO "+fmtD(me.delta));if(m.winner===me.team)setTimeout(confetti,200)}}
@@ -981,7 +1223,7 @@ function showAccept(m){
     <div class="acc-sec${sec0<=5?" hot":""}" id="accSec" aria-hidden="true">${sec0}</div>
     <div class="bar"><div id="accBar" class="${sec0<=5?"hot":""}" style="width:${left()/total*100}%"></div></div>
     <div class="accepts">${Array.from({length:m.total},(_,i)=>`<i class="${i<m.accepted?"ok":""}${i<m.accepted&&i>=prevN?" new":""}"></i>`).join("")}</div>
-    <p class="muted" style="margin-bottom:20px">Приняли <b style="color:#fff">${m.accepted} из ${m.total}</b>. Матч начнётся, когда примут все.</p>
+    <p class="muted" style="margin-bottom:20px">Приняли <b style="color:#fff">${m.accepted} из ${m.total}</b>. Матч начнётся, когда примут все.${!m.test&&!m.iAccepted?`<br><span style="font-size:13px">Не примете — поиск закроется на время</span>`:""}</p>
     ${m.iAccepted?`<div class="acc-ok${prevAcc?"":" pop-in"}">✓ Вы приняли матч — ждём остальных</div>`:`<button class="btn btn-o btn-lg" style="width:100%" id="accYes">Принять</button><button class="btn btn-g" style="width:100%;margin-top:8px" id="accNo">Отклонить</button>`}
   </div>`;
   const y=document.getElementById("accYes");if(y){y.onclick=()=>{y.disabled=true;act(m.id,"accept")};y.focus()}
@@ -1009,7 +1251,7 @@ async function pageProfile(name){
   app.innerHTML=`<div class="wrap">
    <div class="phead">${own?`<label class="ava-edit" title="Сменить аватар">${ava(p.nick,p.avatar)}<span class="ava-cam" aria-hidden="true"><svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M9 4l-2 2H4a1 1 0 00-1 1v12a1 1 0 001 1h16a1 1 0 001-1V7a1 1 0 00-1-1h-3l-2-2zm3 4.5A4.5 4.5 0 1112 17.5 4.5 4.5 0 0112 8.5z"/></svg></span><input type="file" accept="image/png,image/jpeg,image/webp" id="avaIn" class="sr" aria-label="Сменить аватар"></label>`:ava(p.nick,p.avatar)}
      <div><div class="flag">${esc(p.region)} · На StandHub с ${new Date(p.created).toLocaleDateString("ru-RU")}</div><h1>${esc(p.nick)}</h1>
-       <div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap;align-items:center"><span class="chip on" style="height:28px;font-size:12px;display:inline-flex;align-items:center">StandLeo</span>${own?"":frBtn(p.nick,true)}</div></div>
+       <div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap;align-items:center"><span class="chip on" style="height:28px;font-size:12px;display:inline-flex;align-items:center">StandLeo</span>${p.commends?`<span class="pill cmd" title="Столько раз игроки сказали «Спасибо» после матчей">👍 ${fmt(p.commends)} «Спасибо»</span>`:""}${own?"":frBtn(p.nick,true)}</div></div>
      <div class="elo-box">${badge(p.elo,"xl")}<div class="elo-prog"><div class="muted" style="font-size:12px;font-weight:700;text-transform:uppercase">Уровень ${l}</div><div class="v"><span data-count="${p.elo}">${p.elo}</span> <span class="muted" style="font-size:14px">ELO</span></div>
        <div class="bar"><div style="width:${lvlPct(p.elo)}%"></div></div><div class="muted" style="font-size:12px">${l<10?`${TH[l]} — ${TH[l+1]-1}`:"Уровень 10 · 2001+"}</div></div></div>
    </div>
@@ -1062,6 +1304,7 @@ async function pageMatch(id){
 let JUST=null; // карты, убранные только что (для анимации)
 const mSig=m=>JSON.stringify(m,(k,v)=>k==="now"?undefined:v);
 function renderMatch(m){
+  const keep=chatKeep();
   const L0=renderMatch.last||{},same=L0.id===m.id,stCh=same&&L0.state!==m.state,nb=(m.bans||[]).length;
   JUST=same&&m.state==="veto"&&L0.state==="veto"&&nb>L0.bans?new Set(m.bans.slice(L0.bans).map(b=>b.map)):null;
   renderMatch.last={id:m.id,state:m.state,bans:nb};renderMatch.sig=mSig(m);
@@ -1078,6 +1321,7 @@ function renderMatch(m){
   app.innerHTML=`<div class="wrap">
    <div class="mtop"><div><div class="tag">${MODE_NAME[m.mode]} · StandLeo${m.test?" · тестовый матч":""}</div><h1 class="h" style="margin:4px 0 0">Комната матча</h1></div><div class="muted" style="font-size:13px">Матч #${m.id}</div></div>
    ${head}${body}</div>`;
+  mountChat(m,keep);
   bindMatch(m);
   if(S.enter)return entered();
   if(stCh&&!RM()){ // этап матча сменился — плавно показываем новое
@@ -1094,13 +1338,13 @@ function roster(m,t){const ps=m.players.filter(p=>p.team===t).sort((a,b)=>b.elo-
 function center(m){
   const me=m.me,h=m.host||{};
   if(m.state==="accept")return `<div class="card pad"><h3>Ждём, пока все примут матч</h3><p class="muted">Приняли ${m.accepted} из ${m.total}. Осталось <b style="color:#fff" data-dl="${m.acceptDeadline}">0:15</b></p>${me&&!m.iAccepted?`<button class="btn btn-o btn-lg" style="width:100%;margin-top:16px" data-acc>Принять матч</button>`:""}</div>`;
-  if(m.state==="cancelled")return `<div class="card pad"><h3>Матч отменён</h3><p class="muted">${esc(m.cancelReason||"")}. ELO не изменился.</p><a class="btn btn-o" style="margin-top:16px" href="#/lobby">В лобби</a></div>`;
+  if(m.state==="cancelled")return `<div class="card pad"><h3>Матч отменён</h3><p class="muted">${esc(m.cancelReason||"")}. ELO не изменился.</p><a class="btn btn-o" style="margin-top:16px" href="#/lobby">В лобби</a></div>`+fbCard(m)+chatPh(m);
   if(m.state==="veto"){
     const my=me&&me.captain&&m.turn===me.team;
     return `<div class="card pad"><div class="vhead"><div><h3 style="margin:0">Выбор карты</h3><div class="muted" style="font-size:13px">Капитаны по очереди убирают карты. Последняя оставшаяся — карта матча.</div></div><div class="vt" data-dl="${m.turnDeadline}" aria-label="Время на ход">0:20</div></div>
      <div class="turn ${my?"mine":""}">${my?"Ваш ход — уберите одну карту":`Убирает команда ${esc(capName(m,m.turn))}`}</div>
      <div class="vmaps">${m.maps.map(x=>{const b=m.bans.find(y=>y.map===x);return `<button class="vmap${b?" banned":""}${b&&JUST&&JUST.has(x)?" just":""}${my&&!b?" can":""}" style="background:${mapBg(x)}" ${my&&!b?`data-ban="${esc(x)}" aria-label="Убрать карту ${esc(x)}"`:"disabled"}><span class="vn">${esc(x)}</span>${b?`<span class="vb">Убрана · ${b.auto?"время вышло":"команда "+esc(capName(m,b.team))}</span>`:my?`<span class="vb">Убрать</span>`:""}</button>`}).join("")}</div>
-     <div class="muted" style="font-size:13px;margin-top:10px">Если капитан не успеет за 20 секунд, карта уберётся случайно.</div></div>`;
+     <div class="muted" style="font-size:13px;margin-top:10px">Если капитан не успеет за 20 секунд, карта уберётся случайно.</div></div>`+chatPh(m);
   }
   const mapCard=`<div class="mapbig" style="background:${mapBg(m.map)}"><div><div class="tag" style="color:#fff">Карта матча</div><b>${esc(m.map)}</b></div></div>`;
   if(m.state==="live"){
@@ -1114,17 +1358,84 @@ function center(m){
       <li><b>Найдите хоста в StandLeo по ID</b><span class="muted">Хост: ${esc(h.nick||"")}</span><span class="idcopy"><code class="vcode">${esc(h.soid||"")}</code><button class="btn btn-g btn-sm" data-copy="${esc(h.soid||"")}">Скопировать ID</button></span></li>
       <li><b>Напишите ему «.» в личные сообщения</b><span class="muted">Так хост поймёт, что вы из этого матча, и пригласит вас в лобби</span></li>
       <li><b>Играйте за свою команду</b><span class="muted">Карта ${esc(m.map)} · 13 раундов до победы</span></li></ol></div>`;
-    return mapCard+guide+resultCard(m)+(me?`<div class="card pad"><h3>Матч не состоялся?</h3><p class="muted" style="font-size:14px">Если лобби так и не собралось — проголосуйте. Когда наберётся ${m.cancelNeed} из ${m.total} голосов, матч отменится без изменения ELO.</p><button class="btn btn-g" style="margin-top:12px" id="voteC">${me.votedCancel?"Отозвать голос":"Матч не состоялся"} · ${m.cancelVotes}/${m.cancelNeed}</button></div>`:"");
+    return mapCard+guide+resultCard(m)+chatPh(m)+(me?`<div class="card pad"><h3>Матч не состоялся?</h3><p class="muted" style="font-size:14px">Если лобби так и не собралось — проголосуйте. Когда наберётся ${m.cancelNeed} из ${m.total} голосов, матч отменится без изменения ELO.</p><button class="btn btn-g" style="margin-top:12px" id="voteC">${me.votedCancel?"Отозвать голос":"Матч не состоялся"} · ${m.cancelVotes}/${m.cancelNeed}</button></div>`:"");
   }
-  if(m.state==="dispute")return mapCard+`<div class="card pad"><h3>Результат проверяется</h3><p class="muted">Капитаны прислали разные результаты. Администратор проверит матч и выставит итог. ELO пока не меняется.</p></div>`;
+  if(m.state==="dispute")return mapCard+`<div class="card pad"><h3>Результат проверяется</h3><p class="muted">Капитаны прислали разные результаты. Администратор проверит матч и выставит итог. ELO пока не меняется.</p></div>`+chatPh(m);
   // finished
   const p=m.players.find(x=>x.me);
   const big=p?(m.winner==="draw"?"Ничья":m.winner===p.team?`<span class="w">Победа</span>`:`<span class="l">Поражение</span>`):(m.winner==="draw"?"Ничья":`Победила команда ${esc(capName(m,m.winner))}`);
   return mapCard+`<div class="card pad"><h3>Итог матча</h3><div class="resbig">${big}</div>${m.scoreA!=null?`<div class="muted" style="margin-top:4px">Счёт ${m.scoreA} : ${m.scoreB}</div>`:""}
     ${p?`<div style="margin-top:12px;font-size:18px">Ваш ELO: <b class="${p.delta>=0?"w":"l"}"${p.delta!=null?` data-count="${p.delta}" data-sign="1"`:""}>${fmtD(p.delta)}</b></div>`:""}
     ${m.test?`<p class="muted" style="font-size:13px;margin-top:8px">Тестовый матч — рейтинг игроков не изменился.</p>`:""}
-    ${p?`<a class="btn btn-o" style="margin-top:16px" href="#/lobby">Найти новый матч</a>`:""}</div>`;
+    ${p?`<a class="btn btn-o" style="margin-top:16px" href="#/lobby">Найти новый матч</a>`:""}</div>`+fbCard(m)+chatPh(m);
 }
+/* ----- «Спасибо» и жалобы после матча ----- */
+const REASONS={cheat:"Читы",left:"Ушёл / не зашёл в лобби",toxic:"Оскорбления",result:"Неверный результат",other:"Другое"};
+function fbCard(m){
+  const f=m.fb,meP=m.players.find(p=>p.me);if(!f||!meP)return "";
+  const others=m.players.filter(p=>!p.me&&!p.bot).sort((a,b)=>(b.team===meP.team)-(a.team===meP.team)||b.elo-a.elo);if(!others.length)return "";
+  return `<div class="card pad fbk" id="fbk"><h3>Оцените игроков</h3><p class="muted fbk-sub">Скажите «Спасибо» за хорошую игру или пожалуйтесь на нарушителя. Можно в течение суток после матча.</p>
+   ${others.map(p=>{const c=f.c.includes(p.nick),r=f.r.includes(p.nick);return `<div class="fbr">${ava(p.nick,p.avatar)}<div class="fn"><b>${esc(p.nick)}</b><div class="st">${p.team===meP.team?"Ваша команда":"Соперник"}</div></div><div class="fa">${c?`<span class="frb ok">👍 Спасибо отправлено</span>`:`<button class="frb thx" data-fb="c" data-nick="${esc(p.nick)}">👍 Спасибо</button>`}${r?`<span class="frb wait">Жалоба отправлена</span>`:`<button class="frb rep" data-fb="r" data-nick="${esc(p.nick)}">🚩 Жалоба</button>`}</div></div>`}).join("")}</div>`;
+}
+function openReport(mid,nick){
+  openX(`<form class="card pm" id="repF" role="dialog" aria-modal="true" aria-labelledby="xH"><button type="button" class="pm-x" data-x aria-label="Закрыть">×</button><h3 id="xH">Жалоба на ${esc(nick)}</h3><p class="muted pm-sub">Администратор проверит матч и примет решение. На одного игрока за матч можно пожаловаться один раз.</p>
+   <div class="rsn" role="radiogroup" aria-label="Причина">${Object.entries(REASONS).map(([k,t],i)=>`<label><input type="radio" name="rs" value="${k}"${i?"":" checked"}>${t}</label>`).join("")}</div>
+   <textarea class="txa" name="t" maxlength="500" placeholder="Что произошло? (необязательно)" aria-label="Комментарий"></textarea>
+   <div class="row2" style="margin-top:14px"><button class="btn btn-o" type="submit">Отправить жалобу</button><button class="btn btn-g" type="button" data-x>Отмена</button></div></form>`);
+  const f=document.getElementById("repF");f.onsubmit=async e=>{e.preventDefault();const b=f.querySelector("[type=submit]");b.disabled=true;
+    const r=await act(mid,"flag",{nick,reason:f.rs.value,text:f.t.value});if(r){closeX();toast("Жалоба отправлена — администратор проверит")}else b.disabled=false};
+}
+document.addEventListener("click",async e=>{const b=e.target.closest("[data-fb]");if(!b)return;e.preventDefault();const id=(curHash().match(/^\/match\/([a-f0-9]+)/)||[])[1];if(!id||b.disabled)return;
+  if(b.dataset.fb==="r")return openReport(id,b.dataset.nick);
+  b.disabled=true;const r=await act(id,"commend",{nick:b.dataset.nick});if(r)toast(`Вы сказали «Спасибо» игроку ${b.dataset.nick} 👍`);else if(b.isConnected)b.disabled=false});
+/* ----- окно поверх страницы (жалоба, подсказки) ----- */
+function openX(html){const el=document.getElementById("xModal");el.innerHTML=html;el.classList.add("show");el.onclick=e=>{if(e.target===el)closeX()};const f=el.querySelector("input:checked,textarea,.btn-o,button");if(f)f.focus({preventScroll:true})}
+function closeX(){const el=document.getElementById("xModal");if(el&&el.classList.contains("show")){el.classList.remove("show");clearTimeout(el._ct);el._ct=setTimeout(()=>{if(!el.classList.contains("show"))el.innerHTML=""},300)}}
+document.addEventListener("click",e=>{if(e.target.closest("#xModal [data-x]")){e.preventDefault();closeX()}});
+document.addEventListener("keydown",e=>{if(e.key==="Escape"){closeX();closeMore()}});
+/* ----- Чат матча ----- */
+const chatOn=m=>!!(m.chat&&S.user&&(m.me||S.user.admin));
+const chatPh=m=>chatOn(m)?`<div id="chatPh"></div>`:"";
+// перед перерисовкой комнаты запоминаем, что человек печатал и где была прокрутка
+function chatKeep(){const c=S.chat;if(!c||!c.el.isConnected)return null;const i=c.el.querySelector("input"),l=c.el.querySelector(".chat-list");
+  return {f:i&&document.activeElement===i?[i.selectionStart,i.selectionEnd]:null,top:l.scrollTop,bottom:l.scrollHeight-l.clientHeight-l.scrollTop<40}}
+function mountChat(m,keep){
+  const ph=document.getElementById("chatPh");if(!ph)return;
+  let c=S.chat;
+  if(!c||c.mid!==m.id){c=S.chat={mid:m.id,msgs:[],ch:"all",mode:null,el:document.createElement("div"),loaded:false,at:0};c.el.className="card chat";c.el.id="chatBox";
+    c.el.innerHTML=`<div class="chat-h"><h3>Чат матча</h3><span class="muted" data-chs></span></div><div class="chat-list" role="log" aria-label="Сообщения чата"></div><div class="chat-foot"></div>`;paintChatList(c)}
+  ph.replaceWith(c.el);chatMode(c,m);
+  const l=c.el.querySelector(".chat-list");
+  if(keep){l.scrollTop=keep.bottom?l.scrollHeight:keep.top;const i=c.el.querySelector("input");if(keep.f&&i){i.focus({preventScroll:true});try{i.setSelectionRange(keep.f[0],keep.f[1])}catch{}}}
+  else l.scrollTop=l.scrollHeight;
+  if(!c.loaded||Date.now()-c.at>30000)loadChat(c);
+}
+function chatMode(c,m){
+  const team=!!(m.me&&m.me.team),mode=m.chat==="open"?(team?"team":"all"):"ro";
+  c.el.querySelector("[data-chs]").textContent=m.me?"видят только игроки матча":"вы — администратор";
+  if(c.mode===mode)return;c.mode=mode;if(!team)c.ch="all";
+  const ft=c.el.querySelector(".chat-foot");
+  if(mode==="ro"){ft.innerHTML=`<div class="chat-ro">Чат закрыт — писать можно до 30 минут после конца матча</div>`;return}
+  ft.innerHTML=`<form class="chat-f" autocomplete="off">${team?`<div class="chat-ch" role="radiogroup" aria-label="Кому"><button type="button" data-ch="all" role="radio">Всем</button><button type="button" data-ch="team" role="radio">Команде</button></div>`:""}<input maxlength="300" aria-label="Сообщение в чат" enterkeyhint="send"><button class="chat-send" type="submit" aria-label="Отправить">${ic("send")}</button></form>`;
+  const f=ft.querySelector("form"),i=f.querySelector("input");
+  const setCh=ch=>{c.ch=ch;f.querySelectorAll("[data-ch]").forEach(b=>{const on=b.dataset.ch===ch;b.classList.toggle("on",on);b.setAttribute("aria-checked",on)});i.placeholder=ch==="team"?"Написать команде…":"Написать всем…"};
+  f.querySelectorAll("[data-ch]").forEach(b=>b.onclick=()=>{setCh(b.dataset.ch);i.focus({preventScroll:true})});setCh(c.ch);
+  f.onsubmit=async e=>{e.preventDefault();const t=i.value.trim();if(!t)return;const b=f.querySelector(".chat-send");if(b.disabled)return;b.disabled=true;
+    try{const r=await api(`/api/match/${c.mid}/chat`,{method:"POST",body:JSON.stringify({text:t,ch:c.ch})});i.value="";addMsg(c,r.msg,true)}
+    catch(err){toast(err.message);if(err.closed&&S.mv[c.mid]){S.mv[c.mid].chat="read";chatMode(c,S.mv[c.mid])}}
+    b.disabled=false;if(i.isConnected)i.focus({preventScroll:true})};
+}
+async function loadChat(c){try{const r=await api(`/api/match/${c.mid}/chat`);const ids=new Set(r.msgs.map(x=>x.id));c.msgs=r.msgs.concat(c.msgs.filter(x=>!ids.has(x.id))).sort((a,b)=>a.id-b.id);c.loaded=true;c.at=Date.now();paintChatList(c,true)}catch{}}
+const cmTime=t=>new Date(t).toLocaleTimeString("ru-RU",{hour:"2-digit",minute:"2-digit"});
+const cmHtml=x=>`<div class="cm${x.me?" me":""}">${x.adm?`<span class="t2 adm">Админ</span>`:""}${x.ch!=="all"?`<span class="t2 tm">Команде</span>`:""}<b class="${x.tm==="A"?"cA":x.tm==="B"?"cB":""}">${esc(x.nick)}</b><span class="tx">${esc(x.t)}</span><time>${cmTime(x.at)}</time></div>`;
+function paintChatList(c,toBottom){const l=c.el.querySelector(".chat-list");
+  l.innerHTML=c.msgs.length?c.msgs.map(cmHtml).join(""):`<div class="chat-empty">${c.loaded?"Сообщений пока нет. Здесь удобно договориться о лобби: кто хост, когда заходить.":"Загружаем сообщения…"}</div>`;
+  if(toBottom)l.scrollTop=l.scrollHeight}
+function addMsg(c,x,force){if(c.msgs.some(y=>y.id===x.id))return;c.msgs.push(x);const l=c.el.querySelector(".chat-list"),bottom=l.scrollHeight-l.clientHeight-l.scrollTop<40;
+  if(c.msgs.length===1)l.innerHTML="";l.insertAdjacentHTML("beforeend",cmHtml(x));if(!RM())rise([l.lastElementChild],0,250,6);if(bottom||force)l.scrollTop=l.scrollHeight}
+function onChat(d){const c=S.chat;
+  if(c&&c.mid===d.mid)addMsg(c,d.msg);
+  if(!d.msg.me&&curHash()!=="/match/"+d.mid&&Date.now()-(S.chatT||0)>8000){S.chatT=Date.now();toast(`💬 ${d.msg.nick}: ${d.msg.t.length>70?d.msg.t.slice(0,70)+"…":d.msg.t}`)}}
 function resultCard(m){
   const me=m.me;if(!me)return "";
   const caps=["A","B"].map(t=>`<div class="qrow"><span class="muted">Капитан ${esc(capName(m,t))}</span>${m.reports[t]?`<span class="w">✓ загрузил</span>`:`<span class="muted">ждём</span>`}</div>`).join("");
@@ -1164,10 +1475,17 @@ async function uploadShot(id,file){
   if(!r&&curHash()==="/match/"+id)renderMatch(S.mv[id]);
 }
 /* ----- Админка ----- */
-async function pageAdmin(){
+const ADM_TABS=[["","Матчи"],["reports","Жалобы","admR"],["support","Поддержка","admT"]];
+function paintAdmTabs(){const el=document.getElementById("admTabs");if(!el)return;const b=S.badges||{};
+  el.querySelectorAll("[data-tab]").forEach(a=>{const t=ADM_TABS.find(x=>x[0]===a.dataset.tab),n=t[2]?b[t[2]]||0:0,nb=a.querySelector(".nb");nb.textContent=n;nb.classList.toggle("z",!n)})}
+const dtm=t=>new Date(t).toLocaleString("ru-RU",{day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"});
+async function pageAdmin(tab){
   if(needAuth())return;
   if(!S.user.admin){app.innerHTML=`<div class="wrap">${empty("Нет доступа","Эта страница только для администраторов")}</div>`;return}
-  app.innerHTML=`<div class="wrap"><h1 class="h">Админка · матчи</h1><p class="muted" style="margin:-12px 0 20px">Идущие и спорные матчи. Спорный — когда капитаны прислали разные результаты.</p><div id="adm" class="grid"><div class="card">${skel(3)}</div></div></div>`;entered();
+  tab=["reports","support"].includes(tab)?tab:"";
+  const sub={"":"Идущие и спорные матчи. Спорный — когда капитаны прислали разные результаты.",reports:"Жалобы игроков после матчей. Можно закрыть жалобу или закрыть нарушителю поиск матчей.",support:"Обращения в поддержку. Ответ придёт игроку на сайт и в Telegram."}[tab];
+  app.innerHTML=`<div class="wrap"><h1 class="h">Админка</h1><div class="tabs" id="admTabs" style="margin-top:-6px">${ADM_TABS.map(([k,t])=>`<a href="#/admin${k?"/"+k:""}" data-tab="${k}" class="${tab===k?"on":""}">${t}<span class="nb z">0</span></a>`).join("")}</div><p class="muted" style="margin:-6px 0 20px">${sub}</p><div id="adm" class="grid"><div class="card">${skel(3)}</div></div></div>`;entered();paintAdmTabs();
+  if(tab==="reports")return admReports();if(tab==="support")return admSupport();
   const list=await api("/api/admin/matches").catch(()=>[]);const el=document.getElementById("adm");if(!el)return;
   if(!list.length){el.innerHTML=`<div class="card">${empty("Сейчас нет идущих матчей","Здесь появятся идущие матчи и матчи, где капитаны не сошлись в результате")}</div>`;return}
   const rep=(m,t)=>m.reports[t]?`${resName(m.reports[t].result)}${m.reports[t].score?" "+m.reports[t].score.join(":"):""}`:"ещё нет";
@@ -1177,6 +1495,141 @@ async function pageAdmin(){
   rise(el.children,60,400);
   el.querySelectorAll("[data-w]").forEach(b=>b.onclick=async()=>{if(!confirm(b.dataset.w==="cancel"?"Отменить матч? ELO не изменится.":"Выставить результат: «"+b.textContent+"»?"))return;try{await api(`/api/admin/match/${b.dataset.id}/resolve`,{method:"POST",body:JSON.stringify({winner:b.dataset.w})});toast("Готово");pageAdmin()}catch(e){toast(e.message)}});
 }
+async function admReports(){
+  const d=await api("/api/admin/reports").catch(()=>null),el=document.getElementById("adm");if(!el||curHash()!=="/admin/reports")return;
+  if(!d){el.innerHTML=`<div class="card">${empty("Не удалось загрузить","Обновите страницу")}</div>`;return}
+  const card=(r,open)=>`<div class="card pad rep${open?"":" closed"}"><div class="adm-h"><div><b>${esc(r.from)}</b> <span class="muted">→</span> <a href="#/player/${encodeURIComponent(r.to)}"><b style="color:var(--orange2)">${esc(r.to)}</b></a> <span class="pill">${esc(r.reason)}</span>
+      <div class="muted" style="font-size:13px;margin-top:4px">${dtm(r.at)} · <a href="#/match/${r.mid}" style="text-decoration:underline">матч #${r.mid}</a>${r.mode?" · "+MODE_NAME[r.mode]:""}${r.map?" · "+esc(r.map):""}</div></div>${r.ban?`<span class="pill ban">Поиск закрыт · <span data-cd="${r.ban.until}">${cdStr(r.ban.until-Date.now()-S.skew)}</span></span>`:""}</div>
+    ${r.text?`<div class="msg">${esc(r.text)}</div>`:""}
+    <div class="muted" style="font-size:13px;margin:10px 0">Жалоб на ${esc(r.to)} за 30 дней: <b style="color:#fff">${r.against}</b> · «Спасибо» от игроков: <b style="color:#fff">${r.commends}</b></div>
+    ${open?`<div class="row2"><button class="btn btn-g btn-sm" data-ra="close" data-id="${r.id}">Закрыть без наказания</button><button class="btn btn-o btn-sm" data-ra="ban1" data-id="${r.id}">Запрет поиска · 1 день</button><button class="btn btn-o btn-sm" data-ra="ban7" data-id="${r.id}">Запрет · 7 дней</button>${r.ban?`<button class="btn btn-g btn-sm" data-ra="unban" data-id="${r.id}">Снять запрет</button>`:""}</div>`
+      :`<div style="font-size:13px;display:flex;align-items:center;gap:10px;flex-wrap:wrap"><span><span class="w">✓</span> ${esc(r.res||"Закрыта")}</span>${r.ban?`<button class="frb" data-ra="unban" data-id="${r.id}">Снять запрет</button>`:""}</div>`}</div>`;
+  el.innerHTML=(d.open.length?d.open.map(r=>card(r,1)).join(""):`<div class="card">${empty("Новых жалоб нет","Жалобы появятся здесь, когда игроки пожалуются на кого-то после матча")}</div>`)+(d.closed.length?`<h3 class="adm-sub">Закрытые</h3>`+d.closed.map(r=>card(r,0)).join(""):"");
+  rise(el.children,50,350);
+  el.querySelectorAll("[data-ra]").forEach(b=>b.onclick=async()=>{const a=b.dataset.ra;
+    if(a!=="close"&&!confirm(a==="unban"?"Снять запрет на поиск матчей?":`Закрыть игроку поиск матчей на ${a==="ban1"?"1 день":"7 дней"}? Он получит сообщение в Telegram.`))return;
+    b.disabled=true;try{const r=await api(`/api/admin/report/${b.dataset.id}`,{method:"POST",body:JSON.stringify({act:a})});toast(r.res);admReports()}catch(e){toast(e.message);b.disabled=false}});
+}
+async function admSupport(){
+  const d=await api("/api/admin/tickets").catch(()=>null),el=document.getElementById("adm");if(!el||curHash()!=="/admin/support")return;
+  if(!d){el.innerHTML=`<div class="card">${empty("Не удалось загрузить","Обновите страницу")}</div>`;return}
+  const card=(x,open)=>{const last=x.msgs[x.msgs.length-1],st=x.status==="closed"?["","Закрыто"]:last.by==="admin"?["ans","Ответ отправлен"]:["open","Ждёт ответа"];
+    return `<div class="card pad"><div class="adm-h"><div><a href="#/player/${encodeURIComponent(x.nick)}"><b>${esc(x.nick)}</b></a> <span class="muted" style="font-size:13px">ID в игре ${esc(x.soid)}</span> <span class="pill">${esc(x.topic)}</span>${x.mid?` <a href="#/match/${esc(x.mid)}" class="muted" style="font-size:13px;text-decoration:underline">матч #${esc(x.mid)}</a>`:""}<div class="muted" style="font-size:13px;margin-top:4px">${dtm(x.at)}</div></div><span class="tkt-st ${st[0]}">${st[1]}</span></div>
+     ${x.msgs.map(m=>`<div class="msg${m.by==="admin"?" adm":""}"><div class="mh"><b>${m.by==="admin"?"Поддержка":esc(x.nick)}</b> · ${dtm(m.at)}</div>${esc(m.t)}</div>`).join("")}
+     ${open?`<form class="tkt-f" data-aid="${x.id}"><textarea class="txa" maxlength="1500" rows="2" placeholder="Ответ игроку — придёт на сайт и в Telegram" aria-label="Ответ"></textarea><button class="btn btn-o btn-sm" type="submit">Ответить</button></form><div class="tkt-a"><button class="frb" data-aclose="${x.id}">Закрыть обращение</button></div>`:""}</div>`};
+  const kp=keepTx(el);el.innerHTML=(d.open.length?d.open.map(x=>card(x,1)).join(""):`<div class="card">${empty("Открытых обращений нет","Когда игрок напишет в поддержку, обращение появится здесь, а вам придёт сообщение в Telegram")}</div>`)+(d.closed.length?`<h3 class="adm-sub">Закрытые</h3>`+d.closed.map(x=>card(x,0)).join(""):"");restoreTx(el,kp);
+  if(!el._seen){el._seen=1;rise(el.children,50,350)}
+  el.querySelectorAll("form[data-aid]").forEach(f=>f.onsubmit=async e=>{e.preventDefault();const t=f.querySelector("textarea"),b=f.querySelector("button");if(!t.value.trim())return t.focus();b.disabled=true;
+    try{await api(`/api/admin/ticket/${f.dataset.aid}`,{method:"POST",body:JSON.stringify({act:"reply",text:t.value})});t.value="";toast("Ответ отправлен");admSupport()}catch(err){toast(err.message);b.disabled=false}});
+  el.querySelectorAll("[data-aclose]").forEach(b=>b.onclick=async()=>{b.disabled=true;try{await api(`/api/admin/ticket/${b.dataset.aclose}`,{method:"POST",body:JSON.stringify({act:"close"})});toast("Обращение закрыто");admSupport()}catch(e){toast(e.message);b.disabled=false}});
+}
+/* ===== Ежедневные задания ===== */
+const bonusFor=st=>10+5*(Math.min(Math.max(st,1),7)-1);
+const dn=n=>n%10===1&&n%100!==11?"день":n%10>=2&&n%10<=4&&(n%100<12||n%100>14)?"дня":"дней";
+function onTasks(d){const first=!S.tasks;S.tasks=d;paintCoins();if(d.note)setTimeout(()=>toast(d.note),first?0:2800);
+  if(curHash()==="/tasks")paintTasks();else if(curHash()==="/shop"){const b=document.querySelector(".shop-bal b");if(b)b.textContent=fmt(d.coins)}}
+async function loadTasks(){if(!S.user)return;try{onTasks(await api("/api/tasks"))}catch{}}
+function tkHtml(t){
+  const btn=(id,can,got)=>got?`<span class="tk-done">✓ Получено</span>`:can?`<button class="btn btn-o" data-claim="${id}">Забрать</button>`:`<span class="tk-wait">В процессе</span>`;
+  const rw=n=>`<span class="tk-rw">+${n} ${COIN}</span>`,b=t.bonus;
+  return `<div class="card pad tk-head"><div class="tk-bal">${COIN}<div><div class="muted" style="font-size:12px;font-weight:700;text-transform:uppercase">Ваши монеты</div><div class="v">${fmt(t.coins)}</div></div></div><div class="tk-reset">Новые задания через<br><b data-cd="${t.resetAt}">${cdStr(t.resetAt-Date.now()-S.skew)}</b></div></div>
+   <div class="card tk-row${b.got?" got":" ready"}"><div class="tk-ic">📅</div><div class="tk-main"><b>Бонус за вход</b><div class="muted" style="font-size:13px;margin-top:2px">Заходите каждый день — награда растёт. Серия: ${b.streak} ${dn(b.streak)} подряд${b.streak<7?` · завтра +${bonusFor(b.streak+1)}`:""}</div></div>${rw(b.amount)}<div class="tk-act">${btn("bonus",!b.got,b.got)}</div></div>
+   <h3 class="tk-sub">Задания дня</h3>
+   ${t.list.map(x=>{const done=x.prog>=x.goal;return `<div class="card tk-row${x.got?" got":done?" ready":""}" data-task="${x.id}"><div class="tk-ic">${x.ic}</div><div class="tk-main"><b>${esc(x.title)}</b><div class="tk-prog"><div class="bar"><div style="width:${Math.round(x.prog/x.goal*100)}%"></div></div><span>${x.prog} / ${x.goal}</span></div></div>${rw(x.reward)}<div class="tk-act">${btn(x.id,done,x.got)}</div></div>`}).join("")}
+   <div class="card tk-row${t.all.got?" got":t.all.done?" ready":""}"><div class="tk-ic">🎁</div><div class="tk-main"><b>Все задания дня</b><div class="muted" style="font-size:13px;margin-top:2px">Выполните все три задания — получите сундук с бонусом</div></div>${rw(t.all.reward)}<div class="tk-act">${btn("all",t.all.done,t.all.got)}</div></div>
+   <p class="muted" style="font-size:13px;margin-top:4px">Засчитываются только обычные матчи (тестовые — нет). Задания обновляются каждый день в 00:00 по Москве. Монеты пригодятся в <a href="#/shop" style="color:var(--orange2)">магазине</a> — он скоро откроется.</p>`;
+}
+function paintTasks(){const el=document.getElementById("tk");if(!el||!S.tasks)return;const h=tkHtml(S.tasks);if(el._h===h)return;const first=!el._h;el._h=h;el.innerHTML=h;if(first)rise(el.children,50,400)}
+function pageTasks(){
+  if(!S.user){app.innerHTML=`<div class="wrap"><h1 class="h">Задания</h1><div class="card" style="max-width:860px">${empty("Ежедневные задания","Каждый день — новые задания и бонус за вход. Выполняйте их и получайте монеты для магазина StandHub.",`<a class="btn btn-o" href="#/login">Войти</a>`)}</div></div>`;entered();return}
+  app.innerHTML=`<div class="wrap"><h1 class="h">Задания</h1><div class="tk" id="tk"><div class="card">${skel(4)}</div></div></div>`;entered();
+  paintTasks();loadTasks();
+}
+document.addEventListener("click",async e=>{const b=e.target.closest("[data-claim]");if(!b)return;e.preventDefault();if(b.disabled)return;b.disabled=true;
+  try{const r=await api("/api/tasks/claim",{method:"POST",body:JSON.stringify({id:b.dataset.claim})});onTasks(r.state);toast(`+${r.amount} монет 🎉`);if(b.dataset.claim==="all")confetti()}
+  catch(err){toast(err.message);if(b.isConnected)b.disabled=false;if(err.state)onTasks(err.state)}});
+/* ===== Магазин ===== */
+function pageShop(){
+  app.innerHTML=`<div class="wrap"><h1 class="h">Магазин</h1><div class="card shop-soon"><div class="empty-ic" style="width:64px;height:64px">${ic("shop")}</div><div class="big">Магазин скоро откроется</div>
+   <p class="muted" style="max-width:460px">Здесь можно будет обменять монеты на награды. А пока копите монеты: выполняйте ежедневные задания и забирайте бонус за вход.</p>
+   ${S.user?`<div class="shop-bal">${COIN}<b>${fmt(S.tasks?S.tasks.coins:0)}</b><span class="muted">монет на счёте</span></div><a class="btn btn-o" href="#/tasks">К заданиям</a>`:`<a class="btn btn-o" href="#/login">Войти</a>`}</div></div>`;entered();
+  if(S.user&&!S.tasks)loadTasks();
+}
+/* ===== Правила ===== */
+function pageRules(sec){
+  const li=a=>`<ul>${a.map(x=>`<li>${x}</li>`).join("")}</ul>`;
+  app.innerHTML=`<div class="wrap"><h1 class="h">Правила StandHub</h1><div class="doc">
+   <p class="lead">Играем честно и уважаем друг друга. За нарушения — ограничения поиска матчей.</p>
+   <div class="doc-nav"><a href="#/rules/account">Аккаунт</a><a href="#/rules/accept">Принятие матча</a><a href="#/rules/match">Матч</a><a href="#/rules/anticheat">Античит</a><a href="#/rules/penalties">Наказания</a><a href="#/rules/privacy">Конфиденциальность</a></div>
+   <div class="card" id="r-account"><h2>${ic("user")}Аккаунт</h2>${li(["Один игрок — один аккаунт. Привязывайте только свой игровой ID.","Аккаунт подтверждается скриншотом экрана «Мой профиль» через Telegram-бота.","Нельзя играть с чужого аккаунта или давать играть другим со своего (бустинг)."])}</div>
+   <div class="card" id="r-accept"><h2>${ic("play")}Поиск и принятие матча</h2>${li(["Найденный матч нужно принять за <b>15 секунд</b>. Не приняли или отклонили — штраф: поиск матчей закрывается на время.","Пропуски считаются за последние 24 часа. Тестовые матчи не считаются.","Если сайт обновлялся, пока шло принятие, — штрафа нет."])}
+     <div class="pen"><div><span>1-й пропуск за сутки</span><b>Предупреждение</b></div><div><span>2-й пропуск</span><b>Поиск закрыт на 5 минут</b></div><div><span>3-й пропуск</span><b>30 минут</b></div><div><span>4-й и дальше</span><b>2 часа</b></div></div></div>
+   <div class="card" id="r-match"><h2>${ic("swords")}Матч</h2>${li(["Хост создаёт лобби в StandLeo на выбранной карте — 13 раундов до победы.","Игроки находят хоста по ID и пишут ему «.» в личные сообщения — он приглашает в лобби.","Играйте за свою команду до конца матча. Уходить из матча нельзя.","Если лобби так и не собралось — проголосуйте «Матч не состоялся», ELO не изменится.","После игры капитаны загружают честный скриншот итогового экрана. Подделка результата — запрет поиска."])}</div>
+   <div class="card" id="r-anticheat"><h2>${ic("shield")}Античит и честная игра</h2>${li(["Запрещены читы, макросы, изменённые версии игры и любые программы, дающие преимущество.","Запрещены договорные матчи и намеренный проигрыш.","Запрещены оскорбления, угрозы, спам и реклама — в том числе в чате матча.","Заметили нарушение — после матча нажмите «Жалоба» рядом с игроком в комнате матча. Администратор проверит."])}</div>
+   <div class="card" id="r-penalties"><h2>${ic("crown")}Наказания</h2>${li(["Предупреждение или запрет поиска матчей на 1 день или на 7 дней — решает администратор.","За серьёзные и повторные нарушения ограничения могут быть дольше.","Считаете наказание ошибкой — напишите в <a href='#/support' style='color:var(--orange2)'>поддержку</a>."])}</div>
+   <div class="card" id="r-privacy"><h2>${ic("help")}Конфиденциальность</h2>${li(["Мы храним ник, email, игровой ID, регион, аватар, историю матчей и Telegram-чат для уведомлений.","Скриншоты профиля и результатов только распознаются и нигде не сохраняются.","Пароль хранится в зашифрованном виде.","Мы не передаём ваши данные третьим лицам."])}</div>
+  </div></div>`;entered();
+  const t=sec&&document.getElementById("r-"+sec);if(t){setTimeout(()=>{t.scrollIntoView({behavior:RM()?"auto":"smooth",block:"start"});t.classList.add("hl")},60)}
+}
+/* ===== Поддержка ===== */
+const TOPICS={question:"Вопрос",match:"Проблема с матчем",account:"Аккаунт и подтверждение",player:"Жалоба на игрока",idea:"Предложение",other:"Другое"};
+const FAQ=[["Бот не принимает скриншот профиля","Нужен скриншот экрана «Мой профиль» (вкладка «Общее») целиком, без обрезки — с надписью «Мой профиль» и вашим ID. Чужой профиль («Профиль друга») не подходит. Если ID не читается, отправьте скриншот боту как файл, без сжатия."],
+ ["Почему у меня закрыт поиск матчей?","Скорее всего, вы не приняли несколько найденных матчей за сутки. 1-й пропуск — предупреждение, 2-й — 5 минут, 3-й — 30 минут, дальше — 2 часа. Сколько осталось, видно в «Играть»."],
+ ["Как зайти в матч?","Когда карта выбрана, в комнате матча появится ID хоста. Найдите его в StandLeo, напишите «.» в личные сообщения — хост пригласит вас в лобби."],
+ ["Засчитали неверный результат","Если капитаны прислали разные результаты, матч проверит администратор. Если результат уже засчитан неверно — напишите сюда и укажите номер матча (он есть в комнате матча)."],
+ ["Как получить монеты?","Выполняйте ежедневные задания и забирайте бонус за вход в разделе «Задания». Монеты пригодятся в магазине — он скоро откроется."],
+ ["Как пожаловаться на игрока?","После матча откройте комнату матча и нажмите «Жалоба» рядом с игроком — это быстрее, чем писать в поддержку."]];
+function supHtml(list){
+  return list.map(x=>{const last=x.msgs[x.msgs.length-1],st=x.status==="closed"?["","Закрыто"]:last.by==="admin"?["ans","Есть ответ"]:["open","Ждёт ответа"];
+    return `<div class="tkt${x.unread?" new":""}"><div class="tkt-h"><b>${esc(x.topic)}${x.mid?` <span class="muted" style="font-weight:600">· матч #${esc(x.mid)}</span>`:""}</b><span class="tkt-st ${st[0]}">${st[1]}</span></div>
+     ${x.msgs.map(m=>`<div class="msg${m.by==="admin"?" adm":""}"><div class="mh"><b>${m.by==="admin"?"Поддержка StandHub":"Вы"}</b> · ${dtm(m.at)}</div>${esc(m.t)}</div>`).join("")}
+     ${x.status==="open"?`<form class="tkt-f" data-tid="${x.id}"><textarea class="txa" maxlength="1500" rows="2" placeholder="Дополнить обращение…" aria-label="Сообщение"></textarea><button class="btn btn-g btn-sm" type="submit">Отправить</button></form><div class="tkt-a"><button class="frb" data-tclose="${x.id}">✓ Вопрос решён</button></div>`:""}</div>`}).join("")}
+function paintSup(){const el=document.getElementById("supList");if(!el)return;const l=S.sup||[];document.getElementById("supMine").classList.toggle("hid",!l.length);
+  const h=supHtml(l);if(el._h===h)return;el._h=h;const kp=keepTx(el);el.innerHTML=h;restoreTx(el,kp);
+  el.querySelectorAll("form[data-tid]").forEach(f=>f.onsubmit=async e=>{e.preventDefault();const t=f.querySelector("textarea"),b=f.querySelector("button");if(!t.value.trim())return t.focus();b.disabled=true;
+    try{const r=await api("/api/support/reply",{method:"POST",body:JSON.stringify({id:f.dataset.tid,text:t.value})});t.value="";S.sup=r.list;paintSup();toast("Сообщение отправлено")}catch(err){toast(err.message);b.disabled=false}});
+  el.querySelectorAll("[data-tclose]").forEach(b=>b.onclick=async()=>{b.disabled=true;try{const r=await api("/api/support/close",{method:"POST",body:JSON.stringify({id:b.dataset.tclose})});S.sup=r.list;paintSup();toast("Обращение закрыто")}catch(e){toast(e.message);b.disabled=false}})}
+async function loadSup(){try{const r=await api("/api/support");S.sup=r.list;paintSup();if(r.list.some(x=>x.unread))api("/api/support/seen",{method:"POST"}).catch(()=>{})}catch{}}
+function pageSupport(){
+  const u=S.user;
+  app.innerHTML=`<div class="wrap"><h1 class="h">Поддержка</h1><div class="doc">
+   ${u?`<div class="card hid" id="supMine"><h2>${ic("help")}Мои обращения</h2><div id="supList"></div></div>
+    <div class="card"><h2>${ic("send")}Написать в поддержку</h2><form class="sup-f" id="supF" novalidate>
+     <div class="two"><div><label for="supT">Тема</label><select id="supT">${Object.entries(TOPICS).map(([k,t])=>`<option value="${k}">${t}</option>`).join("")}</select></div>
+      <div><label for="supM">Номер матча <span style="font-weight:400">(если вопрос о матче)</span></label><input id="supM" maxlength="20" placeholder="например, 3fa9c01b2d" autocomplete="off"></div></div>
+     <div><label for="supX">Сообщение</label><textarea class="txa" id="supX" maxlength="1500" rows="5" placeholder="Опишите, что случилось. Ответ придёт сюда и в Telegram."></textarea></div>
+     <div><button class="btn btn-o" type="submit">Отправить</button></div></form></div>`
+    :`<div class="card">${empty("Нужен аккаунт","Войдите, чтобы написать в поддержку — ответ придёт сюда и в Telegram.",`<a class="btn btn-o" href="#/login">Войти</a>`)}</div>`}
+   <div class="card faq"><h2>${ic("book")}Частые вопросы</h2>${FAQ.map(([q,a])=>`<details><summary>${q}</summary><p>${a}</p></details>`).join("")}</div>
+  </div></div>`;entered();
+  if(!u)return;
+  const f=document.getElementById("supF");
+  f.onsubmit=async e=>{e.preventDefault();const x=document.getElementById("supX"),b=f.querySelector("[type=submit]");if(x.value.trim().length<10){toast("Опишите вопрос подробнее — хотя бы пару предложений");return x.focus()}
+    b.disabled=true;try{const r=await api("/api/support/new",{method:"POST",body:JSON.stringify({topic:document.getElementById("supT").value,mid:document.getElementById("supM").value,text:x.value})});
+      S.sup=r.list;x.value="";document.getElementById("supM").value="";paintSup();toast("Обращение отправлено — ответим как можно скорее");document.getElementById("supMine").scrollIntoView({behavior:RM()?"auto":"smooth",block:"start"})}
+    catch(err){toast(err.message)}b.disabled=false};
+  if(S.sup)paintSup();loadSup();
+}
+/* ===== Значок на экран (установка как приложение) ===== */
+let bip=null;
+const DOTS3=`<svg width="6" height="18" viewBox="0 0 6 18" style="vertical-align:-3px;margin:0 2px" aria-hidden="true"><circle cx="3" cy="3" r="2" fill="currentColor"/><circle cx="3" cy="9" r="2" fill="currentColor"/><circle cx="3" cy="15" r="2" fill="currentColor"/></svg>`;
+const standalone=()=>matchMedia("(display-mode: standalone)").matches||navigator.standalone===true;
+const iOS=()=>/iphone|ipad|ipod/i.test(navigator.userAgent)||(navigator.platform==="MacIntel"&&navigator.maxTouchPoints>1);
+const touch=()=>matchMedia("(pointer:coarse)").matches;
+const canInstall=()=>!standalone()&&(!!bip||iOS()||touch());
+function paintInstall(){const on=canInstall(),mob=touch();document.querySelectorAll("[data-install]").forEach(el=>{el.classList.toggle("hid",!on);const l=el.querySelector(".il");if(l&&!el.closest(".more"))l.textContent=mob?"Значок на экран":"Установить приложение"})}
+window.addEventListener("beforeinstallprompt",e=>{e.preventDefault();bip=e;paintInstall()});
+window.addEventListener("appinstalled",()=>{bip=null;paintInstall();toast("Готово! StandHub теперь на экране")});
+async function doInstall(){
+  if(bip){const e=bip;bip=null;try{await e.prompt();const r=await e.userChoice;if(r&&r.outcome==="accepted")toast("Готово! Значок StandHub появится на экране")}catch{}paintInstall();return}
+  const how=steps=>openX(`<div class="card pm" role="dialog" aria-modal="true" aria-labelledby="xH"><button class="pm-x" data-x aria-label="Закрыть">×</button><h3 id="xH">Значок StandHub на экране</h3><p class="muted pm-sub">StandHub будет открываться как приложение — на весь экран, без адресной строки.</p>
+    <ol class="howto">${steps.map(x=>`<li><span>${x}</span></li>`).join("")}</ol>${iOS()?"":`<p class="muted" style="font-size:13px;margin-top:14px">Открыли сайт из Telegram? Сначала нажмите <b>${DOTS3}</b> → <b>«Открыть в браузере»</b>.</p>`}
+    <button class="btn btn-o" data-x style="width:100%;margin-top:18px">Понятно</button></div>`);
+  if(iOS())how(["Нажмите <b>«Поделиться»</b> — квадрат со стрелкой вверх внизу экрана","Прокрутите вниз и выберите <b>«На экран „Домой“»</b>","Нажмите <b>«Добавить»</b> — значок появится на экране"]);
+  else how([`Откройте меню браузера — <b>${DOTS3}</b> (три точки) вверху справа`,"Выберите <b>«Добавить на главный экран»</b> или <b>«Установить приложение»</b>","Нажмите <b>«Добавить»</b> — значок появится на экране"]);
+}
+document.addEventListener("click",e=>{const b=e.target.closest("[data-install]");if(!b)return;e.preventDefault();closeMore();doInstall()});
+if("serviceWorker" in navigator&&window.isSecureContext)window.addEventListener("load",()=>navigator.serviceWorker.register("/sw.js").catch(()=>{}));
 async function pageLeaderboard(){
   app.innerHTML=`<div class="wrap"><h1 class="h">Таблица лидеров</h1><div id="lb"><div class="card">${skel(8)}</div></div></div>`;entered();
   const list=(await getLb()).map((p,i)=>({...p,rank:i+1}));const el=document.getElementById("lb");if(!el)return;
@@ -1190,10 +1643,11 @@ async function pageLeaderboard(){
 function route(){
   S.enter=true;
   const h=location.hash.slice(1)||"/";const [,a,b]=h.split("/");
-  renderChrome("/"+(a||""));window.scrollTo(0,0);clearInterval(matchPoll);closeInvite();
+  renderChrome("/"+(a||""));window.scrollTo(0,0);clearInterval(matchPoll);closeInvite();closeX();closeMore();
   if(!a)pageHome();else if(a==="login")pageAuth("login");else if(a==="register")pageAuth("register");else if(a==="verify")pageVerify();
   else if(a==="lobby")pageLobby();else if(a==="profile")pageProfile();else if(a==="player")pageProfile(decodeURIComponent(b));
-  else if(a==="friends")pageFriends();else if(a==="matches")pageMatches();else if(a==="match")pageMatch(b);else if(a==="leaderboard")pageLeaderboard();else if(a==="admin")pageAdmin();else pageHome();
+  else if(a==="friends")pageFriends();else if(a==="matches")pageMatches();else if(a==="match")pageMatch(b);else if(a==="leaderboard")pageLeaderboard();else if(a==="admin")pageAdmin(b);
+  else if(a==="tasks")pageTasks();else if(a==="shop")pageShop();else if(a==="rules")pageRules(b);else if(a==="support")pageSupport();else pageHome();
   bind();
 }
 function bind(){
