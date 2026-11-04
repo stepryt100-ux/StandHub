@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>StandHub — соревновательный StandLeo</title>
+<script>try{if(localStorage.getItem("sh_motion")==="off")document.documentElement.classList.add("no-motion")}catch(e){}</script>
 <style>
 :root{
   --bg:#141416;--bg2:#1c1c1f;--card:#232327;--card2:#2b2b30;--line:#34343a;
@@ -28,7 +29,7 @@ input,select{font:inherit}
 .search span{position:absolute;left:12px;top:8px;color:var(--muted)}
 .top .right{margin-left:auto;display:flex;align-items:center;gap:12px}
 .btn{height:40px;padding:0 20px;border-radius:4px;font-weight:800;text-transform:uppercase;letter-spacing:.03em;display:inline-flex;align-items:center;justify-content:center;gap:8px;transition:.15s}
-.btn-o{background:var(--orange);color:#fff}.btn-o:hover{background:var(--orange2)}
+.btn-o{background:linear-gradient(180deg,#ff6c22,#ff4f00);color:#fff;box-shadow:inset 0 1px 0 rgba(255,255,255,.2)}.btn-o:hover{background:linear-gradient(180deg,#ff8240,#ff5f14)}
 .btn-g{background:var(--card2);color:#fff;border:1px solid var(--line)}.btn-g:hover{background:#38383e}
 .btn-lg{height:52px;padding:0 36px;font-size:17px}
 .userchip{display:flex;align-items:center;gap:10px;padding:4px 10px 4px 4px;border-radius:6px;background:var(--card)}
@@ -37,7 +38,7 @@ input,select{font:inherit}
 .side{position:fixed;top:60px;bottom:0;left:0;width:220px;background:#0f0f11;border-right:1px solid var(--line);padding:16px 10px;display:flex;flex-direction:column;gap:4px;z-index:40}
 .side a{display:flex;align-items:center;gap:12px;height:44px;padding:0 14px;border-radius:6px;color:var(--muted);font-weight:600}
 .side a:hover{background:var(--card);color:#fff}
-.side a.on{background:var(--card);color:#fff;box-shadow:inset 3px 0 0 var(--orange)}
+.side a.on{background:linear-gradient(90deg,rgba(255,85,0,.2),rgba(255,85,0,.04) 70%,transparent);color:#fff;box-shadow:inset 3px 0 0 var(--orange)}
 .side .ic{width:20px;text-align:center}
 .side .sep{height:1px;background:var(--line);margin:12px 6px}
 .side .online{margin-top:auto;font-size:13px;color:var(--muted);padding:12px 14px}
@@ -45,7 +46,7 @@ input,select{font:inherit}
 main{margin:60px 0 0 220px;min-height:calc(100vh - 60px)}
 .wrap{max-width:1180px;margin:0 auto;padding:32px}
 h1.h{font-size:30px;font-weight:900;text-transform:uppercase;font-style:italic;margin-bottom:24px}
-.card{background:var(--card);border:1px solid var(--line);border-radius:8px}
+.card{background:linear-gradient(180deg,#28282d,#212125);border:1px solid var(--line);border-radius:10px;box-shadow:0 14px 34px -22px rgba(0,0,0,.9),inset 0 1px 0 rgba(255,255,255,.04)}
 .pad{padding:20px}
 .muted{color:var(--muted)}
 .grid{display:grid;gap:16px}
@@ -62,7 +63,7 @@ h1.h{font-size:30px;font-weight:900;text-transform:uppercase;font-style:italic;m
 .hero h1 .rot{color:var(--orange);display:block;height:72px;overflow:hidden}
 .hero h1 .rot span{display:block;animation:rot 14s infinite}
 @keyframes rot{0%,12%{transform:translateY(0)}14%,26%{transform:translateY(-100%)}28%,40%{transform:translateY(-200%)}42%,54%{transform:translateY(-300%)}56%,68%{transform:translateY(-400%)}70%,82%{transform:translateY(-500%)}84%,100%{transform:translateY(-600%)}}
-@media (prefers-reduced-motion:reduce){.hero h1 .rot span{animation:none}}
+.no-motion .hero h1 .rot span{animation:none}
 .hero p{max-width:520px;color:#d0d0d6;font-size:18px;margin:24px 0 32px}
 .hero .stripes{position:absolute;right:-80px;top:0;bottom:0;width:55%;overflow:hidden;-webkit-mask:linear-gradient(90deg,transparent,#000 40%);mask:linear-gradient(90deg,transparent,#000 40%)}
 .hero .emblem{position:absolute;right:8%;top:50%;transform:translateY(-50%);width:340px;height:340px;opacity:.9}
@@ -264,8 +265,10 @@ tr.click td,.prow{transition:background-color .15s}
 .spin-slow{transform-box:fill-box;transform-origin:center;animation:sp 40s linear infinite}
 .hero .stripes::before{content:"";position:absolute;inset:0 -140px 0 0;background:repeating-linear-gradient(115deg,transparent 0 60px,rgba(255,85,0,.07) 60px 64px);animation:drift 5s linear infinite}
 @keyframes drift{to{transform:translateX(-70.62px)}}
-.btn-find{position:relative;overflow:hidden}
-.btn-find::after{content:"";position:absolute;inset:0;background:linear-gradient(100deg,transparent 30%,rgba(255,255,255,.22) 50%,transparent 70%);transform:translateX(-120%);transition:transform .7s var(--ease);pointer-events:none}
+.btn-o.btn-lg,.btn-find{position:relative;overflow:hidden}
+.btn-o.btn-lg::after,.btn-find::after{content:"";position:absolute;inset:0;pointer-events:none;transform:translateX(-130%);background:linear-gradient(100deg,transparent 35%,rgba(255,255,255,.3) 50%,transparent 65%);animation:idleShine 4.5s ease-in-out infinite}
+@keyframes idleShine{0%,62%{transform:translateX(-130%)}100%{transform:translateX(130%)}}
+.btn:disabled::after{animation:none!important;opacity:0}
 .btn-find.searching{animation:glow 1.8s ease-in-out infinite}
 .btn-find.searching::after{background:linear-gradient(100deg,transparent 30%,rgba(255,85,0,.28) 50%,transparent 70%);animation:sweep 2s linear infinite}
 @keyframes glow{50%{box-shadow:0 0 0 4px rgba(255,85,0,.15),0 0 30px rgba(255,85,0,.35)}}
@@ -319,13 +322,24 @@ tr.click td,.prow{transition:background-color .15s}
 button.slot:hover{border-color:var(--orange);color:#fff;background:rgba(255,85,0,.06)}
 button.slot:hover .plus{transform:rotate(90deg);border-color:var(--orange)}
 .feat .card:hover,a.podium:hover{transform:translateY(-4px);border-color:rgba(255,85,0,.45);box-shadow:0 18px 40px -20px rgba(255,85,0,.55)}
-.btn-find:not(:disabled):hover::after{transform:translateX(120%)}
 .logo:hover svg{transform:rotate(-10deg) scale(1.1)}
 .userchip:hover{background:var(--card2)}
 .chip:hover{color:#fff;border-color:#4a4a52}.chip.on:hover{border-color:var(--orange)}
 .prow a:hover b,tr.click:hover .pl b{color:var(--orange2)}
 .vmap.can:hover{transform:translateY(-2px);box-shadow:0 8px 20px -8px rgba(255,77,77,.75)}
 }
+h1.h::after{content:"";display:block;width:56px;height:4px;margin-top:10px;border-radius:2px;background:linear-gradient(90deg,var(--orange),var(--yellow));transform-origin:left}
+h1.h.grow::after{animation:bar .8s var(--ease) .25s backwards}
+@keyframes bar{from{transform:scaleX(0)}}
+.top::after{content:"";position:absolute;left:0;right:0;bottom:-1px;height:1px;pointer-events:none;background:linear-gradient(90deg,transparent,rgba(255,85,0,.8) 25%,rgba(255,200,0,.6) 50%,rgba(255,85,0,.8) 75%,transparent);background-size:200% 100%;animation:lineMove 6s linear infinite;opacity:.7}
+@keyframes lineMove{to{background-position:-200% 0}}
+body::before,body::after{content:"";position:fixed;z-index:-1;pointer-events:none;border-radius:50%}
+body::before{width:620px;height:620px;right:-180px;top:20px;background:radial-gradient(circle,rgba(255,85,0,.11),transparent 65%);animation:amb1 16s ease-in-out infinite alternate}
+body::after{width:520px;height:520px;left:140px;bottom:-220px;background:radial-gradient(circle,rgba(255,61,0,.08),transparent 65%);animation:amb2 21s ease-in-out infinite alternate}
+@keyframes amb1{to{transform:translate(-140px,90px) scale(1.15)}}
+@keyframes amb2{to{transform:translate(180px,-70px) scale(1.1)}}
+.ver{font-size:12px;color:#6f6f78;margin-top:6px}
+.side a.mot b{font-weight:700;color:#fff}
 .cf{position:fixed;inset:0;pointer-events:none;z-index:300;overflow:hidden}
 .cf i{position:absolute;top:-16px;border-radius:2px}
 .sk{display:block;height:12px;border-radius:4px;background:linear-gradient(90deg,#2b2b30 25%,#3a3a41 50%,#2b2b30 75%);background-size:300% 100%;animation:shimmer 1.3s linear infinite}
@@ -340,13 +354,14 @@ button.slot:hover .plus{transform:rotate(90deg);border-color:var(--orange)}
 .lvl.ring{animation:ring 1.1s var(--ease) .15s backwards}
 @keyframes ring{from{--p:0%}}
 @media (min-width:761px){.top{background:rgba(15,15,17,.82);-webkit-backdrop-filter:blur(12px) saturate(1.3);backdrop-filter:blur(12px) saturate(1.3)}}
-@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;animation-delay:0s!important;transition-duration:.01ms!important;transition-delay:0s!important}.rv{opacity:1;transform:none}}
+.no-motion *,.no-motion *::before,.no-motion *::after{animation-duration:.01ms!important;animation-iteration-count:1!important;animation-delay:0s!important;transition-duration:.01ms!important;transition-delay:0s!important}.no-motion .rv{opacity:1;transform:none}
+.no-motion body::before,.no-motion body::after{animation:none}
 /* Responsive */
 @media (max-width:1100px){.feat{grid-template-columns:repeat(2,1fr)}.stats{grid-template-columns:repeat(3,1fr)}.lobby,.pgrid,.room{grid-template-columns:1fr}.room .center{order:-1}.hero .emblem{opacity:.25}}
 @media (max-width:760px){
  .side{top:auto;bottom:0;width:100%;height:64px;flex-direction:row;padding:6px;border-right:0;border-top:1px solid var(--line);justify-content:space-around}
  .side a{flex-direction:column;gap:2px;height:52px;padding:4px 6px;font-size:11px;justify-content:center}
- .side a.on{box-shadow:inset 0 -3px 0 var(--orange)}
+ .side a.on{box-shadow:inset 0 -3px 0 var(--orange);background:linear-gradient(0deg,rgba(255,85,0,.2),transparent)}
  .side .sep,.side .online,.side .hide-m{display:none}
  main{margin-left:0;padding-bottom:64px}
  .search{display:none}.top .right .btn-g,.top .right a[href="#/lobby"]{display:none}.top{padding:0 12px}.logo{font-size:18px}
@@ -420,7 +435,7 @@ function paintLive(){
 const L=k=>`<b data-live="${k}">${S.live[k]==null?"—":fmt(S.live[k])}</b>`;
 
 /* ===== Каркас ===== */
-const ICONS={"home":"<path d=\"M3 11l9-8 9 8v10h-6v-6H9v6H3z\"/>","play":"<path d=\"M7 4l13 8-13 8z\"/>","user":"<circle cx=\"12\" cy=\"8\" r=\"4\"/><path d=\"M4 21c0-4 4-6 8-6s8 2 8 6z\"/>","swords":"<path d=\"M3 3h4l10 10-2 2-2-2-3 3-2-2 3-3zM21 3h-4l-5 5 2 2 1-1 2 2-6 6 2 2 3-3 2 2 2-2-2-2 3-3z\"/>","crown":"<path d=\"M3 7l5 4 4-7 4 7 5-4-2 12H5z\"/>","shield":"<path d=\"M12 2l8 3v6c0 5-3.5 9-8 11-4.5-2-8-6-8-11V5z\"/>","help":"<circle cx=\"12\" cy=\"12\" r=\"10\"/><path d=\"M9.5 9a2.5 2.5 0 115 0c0 2-2.5 2-2.5 4M12 17h0\" stroke=\"#0f0f11\" stroke-width=\"2\" fill=\"none\"/>"};
+const ICONS={"home":"<path d=\"M3 11l9-8 9 8v10h-6v-6H9v6H3z\"/>","play":"<path d=\"M7 4l13 8-13 8z\"/>","user":"<circle cx=\"12\" cy=\"8\" r=\"4\"/><path d=\"M4 21c0-4 4-6 8-6s8 2 8 6z\"/>","swords":"<path d=\"M3 3h4l10 10-2 2-2-2-3 3-2-2 3-3zM21 3h-4l-5 5 2 2 1-1 2 2-6 6 2 2 3-3 2 2 2-2-2-2 3-3z\"/>","crown":"<path d=\"M3 7l5 4 4-7 4 7 5-4-2 12H5z\"/>","shield":"<path d=\"M12 2l8 3v6c0 5-3.5 9-8 11-4.5-2-8-6-8-11V5z\"/>","spark":"<path d=\"M12 2l2.4 6.6L21 11l-6.6 2.4L12 20l-2.4-6.6L3 11l6.6-2.4z\"/>","help":"<circle cx=\"12\" cy=\"12\" r=\"10\"/><path d=\"M9.5 9a2.5 2.5 0 115 0c0 2-2.5 2-2.5 4M12 17h0\" stroke=\"#0f0f11\" stroke-width=\"2\" fill=\"none\"/>"};
 function ic(n){return `<svg class="ic" viewBox="0 0 24 24" width="20" height="20" fill="currentColor" aria-hidden="true">${ICONS[n]}</svg>`}
 function renderChrome(route){
   const u=S.user,tr=document.getElementById("topRight"),side=document.getElementById("side");
@@ -436,8 +451,9 @@ function renderChrome(route){
   if(u&&u.admin)items.push(["#/admin","shield","Админ"]);
   const sk=items.map(x=>x[0]).join();
   if(side.dataset.k!==sk){side.dataset.k=sk;side.innerHTML=items.map(([h,i,t])=>`<a href="${h}" data-r="${h.slice(1)}">${ic(i)}${t}</a>`).join("")+
-   `<div class="sep"></div><a href="#" class="hide-m">${ic("shield")}Античит</a><a href="#" class="hide-m">${ic("help")}Поддержка</a>
-    <div class="online"><span class="dot"></span>${L("online")} на сайте</div>`}
+   `<div class="sep"></div><a href="#" class="hide-m">${ic("shield")}Античит</a><a href="#" class="hide-m">${ic("help")}Поддержка</a><a href="#" class="hide-m mot" data-motion>${ic("spark")}Анимации: <b>вкл</b></a>
+    <div class="online"><span class="dot"></span>${L("online")} на сайте<div class="ver">Версия ${APP_V}</div></div>`}
+  paintMotion();
   side.querySelectorAll("a[data-r]").forEach(a=>{const on=a.dataset.r===route;a.classList.toggle("on",on);if(on)a.setAttribute("aria-current","page");else a.removeAttribute("aria-current")});
 }
 const app=document.getElementById("app");
@@ -445,7 +461,12 @@ function toast(t){const e=document.getElementById("toast");e.textContent=t;e.cla
 function needAuth(){if(!S.user){location.hash="#/login";toast("Войдите, чтобы продолжить");return true}return false}
 function empty(title,text,btn){return `<div class="empty"><div class="empty-ic">${ic("crown")}</div><b>${title}</b><p class="muted">${text}</p>${btn||""}</div>`}
 /* ===== Анимации ===== */
-const RM=()=>matchMedia("(prefers-reduced-motion: reduce)").matches;
+const APP_V="1.3";
+// анимации включены всегда; выключить можно кнопкой «Анимации» (меню слева / низ главной)
+const RM=()=>document.documentElement.classList.contains("no-motion");
+function paintMotion(){document.querySelectorAll("[data-motion] b").forEach(b=>b.textContent=RM()?"выкл":"вкл")}
+document.addEventListener("click",e=>{const t=e.target.closest("[data-motion]");if(!t)return;e.preventDefault();const off=!RM();
+  document.documentElement.classList.toggle("no-motion",off);try{localStorage.setItem("sh_motion",off?"off":"on")}catch{}paintMotion();toast(off?"Анимации выключены":"Анимации включены")});
 const EASE="cubic-bezier(.2,.8,.2,1)";
 // плавное появление снизу; конечное состояние — собственные стили элемента
 function rise(els,step=60,dur=450,y=14){if(RM())return;[...els].forEach((el,i)=>{try{el.animate([{offset:0,opacity:0,transform:`translateY(${y}px)`}],{duration:dur,delay:i*step,easing:EASE,fill:"backwards"})}catch{}})}
@@ -467,7 +488,8 @@ function reveal(){const els=app.querySelectorAll(".rv:not(.in)");if(!els.length)
 function animateIn(){if(RM())return;
   const sel=".mtop,h1.h,.wrap>p,.hero .wrap>*,.phead,.mhead,.card,.mapbig",H=innerHeight;
   const els=[...app.querySelectorAll(sel)].filter(el=>!el.closest(".rv")&&!el.parentElement.closest(sel)).filter(el=>{const r=el.getBoundingClientRect();return r.bottom>0&&r.top<H});
-  rise(els.slice(0,14),55,480);
+  rise(els.slice(0,14),70,560,22);
+  app.querySelectorAll("h1.h").forEach(e=>e.classList.add("grow"));
   app.querySelectorAll(".lvl.xl").forEach(el=>el.classList.add("ring"));
   app.querySelectorAll(".elo-prog .bar div").forEach(el=>{try{el.animate([{offset:0,width:"0%"}],{duration:1000,delay:250,easing:EASE,fill:"backwards"})}catch{}});
   countUp(app)}
@@ -514,12 +536,12 @@ async function pageHome(){
   </div></section>
   <section class="cta"><h2 class="rv" style="font-size:40px;font-weight:900;font-style:italic;text-transform:uppercase;margin-bottom:24px">Готов бросить вызов?</h2><div class="rv" style="--i:1"><a class="btn btn-o btn-lg" href="${S.user?"#/lobby":"#/register"}">Играть сейчас</a></div></section>
   <footer>
-    <div><h4>StandHub</h4><p>Соревновательная платформа для StandLeo.</p></div>
-    <div><h4>Помощь</h4><a href="#">Поддержка</a><a href="#">Античит</a><a href="#">Правила</a></div>
+    <div><h4>StandHub</h4><p>Соревновательная платформа для StandLeo.</p><p class="ver">Версия ${APP_V}</p></div>
+    <div><h4>Помощь</h4><a href="#">Поддержка</a><a href="#">Античит</a><a href="#">Правила</a><a href="#" data-motion>Анимации: <b>вкл</b></a></div>
     <div><h4>Платформа</h4><a href="#/lobby">Матчмейкинг</a><a href="#/leaderboard">Рейтинг</a><a href="#/matches">Матчи</a></div>
     <div><h4>Документы</h4><a href="#">Условия использования</a><a href="#">Политика конфиденциальности</a></div>
   </footer>`;
-  entered();reveal();
+  entered();reveal();paintMotion();
   const lb=await getLb();const hl=document.getElementById("homeLb");if(!hl)return;hl.innerHTML=lb.length?lbTable(lb.slice(0,5),true):lbEmpty();bind();
 }
 async function getLb(){try{return await api("/api/leaderboard")}catch{return[]}}
