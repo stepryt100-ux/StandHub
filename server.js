@@ -168,6 +168,6 @@ http.createServer(async (req, res) => {
 
   let f = path.join(PUB, p === '/' ? 'index.html' : path.normalize(p).replace(/^(\.\.[\/\\])+/, ''));
   if (!f.startsWith(PUB) || !fs.existsSync(f) || fs.statSync(f).isDirectory()) f = path.join(PUB, 'index.html');
-  res.writeHead(200, { 'Content-Type': MIME[path.extname(f)] || 'application/octet-stream' });
+  res.writeHead(200, { 'Content-Type': MIME[path.extname(f)] || 'application/octet-stream', 'Cache-Control': 'no-cache, no-store, must-revalidate' });
   fs.createReadStream(f).pipe(res);
 }).listen(PORT, () => console.log(`StandHub запущен: ${SITE_URL}`));
