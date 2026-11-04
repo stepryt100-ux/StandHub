@@ -51,7 +51,7 @@ input,select{font:inherit}
 .side a.on{background:linear-gradient(90deg,rgba(255,85,0,.2),rgba(255,85,0,.04) 70%,transparent);color:#fff;box-shadow:inset 3px 0 0 var(--orange)}
 .side .ic{width:20px;text-align:center}
 .side .sep{height:1px;background:var(--line);margin:12px 6px}
-.side .online{margin-top:auto;font-size:13px;color:var(--muted);padding:12px 14px}
+.side .sfoot{margin-top:auto;font-size:13px;color:var(--muted);padding:12px 14px}
 .dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--green);margin-right:6px}
 main{margin:60px 0 0 220px;min-height:calc(100vh - 60px)}
 .wrap{max-width:1180px;margin:0 auto;padding:32px}
@@ -78,8 +78,6 @@ h1.h{font-size:30px;font-weight:900;text-transform:uppercase;font-style:italic;m
 .hero p{max-width:520px;color:#d0d0d6;font-size:18px;margin:24px 0 32px}
 .hero .stripes{position:absolute;right:-80px;top:0;bottom:0;width:55%;overflow:hidden;-webkit-mask:linear-gradient(90deg,transparent,#000 40%);mask:linear-gradient(90deg,transparent,#000 40%)}
 .hero .emblem{position:absolute;right:8%;top:50%;transform:translateY(-50%);width:340px;height:340px;opacity:.9}
-.online-big{margin-top:20px;color:var(--muted)}
-.online-big b{color:#fff}
 .sec{padding:64px 0}
 .sec h2{font-size:38px;font-weight:900;font-style:italic;text-transform:uppercase;margin-bottom:12px}
 .feat{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-top:32px}
@@ -688,6 +686,7 @@ body::after{width:520px;height:520px;left:140px;bottom:-220px;background:radial-
 .adm-shop{display:grid;gap:18px}
 .adm-sh-t{display:flex;align-items:center;gap:12px}
 .adm-sh-t .gold{width:58px;height:40px;flex:none}
+.adm-top{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap}.adm-on{font-size:13px;color:var(--muted);padding:6px 12px;border:1px solid var(--line);border-radius:999px;background:var(--bg2);white-space:nowrap}.adm-on b{color:#fff}
 .adm-stock{text-align:center;min-width:100px;padding:8px 12px;border-radius:8px;background:rgba(63,207,106,.08);border:1px solid rgba(63,207,106,.35)}
 .adm-stock b{display:block;font-size:26px;font-weight:900;line-height:1.1;color:var(--green);font-variant-numeric:tabular-nums}
 .adm-stock span{font-size:12px;color:var(--muted)}
@@ -803,7 +802,7 @@ body::after{width:520px;height:520px;left:140px;bottom:-220px;background:radial-
  .side{top:auto;bottom:0;width:100%;height:64px;flex-direction:row;padding:6px;border-right:0;border-top:1px solid var(--line);justify-content:space-around}
  .side a{flex-direction:column;gap:2px;height:52px;padding:4px 6px;font-size:11px;justify-content:center}
  .side a.on{box-shadow:inset 0 -3px 0 var(--orange);background:linear-gradient(0deg,rgba(255,85,0,.2),transparent)}
- .side .sep,.side .online,.side .hide-m{display:none}
+ .side .sep,.side .sfoot,.side .hide-m{display:none}
  main{margin-left:0;padding-bottom:64px}
  .side a{flex:1 1 0;min-width:0;padding:4px 2px;white-space:nowrap}
  .side .nb{position:absolute;top:3px;left:calc(50% + 5px);margin:0;min-width:16px;height:16px;font-size:10px;padding:0 4px}
@@ -946,7 +945,7 @@ function renderChrome(route){
   if(side.dataset.k!==sk){side.dataset.k=sk;side.innerHTML=items.map(([h,i,t,m])=>`<a href="${h}" data-r="${h.slice(1)}"${m?"":' class="dk"'}>${ic(i)}${t}${nbOf(h)}</a>`).join("")+
    `<a class="mo" id="moreBtn" role="button" tabindex="0" aria-expanded="false" aria-controls="more">${ic("more")}Ещё<span class="nb dot z" data-mon aria-hidden="true"></span></a>`+
    `<div class="sep"></div><a href="#/rules" data-r="/rules" class="dk">${ic("book")}Правила</a><a href="#/support" data-r="/support" class="dk">${ic("help")}Поддержка<span class="nb z" data-supn aria-label="Ответы поддержки">0</span></a><a href="#" class="dk mot" data-motion>${ic("spark")}Анимации: <b>вкл</b></a><a href="#" class="dk inst hid" data-install>${ic("download")}<span class="il">Установить приложение</span></a>
-    <div class="online"><span class="dot"></span>${L("online")} на сайте<div class="ver">Версия ${APP_V}</div></div>`;
+    <div class="sfoot"><div class="ver">Версия ${APP_V}</div></div>`;
    const mb=document.getElementById("moreBtn");mb.onclick=()=>toggleMore();mb.onkeydown=e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();toggleMore()}};
    const mi=[["#/profile","user","Профиль"],["#/matches","swords","Матчи"],["#/leaderboard","crown","Рейтинг"],["#/shop","shop","Магазин",SHOP_NB],["#/rules","book","Правила"],["#/support","help","Поддержка",`<span class="nb z" data-supn>0</span>`]];
    if(u&&u.admin)mi.push(["#/admin","shield","Админ",`<span class="nb z" data-admn>0</span>`]);
@@ -987,7 +986,7 @@ function toast(t){const e=document.getElementById("toast");e.textContent=t;e.cla
 function needAuth(){if(!S.user){location.hash="#/login";toast("Войдите, чтобы продолжить");return true}return false}
 function empty(title,text,btn){return `<div class="empty"><div class="empty-ic">${ic("crown")}</div><b>${title}</b><p class="muted">${text}</p>${btn||""}</div>`}
 /* ===== Анимации ===== */
-const APP_V="1.10.1";
+const APP_V="1.10.2";
 // анимации включены всегда; выключить можно кнопкой «Анимации» (меню слева / низ главной)
 const RM=()=>document.documentElement.classList.contains("no-motion");
 function paintMotion(){document.querySelectorAll("[data-motion] b").forEach(b=>b.textContent=RM()?"выкл":"вкл")}
@@ -1043,7 +1042,6 @@ async function pageHome(){
     <h1 aria-label="Прокачай свою игру">Прокачай<span class="rot" aria-hidden="true"><span>${[...words,words[0]].map(w=>`<i>${w}</i>`).join("")}</span></span></h1>
     <p>Соревновательный StandLeo на максимуме. Матчмейкинг 5 на 5, ELO-рейтинг, турниры и команды — без потолка для роста.</p>
     <div class="hero-b"><a class="btn btn-o btn-lg" href="${S.user?"#/lobby":"#/register"}">Играть сейчас</a><button class="btn btn-g btn-lg hid" data-install>${ic("download")}<span class="il">Значок на экран</span></button></div>
-    <div class="online-big"><span class="dot"></span>${L("online")} на сайте прямо сейчас</div>
    </div></section>
   <section class="sec"><div class="wrap">
     <h2 class="rv">Больше чем матчмейкинг</h2>
@@ -1332,8 +1330,7 @@ function pageLobby(){
        <li><span>Капитаны по очереди убирают карты — остаётся одна</span></li>
        <li><span>Найдите хоста в StandLeo по ID и напишите ему «.» в личку</span></li>
        <li><span>После игры капитан отмечает результат, соперники подтверждают — ELO пересчитается сам</span></li></ol></div>
-     <div class="card pad"><h3>Сейчас на сайте</h3>
-       <div class="qrow"><span class="muted">Онлайн</span>${L("online")}</div>
+     <div class="card pad"><h3>Прямо сейчас</h3>
        <div class="qrow"><span class="muted">В поиске матча</span>${L("searching")}</div>
        <div class="qrow"><span class="muted">Матчей идёт</span>${L("live")}</div></div>
      <div class="card pad"><h3>Последние матчи</h3><div id="lobbyM" class="muted">${S.lobbyMs?lobbyMsHtml(S.lobbyMs):skel(3,false)}</div></div>
@@ -1848,7 +1845,7 @@ async function pageAdmin(tab){
   if(!S.user.admin){app.innerHTML=`<div class="wrap">${empty("Нет доступа","Эта страница только для администраторов")}</div>`;return}
   tab=["reports","support","shop"].includes(tab)?tab:"";
   const sub={"":"Идущие и спорные матчи. Спорный — когда результат оспорили или капитаны отметили разное. Доказательства от игроков приходят вам в Telegram.",reports:"Жалобы игроков после матчей. Можно закрыть жалобу или закрыть нарушителю поиск матчей.",support:"Обращения в поддержку. Ответ придёт игроку на сайт и в Telegram.",shop:"Товары, цены и заказы. После покупки игрок пишет вам в Telegram и присылает скриншот заказа — сверьте номер заказа здесь, выдайте промокод и нажмите «Выдан». О каждой покупке придёт сообщение в Telegram."}[tab];
-  app.innerHTML=`<div class="wrap"><h1 class="h">Админка</h1><div class="tabs" id="admTabs" style="margin-top:-6px">${ADM_TABS.map(([k,t])=>`<a href="#/admin${k?"/"+k:""}" data-tab="${k}" class="${tab===k?"on":""}">${t}<span class="nb z">0</span></a>`).join("")}</div><p class="muted" style="margin:-6px 0 20px">${sub}</p><div id="adm" class="grid"><div class="card">${skel(3)}</div></div></div>`;entered();paintAdmTabs();
+  app.innerHTML=`<div class="wrap"><div class="adm-top"><h1 class="h">Админка</h1><span class="adm-on" title="Этот счётчик видят только админы"><span class="dot"></span>На сайте: ${L("online")}</span></div><div class="tabs" id="admTabs" style="margin-top:-6px">${ADM_TABS.map(([k,t])=>`<a href="#/admin${k?"/"+k:""}" data-tab="${k}" class="${tab===k?"on":""}">${t}<span class="nb z">0</span></a>`).join("")}</div><p class="muted" style="margin:-6px 0 20px">${sub}</p><div id="adm" class="grid"><div class="card">${skel(3)}</div></div></div>`;entered();paintAdmTabs();
   if(tab==="reports")return admReports();if(tab==="support")return admSupport();if(tab==="shop")return admShop();
   const list=await api("/api/admin/matches").catch(()=>[]);const el=document.getElementById("adm");if(!el)return;
   if(!list.length){el.innerHTML=`<div class="card">${empty("Сейчас нет идущих матчей","Здесь появятся идущие матчи и матчи, где результат оспорили")}</div>`;return}
