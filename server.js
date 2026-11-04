@@ -71,6 +71,8 @@ function findIds(text) {
 // экран «Мой профиль» из StandLeo: ищем надписи, которые есть только на нём (русская и английская версия игры).
 // Нужна хотя бы одна надпись «своего» профиля и ещё минимум две с этого экрана — иначе скриншот не подходит.
 const PROFILE_OWN = ['МОЙПРОФИЛЬ', 'НАСТРОЙКАПЕРСОНАЖА', 'MYPROFILE', 'CHARACTERSETTINGS', 'CHARACTERCUSTOMIZATION'];
+// чужой профиль в игре подписан «Профиль друга» или «Профиль игрока» — такой скриншот не принимаем
+const PROFILE_FOREIGN = ['ПРОФИЛЬДРУГА', 'ПРОФИЛЬИГРОКА', 'FRIENDPROFILE', 'FRIENDSPROFILE', 'PLAYERPROFILE'];
 const PROFILE_MARKS = ['ПОДРОБНАЯ', 'СТАТИСТИКА', 'ТЕКУЩИЕРАНГИ', 'КАЛИБРОВКА', 'СОЮЗНИКИ', 'СЕЗОН', 'ПРОЦЕНТПОБЕД', 'ПОРАЖЕНИЙ', 'УБИЙСТВ', 'СМЕРТЕЙ', 'ОБЩЕЕВРЕМЯВИГРЕ', 'СЫГРАНОМАТЧЕЙ',
   'DETAILED', 'STATISTICS', 'CURRENTRANKS', 'CALIBRATION', 'SEASON', 'WINRATE', 'LOSSES', 'DEFEATS', 'KILLS', 'DEATHS', 'TIMEINGAME', 'MATCHESPLAYED'];
 const LOOK_CYR = { A: 'А', B: 'В', C: 'С', E: 'Е', H: 'Н', K: 'К', M: 'М', O: 'О', P: 'Р', T: 'Т', X: 'Х', Y: 'У' };
@@ -78,8 +80,8 @@ const LOOK_LAT = Object.fromEntries(Object.entries(LOOK_CYR).map(([l, c]) => [c,
 const lettersCyr = t => t.toUpperCase().replace(/Ё/g, 'Е').replace(/[ABCEHKMOPTXY]/g, c => LOOK_CYR[c]).replace(/[^А-Я]/g, '');
 const lettersLat = t => t.toUpperCase().replace(/[АВСЕНКМОРТХУ]/g, c => LOOK_LAT[c]).replace(/[^A-Z]/g, '');
 // есть ли надпись в тексте с учётом ошибок распознавания (1 ошибка на 6+ букв, 2 — на 12+)
-function fuzzyHas(s, p) {
-  const k = p.length >= 12 ? 2 : p.length >= 6 ? 1 : 0;
+function fuzzyHas(s, p, maxK = 2) {
+  const k = Math.min(maxK, p.length >= 12 ? 2 : p.length >= 6 ? 1 : 0);
   if (!k) return s.includes(p);
   let prev = Array.from({ length: p.length + 1 }, (_, i) => i);
   for (let j = 0; j < s.length; j++) {
@@ -91,9 +93,9 @@ function fuzzyHas(s, p) {
   return false;
 }
 function profileCheck(text) {
-  const c = lettersCyr(text), l = lettersLat(text), has = p => fuzzyHas(/[А-Я]/.test(p) ? c : l, p);
-  const own = PROFILE_OWN.some(has), marks = PROFILE_MARKS.filter(has).length;
-  return { own, marks, ok: own && marks >= 2 };
+  const c = lettersCyr(text), l = lettersLat(text), has = (p, k) => fuzzyHas(/[А-Я]/.test(p) ? c : l, p, k);
+  const foreign = PROFILE_FOREIGN.some(p => has(p, 1)), own = !foreign && PROFILE_OWN.some(p => has(p)), marks = PROFILE_MARKS.filter(p => has(p)).length;
+  return { own, foreign, marks, ok: own && marks >= 2 };
 }
 // подготовка скриншота: верх экрана (там ID) увеличиваем — Telegram сжимает фото, и мелкий ID иначе не читается
 let sharp = null;
@@ -111,7 +113,9 @@ async function profileImages(buf) {
   } catch (e) { console.error('Обработка скриншота:', e.message); return [buf]; }
 }
 const botBusy = new Set(); // один скриншот за раз от каждого чата
-const NOT_PROFILE = '❌ Этот скриншот не подходит — это не экран «Мой профиль» из StandLeo.\n\nКак сделать правильный:\n1. Откройте в игре свой профиль (вкладка «Общее»)\n2. Сделайте скриншот всего экрана, без обрезки\n3. Пришлите его сюда\n\nНа скриншоте должны быть видны надпись «Мой профиль» и ваш ID.';
+const HOWTO = 'Как сделать правильный:\n1. Откройте в игре свой профиль (вкладка «Общее»)\n2. Сделайте скриншот всего экрана, без обрезки\n3. Пришлите его сюда\n\nНа скриншоте должны быть видны надпись «Мой профиль» и ваш ID.';
+const NOT_PROFILE = '❌ Этот скриншот не подходит — это не экран «Мой профиль» из StandLeo.\n\n' + HOWTO;
+const FOREIGN_PROFILE = '❌ Это чужой профиль («Профиль друга» или «Профиль игрока»). Подтвердить аккаунт можно только скриншотом своего профиля — экрана «Мой профиль».\n\n' + HOWTO;
 const tg = (method, body) => fetch(`https://api.telegram.org/bot${TG_TOKEN}/${method}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) }).then(r => r.json());
 const say = (chat_id, text, extra = {}) => tg('sendMessage', { chat_id, text, parse_mode: 'HTML', disable_web_page_preview: true, ...extra });
 const escH = s => String(s).replace(/[&<>]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c]));
@@ -145,7 +149,8 @@ async function handlePhoto(msg) {
       if (profileCheck(text).ok && findIds(text).all.includes(u.soid)) break;
     }
     const pc = profileCheck(text), ids = findIds(text);
-    console.log(`Проверка скриншота ${u.nick}: профиль=${pc.ok} (свой=${pc.own}, надписей=${pc.marks}), ID найден=${ids.all.includes(u.soid)}`);
+    console.log(`Проверка скриншота ${u.nick}: профиль=${pc.ok} (свой=${pc.own}, чужой=${pc.foreign}, надписей=${pc.marks}), ID найден=${ids.all.includes(u.soid)}`);
+    if (pc.foreign) return say(chatId, FOREIGN_PROFILE);
     if (!pc.ok) return say(chatId, NOT_PROFILE);
     if (ids.all.includes(u.soid)) {
       const taken = verified().find(x => x.soid === u.soid);
