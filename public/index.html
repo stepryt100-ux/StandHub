@@ -708,6 +708,12 @@ body::after{width:520px;height:520px;left:140px;bottom:-220px;background:radial-
 .adm-cfg label.w2{flex:1 1 260px}.adm-cfg label.w3{flex:1 1 100%}.adm-cfg label.w2 input,.adm-cfg label.w3 input{width:100%}
 .adm-sub2{font-size:13px;text-transform:uppercase;font-weight:800;color:var(--muted);letter-spacing:.04em;margin:4px 0 -6px}
 .adm-cupb{display:flex;gap:10px;flex-wrap:wrap}.adm-cupb .ic{width:16px;height:16px}
+.adm-pic{display:flex;gap:16px;align-items:center;padding:12px;border:1px solid var(--line);border-radius:10px;background:var(--bg2)}
+.adm-pim{flex:none;display:block;width:220px;border-radius:8px;overflow:hidden;border:1px solid var(--line)}.adm-pim img{display:block;width:100%;aspect-ratio:16/9;object-fit:cover;background:#111}
+.adm-pir{display:flex;flex-direction:column;align-items:flex-start;gap:8px;min-width:0}.adm-pir>.muted{font-size:13px}.adm-pir .chk{margin-top:0}
+.adm-pib{display:flex;align-items:center;gap:12px;flex-wrap:wrap}.adm-pib .ic{width:16px;height:16px}
+.adm-file{position:relative;cursor:pointer}.adm-file input{position:absolute;width:1px;height:1px;opacity:0;pointer-events:none}.adm-file:focus-within{box-shadow:0 0 0 3px rgba(255,85,0,.25)}
+@media (max-width:760px){.adm-pic{flex-direction:column;align-items:stretch}.adm-pim{width:100%}}
 .pill.ok{background:rgba(63,207,106,.15);color:var(--green)}
 .adm-ctools{display:flex;align-items:center;gap:8px}.adm-ctools .ic{width:16px;height:16px}
 .adm-tm{list-style:none;display:grid;gap:4px;margin-top:8px;font-size:13px}
@@ -961,7 +967,7 @@ function qHint(){
 const L=k=>`<b data-live="${k}">${S.live[k]==null?"—":fmt(S.live[k])}</b>`;
 
 /* ===== Каркас ===== */
-const ICONS={"trophy":"<path d=\"M6 2h12v2h4v4a5 5 0 01-4.4 5 6 6 0 01-4.6 3.9V19h4v3H7v-3h4v-2.1A6 6 0 016.4 13 5 5 0 012 8V4h4zm0 4H4v2a3 3 0 002 2.8zm12 0v4.8A3 3 0 0020 8V6z\"/>","cal":"<path fill-rule=\"evenodd\" d=\"M7 2h2v2h6V2h2v2h2a2 2 0 012 2v13a2 2 0 01-2 2H5a2 2 0 01-2-2V6a2 2 0 012-2h2zM5 9v10h14V9zm2 2h3v3H7z\"/>","copy":"<path d=\"M8 3h11a2 2 0 012 2v11h-2V5H8z\"/><path fill-rule=\"evenodd\" d=\"M5 7h10a2 2 0 012 2v10a2 2 0 01-2 2H5a2 2 0 01-2-2V9a2 2 0 012-2zm0 2v10h10V9z\"/>","bell":"<path d=\"M12 2a7 7 0 00-7 7v4.5L3 17v1h18v-1l-2-3.5V9a7 7 0 00-7-7zm-2.5 17a2.5 2.5 0 005 0z\"/>","gift":"<path d=\"M3 8h18v4H3zM4.5 13H11v8H4.5zM13 13h6.5v8H13z\"/><path d=\"M12 8c-1.5-3-5.5-4-6-1.5S9 8 12 8zm0 0c1.5-3 5.5-4 6-1.5S15 8 12 8z\"/>","check":"<path d=\"M9.5 16.2L5.3 12l-1.4 1.4 5.6 5.6L20.1 8.4 18.7 7z\"/>","tg":"<path fill-rule=\"evenodd\" d=\"M2.4 11.1 21.2 3.9c.7-.3 1.4.3 1.2 1.1L19 20c-.2.8-1.1 1.1-1.7.7l-5.1-3.8-2.6 2.5c-.4.3-.9.2-1-.3L7.8 14l-5.4-1.7c-.7-.2-.8-1-.1-1.2zM8.9 14.2l.7 4 .5-3.1 7.6-7.6z\"/>","alert":"<path fill-rule=\"evenodd\" d=\"M12 2.5L1.5 21h21zM11 9.5h2v6h-2zm0 7.5h2v2h-2z\"/>","lock":"<path fill-rule=\"evenodd\" d=\"M8 10V7a4 4 0 018 0v3h-2V7a2 2 0 00-4 0v3zM5 10h14a1 1 0 011 1v10a1 1 0 01-1 1H5a1 1 0 01-1-1V11a1 1 0 011-1zm7 3.5a1.5 1.5 0 00-.75 2.8V18h1.5v-1.7a1.5 1.5 0 00-.75-2.8z\"/>","users":"<circle cx=\"9\" cy=\"8\" r=\"3.6\"/><path d=\"M2.5 20c0-3.7 2.9-5.8 6.5-5.8s6.5 2.1 6.5 5.8z\"/><circle cx=\"16.6\" cy=\"8.8\" r=\"2.9\"/><path d=\"M16.3 13.4c3.2.1 5.2 2.1 5.2 5.4h-4.6c-.1-2.1-.9-3.9-2.3-5.2.5-.1 1.1-.2 1.7-.2z\"/>","home":"<path d=\"M3 11l9-8 9 8v10h-6v-6H9v6H3z\"/>","play":"<path d=\"M7 4l13 8-13 8z\"/>","user":"<circle cx=\"12\" cy=\"8\" r=\"4\"/><path d=\"M4 21c0-4 4-6 8-6s8 2 8 6z\"/>","swords":"<path d=\"M3 3h4l10 10-2 2-2-2-3 3-2-2 3-3zM21 3h-4l-5 5 2 2 1-1 2 2-6 6 2 2 3-3 2 2 2-2-2-2 3-3z\"/>","crown":"<path d=\"M3 7l5 4 4-7 4 7 5-4-2 12H5z\"/>","shield":"<path d=\"M12 2l8 3v6c0 5-3.5 9-8 11-4.5-2-8-6-8-11V5z\"/>","spark":"<path d=\"M12 2l2.4 6.6L21 11l-6.6 2.4L12 20l-2.4-6.6L3 11l6.6-2.4z\"/>","help":"<circle cx=\"12\" cy=\"12\" r=\"10\"/><path d=\"M9.5 9a2.5 2.5 0 115 0c0 2-2.5 2-2.5 4M12 17h0\" stroke=\"#0f0f11\" stroke-width=\"2\" fill=\"none\"/>",
+const ICONS={"img":"<path d=\"M21 19V5a2 2 0 00-2-2H5a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2zM8.5 13.5l2.5 3 3.5-4.5 4.5 6H5z\"/>","trophy":"<path d=\"M6 2h12v2h4v4a5 5 0 01-4.4 5 6 6 0 01-4.6 3.9V19h4v3H7v-3h4v-2.1A6 6 0 016.4 13 5 5 0 012 8V4h4zm0 4H4v2a3 3 0 002 2.8zm12 0v4.8A3 3 0 0020 8V6z\"/>","cal":"<path fill-rule=\"evenodd\" d=\"M7 2h2v2h6V2h2v2h2a2 2 0 012 2v13a2 2 0 01-2 2H5a2 2 0 01-2-2V6a2 2 0 012-2h2zM5 9v10h14V9zm2 2h3v3H7z\"/>","copy":"<path d=\"M8 3h11a2 2 0 012 2v11h-2V5H8z\"/><path fill-rule=\"evenodd\" d=\"M5 7h10a2 2 0 012 2v10a2 2 0 01-2 2H5a2 2 0 01-2-2V9a2 2 0 012-2zm0 2v10h10V9z\"/>","bell":"<path d=\"M12 2a7 7 0 00-7 7v4.5L3 17v1h18v-1l-2-3.5V9a7 7 0 00-7-7zm-2.5 17a2.5 2.5 0 005 0z\"/>","gift":"<path d=\"M3 8h18v4H3zM4.5 13H11v8H4.5zM13 13h6.5v8H13z\"/><path d=\"M12 8c-1.5-3-5.5-4-6-1.5S9 8 12 8zm0 0c1.5-3 5.5-4 6-1.5S15 8 12 8z\"/>","check":"<path d=\"M9.5 16.2L5.3 12l-1.4 1.4 5.6 5.6L20.1 8.4 18.7 7z\"/>","tg":"<path fill-rule=\"evenodd\" d=\"M2.4 11.1 21.2 3.9c.7-.3 1.4.3 1.2 1.1L19 20c-.2.8-1.1 1.1-1.7.7l-5.1-3.8-2.6 2.5c-.4.3-.9.2-1-.3L7.8 14l-5.4-1.7c-.7-.2-.8-1-.1-1.2zM8.9 14.2l.7 4 .5-3.1 7.6-7.6z\"/>","alert":"<path fill-rule=\"evenodd\" d=\"M12 2.5L1.5 21h21zM11 9.5h2v6h-2zm0 7.5h2v2h-2z\"/>","lock":"<path fill-rule=\"evenodd\" d=\"M8 10V7a4 4 0 018 0v3h-2V7a2 2 0 00-4 0v3zM5 10h14a1 1 0 011 1v10a1 1 0 01-1 1H5a1 1 0 01-1-1V11a1 1 0 011-1zm7 3.5a1.5 1.5 0 00-.75 2.8V18h1.5v-1.7a1.5 1.5 0 00-.75-2.8z\"/>","users":"<circle cx=\"9\" cy=\"8\" r=\"3.6\"/><path d=\"M2.5 20c0-3.7 2.9-5.8 6.5-5.8s6.5 2.1 6.5 5.8z\"/><circle cx=\"16.6\" cy=\"8.8\" r=\"2.9\"/><path d=\"M16.3 13.4c3.2.1 5.2 2.1 5.2 5.4h-4.6c-.1-2.1-.9-3.9-2.3-5.2.5-.1 1.1-.2 1.7-.2z\"/>","home":"<path d=\"M3 11l9-8 9 8v10h-6v-6H9v6H3z\"/>","play":"<path d=\"M7 4l13 8-13 8z\"/>","user":"<circle cx=\"12\" cy=\"8\" r=\"4\"/><path d=\"M4 21c0-4 4-6 8-6s8 2 8 6z\"/>","swords":"<path d=\"M3 3h4l10 10-2 2-2-2-3 3-2-2 3-3zM21 3h-4l-5 5 2 2 1-1 2 2-6 6 2 2 3-3 2 2 2-2-2-2 3-3z\"/>","crown":"<path d=\"M3 7l5 4 4-7 4 7 5-4-2 12H5z\"/>","shield":"<path d=\"M12 2l8 3v6c0 5-3.5 9-8 11-4.5-2-8-6-8-11V5z\"/>","spark":"<path d=\"M12 2l2.4 6.6L21 11l-6.6 2.4L12 20l-2.4-6.6L3 11l6.6-2.4z\"/>","help":"<circle cx=\"12\" cy=\"12\" r=\"10\"/><path d=\"M9.5 9a2.5 2.5 0 115 0c0 2-2.5 2-2.5 4M12 17h0\" stroke=\"#0f0f11\" stroke-width=\"2\" fill=\"none\"/>",
  "tasks":"<path fill-rule=\"evenodd\" d=\"M7 2h2v2h6V2h2v2h2a2 2 0 012 2v13a2 2 0 01-2 2H5a2 2 0 01-2-2V6a2 2 0 012-2h2zM7.4 13.1l1.5-1.5 2.1 2.1 4.6-4.6 1.5 1.5-6.1 6.1z\"/>",
  "shop":"<path d=\"M3.6 8h16.8l-1.3 13H4.9zM8 8V6.5a4 4 0 018 0V8h-2V6.5a2 2 0 00-4 0V8z\"/>",
  "book":"<path d=\"M5 3.5A1.5 1.5 0 016.5 2H20v15H6.6a1.6 1.6 0 000 3.2H20V22H6.5A2.5 2.5 0 014 19.5v-15c0-.4.4-1 1-1zM8 6v2h8V6z\"/>",
@@ -1035,7 +1041,7 @@ function toast(t){const e=document.getElementById("toast");e.textContent=t;e.cla
 function needAuth(){if(!S.user){location.hash="#/login";toast("Войдите, чтобы продолжить");return true}return false}
 function empty(title,text,btn){return `<div class="empty"><div class="empty-ic">${ic("crown")}</div><b>${title}</b><p class="muted">${text}</p>${btn||""}</div>`}
 /* ===== Анимации ===== */
-const APP_V="1.11";
+const APP_V="1.11.1";
 // анимации включены всегда; выключить можно кнопкой «Анимации» (меню слева / низ главной)
 const RM=()=>document.documentElement.classList.contains("no-motion");
 function paintMotion(){document.querySelectorAll("[data-motion] b").forEach(b=>b.textContent=RM()?"выкл":"вкл")}
@@ -1964,6 +1970,20 @@ function paintCupTeams(d){const box=document.getElementById("admCt");if(!box)ret
 async function cupPost(body,btn,msg,full){if(btn)btn.disabled=true;
   try{const r=await api("/api/admin/cup",{method:"POST",body:JSON.stringify(body)});toast(msg(r));if(full)paintAdmCup(r.admin);else{paintCupTeams(r.admin);if(btn&&btn.isConnected)btn.disabled=false}}
   catch(e){toast(e.message);if(btn&&btn.isConnected)btn.disabled=false}}
+// картинка анонса: предпросмотр, «Заменить» (сжимаем до 1280 px) и «Вернуть стандартную»; галочку «с картинкой» не сбрасываем
+function cupPicIn(d,on){const u=`/api/cup/img?v=${encodeURIComponent(d.img.v)}`;return `<a class="adm-pim" href="${u}" target="_blank" rel="noopener" title="Открыть картинку целиком"><img src="${u}" alt="Картинка анонса"></a>
+  <div class="adm-pir"><b>Картинка анонса</b><span class="muted">${d.img.custom?"Своя картинка":"Стандартная — «Кубок открытия»"}. Лучше всего 1280×720 (16:9)</span>
+   <label class="chk"><input type="checkbox" data-c="pic"${on?" checked":""}><span>Публиковать анонс с картинкой</span></label>
+   <div class="adm-pib"><label class="btn btn-g btn-sm adm-file">${ic("img")}Заменить картинку<input type="file" accept="image/png,image/jpeg,image/webp" data-cimg></label>${d.img.custom?`<button class="adm-undo" data-cimgr>Вернуть стандартную</button>`:""}</div></div>`}
+function paintCupPic(d){const box=document.getElementById("admCpic");if(!box)return;const cb=box.querySelector('[data-c="pic"]');box.innerHTML=cupPicIn(d,cb?cb.checked:d.cfg.pic);bindCupPic(box)}
+function bindCupPic(box){if(!box)return;
+  const fi=box.querySelector("[data-cimg]");fi.onchange=async()=>{const f=fi.files[0];fi.value="";if(!f)return;if(!/^image\//.test(f.type)){toast("Выберите картинку");return}
+    let data;try{const im=await createImageBitmap(f),k=Math.min(1,1280/im.width,1280/im.height),c=document.createElement("canvas");c.width=Math.max(1,Math.round(im.width*k));c.height=Math.max(1,Math.round(im.height*k));
+      const x=c.getContext("2d");x.fillStyle="#111";x.fillRect(0,0,c.width,c.height);x.drawImage(im,0,0,c.width,c.height);data=c.toDataURL("image/jpeg",.9)}catch{toast("Не удалось открыть картинку — попробуйте JPG или PNG");return}
+    toast("Загружаем картинку…");cupImg({act:"img",data},"Картинка анонса обновлена")};
+  const rs=box.querySelector("[data-cimgr]");if(rs)rs.onclick=e=>cupImg({act:"imgReset"},"Вернули стандартную картинку",e.currentTarget)}
+async function cupImg(body,msg,btn){if(btn)btn.disabled=true;
+  try{const r=await api("/api/admin/cup",{method:"POST",body:JSON.stringify(body)});S.admCup=r.admin;toast(msg);paintCupPic(r.admin)}catch(e){toast(e.message);if(btn&&btn.isConnected)btn.disabled=false}}
 function paintAdmCup(d){const el=document.getElementById("adm");if(!el)return;S.admCup=d;const c=d.cfg,[dd,tt]=mskParts(c.start);
   const botCard=d.bot?`<div class="card pad adm-cb ok"><div class="adm-h"><div><b>${ic("tg")}Бот регистрации: <a href="https://t.me/${encodeURIComponent(d.bot)}" target="_blank" rel="noopener">@${esc(d.bot)}</a></b><div class="muted" style="font-size:13px;margin-top:4px">Подключён. Кнопка «Регистрация в Telegram» на плашке открывает этого бота.${d.env?" Токен задан в Railway (CUP_BOT_TOKEN).":""}</div></div>${d.env?"":`<button class="btn btn-g btn-sm" data-cboff>Отключить</button>`}</div></div>`
    :`<div class="card pad adm-cb"><b>${ic("tg")}Бот регистрации не подключён</b>
@@ -1982,18 +2002,20 @@ function paintAdmCup(d){const el=document.getElementById("adm");if(!el)return;S.
      <label class="w2">Призы<input type="text" data-c="prize" maxlength="80" value="${esc(c.prize)}"></label>
      <label class="w3">Описание<input type="text" data-c="desc" maxlength="200" value="${esc(c.desc)}"></label></div>
     <h4 class="adm-sub2">Telegram-канал для анонсов</h4>
-    <p class="muted" style="font-size:13px;margin:0">${d.bot?`Добавьте <b style="color:#fff">@${esc(d.bot)}</b> в администраторы канала с правом «Публикация сообщений». Кнопка «Опубликовать анонс» отправит в канал пост о турнире с кнопкой регистрации.`:"Сначала подключите бота регистрации — он будет публиковать посты в канал."}</p>
+    <p class="muted" style="font-size:13px;margin:0">${d.bot?`Добавьте <b style="color:#fff">@${esc(d.bot)}</b> в администраторы канала с правом «Публикация сообщений» — кнопкой ниже или вручную: канал → «Администраторы» → «Добавить администратора». Кнопка «Опубликовать анонс» отправит в канал пост о турнире с картинкой и кнопкой регистрации.`:"Сначала подключите бота регистрации — он будет публиковать посты в канал."}</p>
+    ${d.bot?`<div class="adm-cupb"><a class="btn btn-g btn-sm" href="https://t.me/${encodeURIComponent(d.bot)}?startchannel&admin=post_messages" target="_blank" rel="noopener" data-caddch>${ic("tg")}Добавить бота в канал</a></div>`:""}
     <div class="adm-cfg"><label>Канал<input type="text" data-c="channel" maxlength="60" value="${esc(c.channel)}" placeholder="@standhub" autocomplete="off" spellcheck="false"></label>
      <label class="chk"><input type="checkbox" data-c="chNew"${c.chNew?" checked":""}><span>Сообщать в канал о каждой новой команде</span></label></div>
+    <div class="adm-pic" id="admCpic">${cupPicIn(d,c.pic)}</div>
     <div class="adm-cupb"><button class="btn btn-o btn-sm" data-csave>Сохранить</button><button class="btn btn-g btn-sm" data-cpost${d.bot?"":" disabled"}>${ic("send")}Опубликовать анонс в канал</button></div></div>
    <div class="adm-oh"><h3 class="adm-sub" id="admCh"></h3><div id="admCtools" class="adm-ctools"><button class="btn btn-g btn-sm" data-ccopy>${ic("copy")}Скопировать список</button><button class="adm-undo" data-cclear>Очистить список</button></div></div>
    <div class="card" id="admCt"></div>`;
-  paintCupTeams(d);
+  paintCupTeams(d);bindCupPic(document.getElementById("admCpic"));
   const g=k=>el.querySelector(`[data-c="${k}"]`);
   const on=el.querySelector("[data-cbon]");if(on)on.onclick=e=>{const v=el.querySelector("#cupTok").value.trim();if(!v){toast("Вставьте токен от @BotFather");return}cupPost({act:"bot",token:v},e.currentTarget,r=>"Бот подключён: @"+r.bot,true)};
   const off=el.querySelector("[data-cboff]");if(off)off.onclick=e=>{if(!confirm("Отключить бота регистрации? Кнопка «Регистрация в Telegram» на плашке перестанет работать."))return;cupPost({act:"botOff"},e.currentTarget,()=>"Бот отключён",true)};
-  el.querySelector("[data-csave]").onclick=e=>cupPost({act:"cfg",on:g("on").checked,reg:g("reg").checked,title:g("title").value,start:mskTs(g("date").value,g("time").value),max:Number(g("max").value),prize:g("prize").value,desc:g("desc").value,channel:g("channel").value,chNew:g("chNew").checked},e.currentTarget,()=>"Сохранено",true);
-  el.querySelector("[data-cpost]").onclick=e=>cupPost({act:"post",channel:g("channel").value},e.currentTarget,r=>"Анонс опубликован в "+r.channel);
+  el.querySelector("[data-csave]").onclick=e=>cupPost({act:"cfg",on:g("on").checked,reg:g("reg").checked,title:g("title").value,start:mskTs(g("date").value,g("time").value),max:Number(g("max").value),prize:g("prize").value,desc:g("desc").value,channel:g("channel").value,chNew:g("chNew").checked,pic:g("pic").checked},e.currentTarget,()=>"Сохранено",true);
+  el.querySelector("[data-cpost]").onclick=e=>cupPost({act:"post",channel:g("channel").value},e.currentTarget,r=>"Анонс опубликован в "+r.channel+(r.noPic?" — без картинки: Telegram её не принял":""));
   el.querySelector("[data-ccopy]").onclick=()=>copyTxt(cupListTxt(S.admCup),"Список команд скопирован");
   el.querySelector("[data-cclear]").onclick=e=>{const n=S.admCup.teams.length;if(!confirm(`Удалить все команды (${n}) из списка? Игрокам ничего не придёт — обычно это нужно перед новым турниром.`))return;cupPost({act:"clear"},e.currentTarget,r=>`Список очищен (${r.n})`)};
 }

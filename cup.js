@@ -38,10 +38,17 @@ const cleanCh = s => {
   return /^[A-Za-z][A-Za-z0-9_]{3,31}$/.test(s) ? '@' + s : null;
 };
 const sleep = ms => new Promise(r => setTimeout(r, ms));
+const fs = require('fs'), path = require('path');
+// картинка анонса по умолчанию — «Кубок открытия» 1280×720; админ может загрузить свою
+const DEF_IMG = path.join(__dirname, 'assets', 'cup-open.jpg'), DEF_V = 'd1';
+let defBuf = null;
+const defImg = () => { if (!defBuf) { try { defBuf = fs.readFileSync(DEF_IMG); } catch { defBuf = Buffer.alloc(0); } } return defBuf; };
+// ошибки доступа к каналу — с ними картинку не обойти, публиковать текстом бесполезно
+const ACCESS_ERR = /chat not found|rights|not a member|forbidden|administrator|admin_required|kicked|not enough/i;
 
 module.exports = function ({ db, save, sendTo, sendAll, tell, alertAdmins, escH, siteUrl, partyOf, mainBot = () => null, envToken = '', mainToken = '' }) {
   const C = db.cup = db.cup || {};
-  C.cfg = { on: true, reg: true, title: 'Кубок открытия', start: nextSat(), prize: 'Промокоды на голду', desc: 'Собери пати из пяти человек, регистрация в нашем Telegram', max: 16, channel: '', chNew: false, ...(C.cfg || {}) };
+  C.cfg = { on: true, reg: true, title: 'Кубок открытия', start: nextSat(), prize: 'Промокоды на голду', desc: 'Собери пати из пяти человек, регистрация в нашем Telegram', max: 16, channel: '', chNew: false, pic: true, ...(C.cfg || {}) };
   C.teams = C.teams || [];
   C.seq = Math.max(C.seq || 0, ...C.teams.map(t => t.n || 0));
   const cfg = C.cfg;
@@ -62,6 +69,31 @@ module.exports = function ({ db, save, sendTo, sendAll, tell, alertAdmins, escH,
   const call = (tok, method, body = {}, signal) => fetch(`https://api.telegram.org/bot${tok}/${method}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body), signal }).then(r => r.json());
   const tg = (method, body) => (bot ? call(token(), method, body).catch(() => ({ ok: false })) : Promise.resolve({ ok: false, description: 'бот не подключён' }));
   const say = (chat_id, text, extra = {}) => tg('sendMessage', { chat_id, text, parse_mode: 'HTML', disable_web_page_preview: true, ...extra });
+  // текущая картинка анонса: своя (из админки) или стандартная
+  let cImg = null; // раскодированная своя картинка (кэш)
+  const img = () => {
+    if (!(C.img && C.img.data)) return { buf: defImg(), type: 'image/jpeg', v: DEF_V, custom: false };
+    const v = 'c' + C.img.v; if (!cImg || cImg.v !== v) cImg = { buf: Buffer.from(C.img.data, 'base64'), type: C.img.type, v, custom: true };
+    return cImg;
+  };
+  // пост с картинкой: первый раз загружаем файл, дальше Telegram помнит его по file_id
+  async function sayPic(chat_id, caption, extra = {}) {
+    if (!bot) return { ok: false, description: 'бот не подключён' };
+    const im = img(); if (!im.buf.length) return { ok: false, description: 'нет картинки' };
+    const base = { chat_id: String(chat_id), caption, parse_mode: 'HTML', ...extra };
+    let r = null;
+    if (C.fid && C.fid.v === im.v) { r = await tg('sendPhoto', { ...base, photo: C.fid.id }); if (r.ok || ACCESS_ERR.test(r.description || '')) return keepFid(r, im); }
+    const fd = new FormData();
+    for (const [k, v] of Object.entries(base)) fd.append(k, typeof v === 'string' ? v : JSON.stringify(v));
+    fd.append('photo', new Blob([im.buf], { type: im.type }), im.type === 'image/png' ? 'cup.png' : 'cup.jpg');
+    r = await fetch(`https://api.telegram.org/bot${token()}/sendPhoto`, { method: 'POST', body: fd }).then(x => x.json()).catch(() => ({ ok: false }));
+    return keepFid(r, im);
+  }
+  function keepFid(r, im) {
+    const ph = r && r.ok && r.result && r.result.photo;
+    if (ph && ph.length) { const id = ph[ph.length - 1].file_id; if (!C.fid || C.fid.id !== id || C.fid.v !== im.v) { C.fid = { v: im.v, id }; save(); } }
+    return r;
+  }
   async function connect(known) {
     const my = ++gen; if (ctl) ctl.abort(); ctl = null; bot = null; botErr = null;
     const tok = token(); if (!tok) return;
@@ -176,7 +208,21 @@ module.exports = function ({ db, save, sendTo, sendAll, tell, alertAdmins, escH,
     }
     if (q.data === 'cup:no') return say(chat, 'Хорошо, регистрация остаётся в силе 👍', { reply_markup: KB });
   }
+  // бота добавили в канал (или убрали) — сразу сообщаем админам, первый канал сохраняем сами
+  function onMember(u) {
+    const ch = u.chat || {}, st = u.new_chat_member || {}; if (ch.type !== 'channel' || !bot) return;
+    const id = ch.username ? '@' + ch.username : String(ch.id), title = escH(ch.title || id), where = `«Админ» → «Турнир»`;
+    if (st.status === 'administrator') {
+      if (!st.can_post_messages) return alertAdmins(`⚠️ Бот турнира @${bot} добавлен в канал «${title}», но без права «Публикация сообщений». Откройте канал → «Администраторы» → @${bot} и включите это право.`);
+      let note = '';
+      if (!cfg.channel) { cfg.channel = id; save(); note = `\nКанал ${escH(id)} сохранён в ${where}.`; }
+      else if (cfg.channel.toLowerCase() !== id.toLowerCase()) note = `\nСейчас для анонсов указан другой канал — ${escH(cfg.channel)}. Чтобы публиковать сюда, впишите ${escH(id)} в ${where}.`;
+      return alertAdmins(`✅ Бот турнира @${bot} — администратор канала «${title}». Анонс публикуется кнопкой «Опубликовать анонс в канал» в ${where}.${note}`);
+    }
+    if (['left', 'kicked', 'member', 'restricted'].includes(st.status) && ['administrator', 'creator'].includes((u.old_chat_member || {}).status)) return alertAdmins(`ℹ️ Бот турнира @${bot} больше не администратор канала «${title}» — анонсы туда не уйдут.`);
+  }
   async function onUpdate(upd) {
+    if (upd.my_chat_member) return onMember(upd.my_chat_member);
     if (upd.callback_query) return onCb(upd.callback_query);
     const msg = upd.message; if (!msg || !msg.chat || msg.chat.type !== 'private') return;
     const chat = msg.chat.id, from = msg.from || { id: chat }, text = clean(msg.text);
@@ -194,7 +240,7 @@ module.exports = function ({ db, save, sendTo, sendAll, tell, alertAdmins, escH,
   const tgErr = r => {
     const d = String((r && r.description) || '');
     if (/chat not found/i.test(d)) return 'Канал не найден. Проверьте адрес — например, @standhub';
-    if (/rights|not a member|forbidden|administrator|kicked/i.test(d)) return `Бот не может публиковать в канале. Добавьте @${bot} в администраторы канала с правом «Публикация сообщений»`;
+    if (/rights|not a member|forbidden|administrator|admin_required|kicked/i.test(d)) return `Бот не может публиковать в канале. Добавьте @${bot} в администраторы канала с правом «Публикация сообщений»`;
     return 'Telegram не принял сообщение' + (d ? ': ' + d : '');
   };
   function postNew(t) {
@@ -217,7 +263,7 @@ module.exports = function ({ db, save, sendTo, sendAll, tell, alertAdmins, escH,
 
   // ---------- админка ----------
   const adminState = () => ({
-    cfg: { ...cfg }, phase: phase(), bot, botErr, env: !C.token && !!envToken, main: mainBot(),
+    cfg: { ...cfg }, phase: phase(), bot, botErr, env: !C.token && !!envToken, main: mainBot(), img: (({ v, custom }) => ({ v, custom }))(img()),
     teams: C.teams.slice().sort((a, b) => a.n - b.n).map(t => ({ id: t.id, n: t.n, name: t.name, at: t.at, cap: nick(t.cap),
       members: t.members.map(id => { const u = user(id) || {}; return { nick: u.nick || '?', soid: u.soid || '', elo: u.elo || 0, tg: u.tgUser || null, cap: id === t.cap }; }) })),
   });
@@ -230,7 +276,7 @@ module.exports = function ({ db, save, sendTo, sendAll, tell, alertAdmins, escH,
     if (!Number.isInteger(max) || max < 2 || max > 256) return { error: 'Мест — от 2 до 256 команд' };
     if (ch === null) return { error: 'Канал — в виде @название или ссылка t.me/название' };
     if (start !== cfg.start) C.reminded = 0;
-    Object.assign(cfg, { title, start, prize, desc, max, on: !!b.on, reg: !!b.reg, channel: ch, chNew: !!b.chNew });
+    Object.assign(cfg, { title, start, prize, desc, max, on: !!b.on, reg: !!b.reg, channel: ch, chNew: !!b.chNew, pic: b.pic === undefined ? cfg.pic : !!b.pic });
     save(); push(); return { ok: true };
   }
   async function setBot(raw) {
@@ -246,14 +292,30 @@ module.exports = function ({ db, save, sendTo, sendAll, tell, alertAdmins, escH,
     if (chIn !== undefined) { const ch = cleanCh(chIn); if (ch === null) return { error: 'Канал — в виде @название или ссылка t.me/название' }; if (ch !== cfg.channel) { cfg.channel = ch; save(); } }
     if (!bot) return { error: 'Сначала подключите бота турнира' };
     if (!cfg.channel) return { error: 'Укажите канал, например @standhub' };
-    const r = await say(cfg.channel, annText(), { reply_markup: regKb() });
-    return r && r.ok ? { ok: true, channel: cfg.channel } : { error: tgErr(r) };
+    let r = cfg.pic ? await sayPic(cfg.channel, annText(), { reply_markup: regKb() }) : null, noPic = false;
+    // картинку Telegram не принял (не из-за прав) — всё равно публикуем анонс, только текстом
+    if (r && !r.ok && !ACCESS_ERR.test(r.description || '')) { console.error('Бот турнира: картинка не ушла —', r.description); noPic = true; r = null; }
+    if (!r) r = await say(cfg.channel, annText(), { reply_markup: regKb() });
+    return r && r.ok ? { ok: true, channel: cfg.channel, pic: cfg.pic && !noPic, noPic } : { error: tgErr(r) };
+  }
+  // своя картинка анонса: JPG или PNG до 1,5 МБ (сайт сам сжимает до 1280 px)
+  function setImg(data) {
+    const m = /^data:image\/(jpeg|png);base64,([A-Za-z0-9+/=]+)$/.exec(String(data || ''));
+    if (!m) return { error: 'Нужна картинка JPG или PNG' };
+    if (m[2].length > 2e6) return { error: 'Картинка слишком большая — до 1,5 МБ' };
+    const buf = Buffer.from(m[2], 'base64');
+    const real = m[1] === 'jpeg' ? buf[0] === 0xff && buf[1] === 0xd8 && buf[2] === 0xff : buf.length > 8 && buf[0] === 0x89 && buf.toString('latin1', 1, 4) === 'PNG';
+    if (!real || buf.length < 60) return { error: 'Файл повреждён или это не картинка' };
+    C.img = { data: m[2], type: 'image/' + m[1], v: Date.now() }; C.fid = null; save();
+    return { ok: true };
   }
   async function admin(by, act, b) {
     if (act === 'cfg') return setCfg(b);
     if (act === 'bot') return setBot(b.token);
     if (act === 'botOff') { C.token = null; save(); await connect(); push(); return { ok: true }; }
     if (act === 'post') return post(b.channel);
+    if (act === 'img') return setImg(b.data);
+    if (act === 'imgReset') { C.img = null; C.fid = null; save(); return { ok: true }; }
     if (act === 'del') {
       const t = C.teams.find(x => x.id === String(b.id || '')); if (!t) return { error: 'Команда не найдена — обновите страницу' };
       drop(t);
@@ -266,5 +328,5 @@ module.exports = function ({ db, save, sendTo, sendAll, tell, alertAdmins, escH,
   }
 
   connect();
-  return { state, adminState, admin, phase, when, nextSat, botName: () => bot };
+  return { state, adminState, admin, phase, when, nextSat, botName: () => bot, img: () => { const { buf, type, v } = img(); return { buf, type, v }; } };
 };

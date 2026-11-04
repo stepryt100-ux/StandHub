@@ -413,10 +413,15 @@ http.createServer(async (req, res) => {
   }
   // ---------- турнир ----------
   if (p === '/api/cup') { const u = authUser(req); return send(res, 200, cup.state(u && u.id)); }
+  if (p === '/api/cup/img') { // картинка анонса — для предпросмотра в админке
+    const im = cup.img(); if (!im.buf.length) { res.writeHead(404); return res.end(); }
+    res.writeHead(200, { 'Content-Type': im.type, 'Cache-Control': 'public, max-age=86400' }); return res.end(im.buf);
+  }
   if (p === '/api/admin/cup') {
     const u = authUser(req); if (!isAdmin(u)) return send(res, 403, { error: 'Только для администратора' });
     if (req.method !== 'POST') return send(res, 200, cup.adminState());
-    const b = await body(req, 4e3), r = await cup.admin(u, String(b.act || ''), b);
+    const b = await body(req, 3e6); if (b.tooBig) return send(res, 400, { error: 'Картинка слишком большая — до 1,5 МБ' });
+    const r = await cup.admin(u, String(b.act || ''), b);
     return send(res, r.error ? 400 : 200, { ...r, admin: cup.adminState() });
   }
   // ---------- поддержка ----------
