@@ -44,7 +44,7 @@ const stateOf = uid => { const am = match.matchOf(uid); return { type: 'state', 
 setInterval(() => { for (const r of clients.keys()) r.write(': ping\n\n'); }, 25000);
 
 // ---------- Telegram-бот: проверка ID по скриншоту ----------
-// распознавание текста: 'eng' — для ID в профиле, 'eng+rus' — для итогового экрана матча.
+// распознавание текста (eng+rus): скриншот профиля в боте и итоговый экран матча.
 // Обработчик создаётся при первой картинке и выгружается после 10 минут простоя, чтобы не занимать память.
 const workers = {};
 async function ocr(buf, langs = 'eng') {
@@ -54,15 +54,64 @@ async function ocr(buf, langs = 'eng') {
   try { const { data } = await (await w.p).recognize(buf); return data.text || ''; }
   finally { w.busy--; w.t = setTimeout(async () => { if (w.busy || workers[langs] !== w) return; delete workers[langs]; try { (await w.p).terminate(); } catch {} }, 10 * 60e3); }
 }
-// ищем ID на скриншоте: убираем пробелы, путаницу O/0 и I/1
+// ищем ID на скриншоте: путаница O/0 и I/1; цифры, разбитые пробелами, склеиваем,
+// а части проверяем и по отдельности (значок «копировать» рядом с ID иногда читается как лишняя цифра)
 function findIds(text) {
-  const ids = new Set();
+  const all = new Set(), shown = new Set();
   for (const line of text.split('\n')) {
     const norm = line.replace(/[OoОо]/g, '0').replace(/[Il|І]/g, '1');
-    for (const m of norm.match(/\d[\d\s]{3,}\d/g) || []) { const d = m.replace(/\s/g, ''); if (d.length >= 5 && d.length <= 12) ids.add(d); }
+    for (const m of norm.match(/\d[\d\s]*\d|\d/g) || []) {
+      const t = m.trim().split(/\s+/), whole = t.join('');
+      if (whole.length >= 5 && whole.length <= 12) shown.add(whole);
+      for (let i = 0; i < t.length; i++) for (let j = i; j < Math.min(t.length, i + 6); j++) { const d = t.slice(i, j + 1).join(''); if (d.length >= 5 && d.length <= 12) all.add(d); }
+    }
   }
-  return [...ids];
+  return { all: [...all], shown: [...shown] };
 }
+// экран «Мой профиль» из StandLeo: ищем надписи, которые есть только на нём (русская и английская версия игры).
+// Нужна хотя бы одна надпись «своего» профиля и ещё минимум две с этого экрана — иначе скриншот не подходит.
+const PROFILE_OWN = ['МОЙПРОФИЛЬ', 'НАСТРОЙКАПЕРСОНАЖА', 'MYPROFILE', 'CHARACTERSETTINGS', 'CHARACTERCUSTOMIZATION'];
+const PROFILE_MARKS = ['ПОДРОБНАЯ', 'СТАТИСТИКА', 'ТЕКУЩИЕРАНГИ', 'КАЛИБРОВКА', 'СОЮЗНИКИ', 'СЕЗОН', 'ПРОЦЕНТПОБЕД', 'ПОРАЖЕНИЙ', 'УБИЙСТВ', 'СМЕРТЕЙ', 'ОБЩЕЕВРЕМЯВИГРЕ', 'СЫГРАНОМАТЧЕЙ',
+  'DETAILED', 'STATISTICS', 'CURRENTRANKS', 'CALIBRATION', 'SEASON', 'WINRATE', 'LOSSES', 'DEFEATS', 'KILLS', 'DEATHS', 'TIMEINGAME', 'MATCHESPLAYED'];
+const LOOK_CYR = { A: 'А', B: 'В', C: 'С', E: 'Е', H: 'Н', K: 'К', M: 'М', O: 'О', P: 'Р', T: 'Т', X: 'Х', Y: 'У' };
+const LOOK_LAT = Object.fromEntries(Object.entries(LOOK_CYR).map(([l, c]) => [c, l]));
+const lettersCyr = t => t.toUpperCase().replace(/Ё/g, 'Е').replace(/[ABCEHKMOPTXY]/g, c => LOOK_CYR[c]).replace(/[^А-Я]/g, '');
+const lettersLat = t => t.toUpperCase().replace(/[АВСЕНКМОРТХУ]/g, c => LOOK_LAT[c]).replace(/[^A-Z]/g, '');
+// есть ли надпись в тексте с учётом ошибок распознавания (1 ошибка на 6+ букв, 2 — на 12+)
+function fuzzyHas(s, p) {
+  const k = p.length >= 12 ? 2 : p.length >= 6 ? 1 : 0;
+  if (!k) return s.includes(p);
+  let prev = Array.from({ length: p.length + 1 }, (_, i) => i);
+  for (let j = 0; j < s.length; j++) {
+    const cur = [0];
+    for (let i = 1; i <= p.length; i++) cur[i] = Math.min(prev[i] + 1, cur[i - 1] + 1, prev[i - 1] + (p[i - 1] === s[j] ? 0 : 1));
+    if (cur[p.length] <= k) return true;
+    prev = cur;
+  }
+  return false;
+}
+function profileCheck(text) {
+  const c = lettersCyr(text), l = lettersLat(text), has = p => fuzzyHas(/[А-Я]/.test(p) ? c : l, p);
+  const own = PROFILE_OWN.some(has), marks = PROFILE_MARKS.filter(has).length;
+  return { own, marks, ok: own && marks >= 2 };
+}
+// подготовка скриншота: верх экрана (там ID) увеличиваем — Telegram сжимает фото, и мелкий ID иначе не читается
+let sharp = null;
+try { sharp = require('sharp'); sharp.cache(false); sharp.concurrency(1); } catch (e) { console.error('sharp не загрузился — скриншоты распознаются без обработки:', e.message); }
+async function profileImages(buf) {
+  if (!sharp) return [buf];
+  try {
+    const { width: W, height: H } = await sharp(buf).metadata();
+    if (!W || !H) return [buf];
+    const ft = Math.min(3, Math.max(1, 2300 / H)), th = Math.max(1, Math.round(H * 0.4));
+    const top = await sharp(buf).extract({ left: 0, top: 0, width: W, height: th }).resize(Math.min(6000, Math.round(W * ft))).grayscale().normalize().png().toBuffer();
+    const full = H < 650 ? await sharp(buf).resize(Math.round(W * Math.min(2.5, 1300 / H))).grayscale().normalize().png().toBuffer()
+      : H > 1440 ? await sharp(buf).resize({ height: 1440 }).png().toBuffer() : buf;
+    return [top, full];
+  } catch (e) { console.error('Обработка скриншота:', e.message); return [buf]; }
+}
+const botBusy = new Set(); // один скриншот за раз от каждого чата
+const NOT_PROFILE = '❌ Этот скриншот не подходит — это не экран «Мой профиль» из StandLeo.\n\nКак сделать правильный:\n1. Откройте в игре свой профиль (вкладка «Общее»)\n2. Сделайте скриншот всего экрана, без обрезки\n3. Пришлите его сюда\n\nНа скриншоте должны быть видны надпись «Мой профиль» и ваш ID.';
 const tg = (method, body) => fetch(`https://api.telegram.org/bot${TG_TOKEN}/${method}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) }).then(r => r.json());
 const say = (chat_id, text, extra = {}) => tg('sendMessage', { chat_id, text, parse_mode: 'HTML', disable_web_page_preview: true, ...extra });
 const escH = s => String(s).replace(/[&<>]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c]));
@@ -76,19 +125,29 @@ function linkChat(chatId, code) {
   if (!u) return say(chatId, '❌ Код не найден или устарел. Зарегистрируйтесь на сайте заново:\n' + go('/#/register'));
   if (u.verified) return say(chatId, `✅ Аккаунт <b>${escH(u.nick)}</b> уже подтверждён. Можно входить на сайт:\n${go('/#/login')}`);
   u.tgChat = chatId; save();
-  return say(chatId, `👋 Аккаунт <b>${escH(u.nick)}</b> найден.\n\nТеперь пришлите <b>скриншот своего профиля в StandLeo</b>, где виден ваш ID.\nНа сайте вы указали ID: <code>${escH(u.soid)}</code>`);
+  return say(chatId, `👋 Аккаунт <b>${escH(u.nick)}</b> найден.\n\nТеперь пришлите <b>скриншот экрана «Мой профиль» из StandLeo</b> — весь экран, без обрезки, чтобы был виден ваш ID.\nНа сайте вы указали ID: <code>${escH(u.soid)}</code>`);
 }
 async function handlePhoto(msg) {
   const chatId = msg.chat.id;
   const u = db.users.find(x => x.tgChat === chatId && !x.verified);
   if (!u) return say(chatId, 'Сначала зарегистрируйтесь на сайте и нажмите кнопку «Открыть бота» на странице подтверждения, или пришлите сюда 6-значный код с сайта.\n' + go('/#/register'));
+  if (botBusy.has(chatId)) return say(chatId, '⏳ Ещё проверяю предыдущий скриншот — подождите несколько секунд.');
+  botBusy.add(chatId);
   const fileId = msg.photo ? msg.photo[msg.photo.length - 1].file_id : msg.document.file_id;
   await say(chatId, '🔍 Проверяю скриншот…');
   try {
     const f = await tg('getFile', { file_id: fileId });
     const buf = Buffer.from(await (await fetch(`https://api.telegram.org/file/bot${TG_TOKEN}/${f.result.file_path}`)).arrayBuffer());
-    const ids = findIds(await ocr(buf));
-    if (ids.includes(u.soid)) {
+    // сначала верх экрана (ID и заголовок), если не хватило — весь экран
+    let text = '';
+    for (const img of await profileImages(buf)) {
+      text += '\n' + await ocr(img, 'eng+rus');
+      if (profileCheck(text).ok && findIds(text).all.includes(u.soid)) break;
+    }
+    const pc = profileCheck(text), ids = findIds(text);
+    console.log(`Проверка скриншота ${u.nick}: профиль=${pc.ok} (свой=${pc.own}, надписей=${pc.marks}), ID найден=${ids.all.includes(u.soid)}`);
+    if (!pc.ok) return say(chatId, NOT_PROFILE);
+    if (ids.all.includes(u.soid)) {
       const taken = verified().find(x => x.soid === u.soid);
       if (taken) return say(chatId, '❌ Этот игровой ID уже подтверждён другим аккаунтом StandHub. Если это ошибка — напишите в поддержку.');
       u.verified = true; u.tgId = msg.from.id; u.vcode = null;
@@ -96,10 +155,12 @@ async function handlePhoto(msg) {
       save();
       return say(chatId, `✅ <b>Всё верно!</b> ID <code>${escH(u.soid)}</code> совпадает.\n\nАккаунт <b>${escH(u.nick)}</b> подтверждён — теперь можно войти на сайт:\n${go('/#/login')}`);
     }
-    return say(chatId, ids.length
-      ? `❌ ID не совпадает.\nНа скриншоте найдено: <code>${ids.map(escH).join(', ')}</code>\nНа сайте указано: <code>${escH(u.soid)}</code>\n\nПроверьте ID или пришлите другой скриншот.`
-      : '❌ Не получилось найти ID на скриншоте. Пришлите чёткий скриншот профиля целиком, без обрезки, чтобы ID было хорошо видно.');
+    const shown = ids.shown.filter(x => x.length >= 6 && x.length <= 10).slice(0, 3);
+    return say(chatId, shown.length
+      ? `❌ ID не совпадает.\nНа скриншоте найдено: <code>${shown.map(escH).join(', ')}</code>\nНа сайте указано: <code>${escH(u.soid)}</code>\n\nПроверьте ID или пришлите другой скриншот.`
+      : '❌ Экран профиля вижу, но не получилось прочитать ID. Пришлите скриншот в лучшем качестве — например, отправьте его как файл, без сжатия.');
   } catch (e) { console.error('OCR error', e); return say(chatId, '⚠️ Не удалось обработать картинку, попробуйте ещё раз.'); }
+  finally { botBusy.delete(chatId); }
 }
 async function onUpdate(upd) {
   const msg = upd.message; if (!msg || msg.chat.type !== 'private') return;
@@ -107,7 +168,7 @@ async function onUpdate(upd) {
   if (msg.photo || (msg.document && /^image\//.test(msg.document.mime_type || ''))) return handlePhoto(msg);
   const m = text.match(/^\/start\s+(\d{6})$/) || text.match(/^(\d{6})$/);
   if (m) return linkChat(msg.chat.id, m[1]);
-  return say(msg.chat.id, `Привет! Это бот подтверждения аккаунтов <b>StandHub</b>.\n\n1. Зарегистрируйтесь на сайте ${siteA('/#/register')}\n2. Нажмите «Открыть бота» или пришлите сюда 6-значный код с сайта\n3. Пришлите скриншот профиля StandLeo с вашим ID`);
+  return say(msg.chat.id, `Привет! Это бот подтверждения аккаунтов <b>StandHub</b>.\n\n1. Зарегистрируйтесь на сайте ${siteA('/#/register')}\n2. Нажмите «Открыть бота» или пришлите сюда 6-значный код с сайта\n3. Пришлите скриншот экрана «Мой профиль» из StandLeo — весь экран, чтобы был виден ваш ID`);
 }
 async function startBot() {
   if (!TG_TOKEN) return console.log('TELEGRAM_BOT_TOKEN не задан — бот выключен');
@@ -153,7 +214,7 @@ http.createServer(async (req, res) => {
     return;
   }
   if (p === '/api/stats') return send(res, 200, stats());
-  if (p === '/api/health') return send(res, 200, { ok: true, bot: botUsername, tokenSet: !!TG_TOKEN, disk: !!process.env.RAILWAY_VOLUME_MOUNT_PATH, users: db.users.filter(u => u.verified).length });
+  if (p === '/api/health') return send(res, 200, { ok: true, bot: botUsername, tokenSet: !!TG_TOKEN, disk: !!process.env.RAILWAY_VOLUME_MOUNT_PATH, users: db.users.filter(u => u.verified).length, img: !!sharp });
 
   if (p === '/api/register' && req.method === 'POST') {
     cleanup();

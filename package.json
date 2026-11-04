@@ -10,6 +10,7 @@
     "node": ">=18"
   },
   "dependencies": {
+    "sharp": "^0.34.5",
     "tesseract.js": "^5.1.1"
   }
 }

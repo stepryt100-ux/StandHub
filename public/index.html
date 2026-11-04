@@ -476,7 +476,7 @@ function toast(t){const e=document.getElementById("toast");e.textContent=t;e.cla
 function needAuth(){if(!S.user){location.hash="#/login";toast("Войдите, чтобы продолжить");return true}return false}
 function empty(title,text,btn){return `<div class="empty"><div class="empty-ic">${ic("crown")}</div><b>${title}</b><p class="muted">${text}</p>${btn||""}</div>`}
 /* ===== Анимации ===== */
-const APP_V="1.3.2";
+const APP_V="1.3.3";
 // анимации включены всегда; выключить можно кнопкой «Анимации» (меню слева / низ главной)
 const RM=()=>document.documentElement.classList.contains("no-motion");
 function paintMotion(){document.querySelectorAll("[data-motion] b").forEach(b=>b.textContent=RM()?"выкл":"вкл")}
@@ -610,7 +610,7 @@ function pageVerify(){
    <ol class="steps">
      <li><b>Откройте нашего Telegram-бота</b><span class="muted">${p.bot?"@"+esc(p.bot):"Бот пока не подключён"}</span></li>
      <li><b>Отправьте боту код</b><span class="muted">Если нажали кнопку ниже — код отправится сам</span><code class="vcode">${esc(p.code)}</code></li>
-     <li><b>Пришлите скриншот профиля StandLeo</b><span class="muted">Так, чтобы был хорошо виден ваш ID</span></li>
+     <li><b>Пришлите скриншот экрана «Мой профиль» из StandLeo</b><span class="muted">Весь экран, без обрезки — так, чтобы были видны надпись «Мой профиль» и ваш ID. Другие скриншоты бот не примет</span></li>
    </ol>
    ${link?`<a class="btn btn-o btn-lg" style="width:100%" href="${link}" target="_blank" rel="noopener">Открыть бота в Telegram</a>`:`<div class="card pad" style="border-color:var(--orange)">Telegram-бот ещё не настроен администратором сайта.</div>`}
    <div id="vstatus" class="muted" style="text-align:center;margin-top:16px"><span class="dot" style="background:var(--orange)"></span>Ждём подтверждения от бота…</div>
@@ -622,7 +622,7 @@ function pageVerify(){
     if(location.hash!=="#/verify")return clearInterval(verifyTimer);
     try{const r=await api("/api/verify-status?code="+p.code);
       if(r.verified){clearInterval(verifyTimer);sessionStorage.removeItem("sh_pending");toast("Аккаунт подтверждён! Теперь войдите");location.hash="#/login"}
-      else if(r.linked){document.getElementById("vstatus").innerHTML='<span class="dot" style="background:var(--orange)"></span>Бот на связи — пришлите ему скриншот профиля'}
+      else if(r.linked){document.getElementById("vstatus").innerHTML='<span class="dot" style="background:var(--orange)"></span>Бот на связи — пришлите ему скриншот экрана «Мой профиль»'}
     }catch{}
   },3000);
 }
