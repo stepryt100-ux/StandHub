@@ -9,20 +9,28 @@ const MATCH_TTL = 3 * 3600e3;          // матч без результата �
 const K = 50;                          // равные команды: +25 / −25
 const rnd = (a, b) => a + Math.floor(Math.random() * (b - a + 1));
 const other = t => (t === 'A' ? 'B' : 'A');
+const players = n => n + ' ' + (n % 10 === 1 && n % 100 !== 11 ? 'игрок' : n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 12 || n % 100 > 14) ? 'игрока' : 'игроков');
 
 module.exports = function (ctx) {
   const { db, save, sendTo, broadcast, ocr, avatarOf } = ctx;
   const tell = ctx.tell || (() => {}), alertAdmins = ctx.alertAdmins || (() => {}), site = ctx.siteUrl || '';
+  // пати: кто с кем в одной группе (модуль party.js подключается позже), кто на сайте, отправка состояния игроку
+  const partyOf = uid => (ctx.partyOf ? ctx.partyOf(uid) : null);
+  const isOnline = ctx.isOnline || (() => true), pushState = ctx.pushState || (() => {}), onParty = ctx.onPartyChange || (() => {});
+  // в очереди стоят группы: один игрок или пати целиком — { uids, pid, joined, prio }
   const queues = { '5v5': [], '2v2': [], '1v1': [] };
   const userById = id => db.users.find(u => u.id === id);
+  const nickOf = id => (userById(id) || {}).nick || 'Игрок';
   const OPEN = ['accept', 'veto', 'live', 'dispute'];   // ещё не закрытые матчи
   const BUSY = ['accept', 'veto', 'live'];              // игрок занят и не может искать новый матч
   const open = () => db.matches.filter(m => OPEN.includes(m.state));
   const matchOf = uid => db.matches.find(m => BUSY.includes(m.state) && m.players.some(p => p.id === uid));
-  const queueEntry = uid => { for (const k in queues) { const q = queues[k].find(x => x.uid === uid); if (q) return { mode: k, waited: Date.now() - q.joined }; } return null; };
+  const entryOf = uid => { for (const k in queues) { const q = queues[k].find(x => x.uids.includes(uid)); if (q) return { mode: k, q }; } return null; };
+  const queueEntry = uid => { const e = entryOf(uid); return e ? { mode: e.mode, waited: Date.now() - e.q.joined, party: e.q.uids.length > 1 } : null; };
   const inQueue = uid => (queueEntry(uid) || {}).mode || null;
-  const searching = () => Object.values(queues).reduce((a, q) => a + q.length, 0);
-  const searchingBy = () => Object.fromEntries(Object.keys(queues).map(k => [k, queues[k].length])); // сколько ищут в каждом режиме
+  const people = q => q.reduce((a, x) => a + x.uids.length, 0);
+  const searching = () => Object.values(queues).reduce((a, q) => a + people(q), 0);
+  const searchingBy = () => Object.fromEntries(Object.keys(queues).map(k => [k, people(queues[k])])); // сколько игроков ищут в каждом режиме
   const liveCount = () => db.matches.filter(m => !m.test && ['veto', 'live'].includes(m.state)).length;
   const find = id => db.matches.find(m => m.id === id);
   const P = (m, id) => m.players.find(p => p.id === id);
@@ -33,41 +41,88 @@ module.exports = function (ctx) {
   const link = m => go('/#/match/' + m.id);
 
   // ---------- очередь ----------
+  const drop = uids => { for (const k in queues) queues[k] = queues[k].filter(x => !x.uids.some(id => uids.includes(id))); };
   function join(u, mode) {
     if (!MODES[mode]) return { error: 'Неизвестный режим' };
     const am = matchOf(u.id); if (am) return { error: 'У вас уже есть активный матч', match: am.id };
-    leave(u.id, true);
-    queues[mode].push({ uid: u.id, joined: Date.now(), prio: Date.now() });
+    // пати ищет матч целиком: запускает лидер, все должны быть на сайте и не в матче
+    const pt = partyOf(u.id), uids = pt ? pt.members.slice() : [u.id], half = MODES[mode] / 2;
+    if (pt) {
+      if (pt.leader !== u.id) return { error: `Поиск запускает лидер пати — ${nickOf(pt.leader)}` };
+      if (uids.length > half) return { error: half === 1 ? 'В режиме «1 на 1» играют без пати — выберите «2 на 2» или «5 на 5»' : `В пати ${players(uids.length)} — в режиме «${MODE_NAME[mode]}» можно максимум ${half}` };
+      for (const id of uids) if (id !== u.id) {
+        if (matchOf(id)) return { error: `${nickOf(id)} ещё в матче — подождите, пока он закончится` };
+        if (!isOnline(id)) return { error: `${nickOf(id)} сейчас не на сайте — подождите его или исключите из пати`, code: 'offline' };
+      }
+    }
+    drop(uids);
+    queues[mode].push({ uids, pid: pt ? pt.id : null, joined: Date.now(), prio: Date.now() });
+    if (pt) {
+      if (pt.mode !== mode) { pt.mode = mode; save(); onParty(pt); }
+      for (const id of uids) if (id !== u.id) pushState(id, { note: `${u.nick} запустил(а) поиск матча · ${MODE_NAME[mode]}` });
+    }
     broadcast(); tick(); return { ok: true, mode };
   }
-  function leave(uid, silent) { for (const k in queues) queues[k] = queues[k].filter(q => q.uid !== uid); if (!silent) broadcast(); }
+  // выход из поиска. Если искало пати — поиск останавливается у всех, остальным показываем причину
+  function leave(uid, silent, why) {
+    const e = entryOf(uid); if (!e) return;
+    queues[e.mode] = queues[e.mode].filter(x => x !== e.q);
+    for (const id of e.q.uids) if (id !== uid) pushState(id, { stop: why || `${nickOf(uid)} отменил(а) поиск` });
+    if (!silent) broadcast();
+  }
+  // остановить поиск у всех групп, где есть эти игроки (состав пати изменился и т.п.)
+  function stopFor(uids, why) {
+    const hit = [];
+    for (const k in queues) queues[k] = queues[k].filter(x => { if (!x.uids.some(id => uids.includes(id))) return true; hit.push(...x.uids); return false; });
+    for (const id of hit) pushState(id, { stop: why || 1 }); // stop: 1 — тихо, без сообщения
+    if (hit.length) broadcast();
+    return hit.length > 0;
+  }
 
-  // подбор: самый долго ждущий + ближайшие по ELO; допуск по ELO растёт со временем ожидания. Регион не учитывается.
+  // подбор: самая долго ждущая группа + ближайшие по ELO; допуск по ELO растёт со временем ожидания. Регион не учитывается.
+  // Пати не разбиваются: группы должны делиться на две равные команды целиком.
+  const avgElo = x => x.uids.reduce((a, id) => a + (userById(id) || { elo: 1000 }).elo, 0) / x.uids.length;
+  function canSplit(sizes, half) { let r = new Set([0]); for (const s of sizes) { const n = new Set(r); for (const v of r) if (v + s <= half) n.add(v + s); r = n; } return r.has(half); }
+  function pick(q, N) {
+    const first = q[0], half = N / 2, fe = avgElo(first);
+    if (first.uids.length > half) return null;
+    const range = Math.min(1500, 150 + ((Date.now() - first.prio) / 1000) * 10);
+    const cands = q.slice(1).filter(x => x.uids.length <= half && Math.abs(avgElo(x) - fe) <= range)
+      .sort((a, b) => Math.abs(avgElo(a) - fe) - Math.abs(avgElo(b) - fe)).slice(0, 14);
+    const chosen = [first];
+    const dfs = (i, total) => {
+      if (total === N) return canSplit(chosen.map(x => x.uids.length), half);
+      for (let j = i; j < cands.length; j++) {
+        if (total + cands[j].uids.length > N) continue;
+        chosen.push(cands[j]); if (dfs(j + 1, total + cands[j].uids.length)) return true; chosen.pop();
+      }
+      return false;
+    };
+    return dfs(0, first.uids.length) ? chosen : null;
+  }
   function tick() {
     for (const mode in queues) {
       const N = MODES[mode];
       for (;;) {
-        const q = queues[mode].filter(x => userById(x.uid) && !matchOf(x.uid)).sort((a, b) => a.prio - b.prio);
+        const q = queues[mode].filter(x => x.uids.every(id => userById(id) && !matchOf(id))).sort((a, b) => a.prio - b.prio);
         queues[mode] = q;
-        if (q.length < N) break;
-        const first = q[0], fu = userById(first.uid);
-        const range = Math.min(1500, 150 + ((Date.now() - first.prio) / 1000) * 10);
-        const cands = q.slice(1).map(x => ({ x, u: userById(x.uid) })).filter(c => Math.abs(c.u.elo - fu.elo) <= range)
-          .sort((a, b) => Math.abs(a.u.elo - fu.elo) - Math.abs(b.u.elo - fu.elo)).slice(0, N - 1);
-        if (cands.length < N - 1) break;
-        const picked = [first, ...cands.map(c => c.x)];
+        if (people(q) < N) break;
+        const picked = pick(q, N);
+        if (!picked) break;
         queues[mode] = q.filter(x => !picked.includes(x));
-        createMatch(mode, picked.map(x => userById(x.uid)), false);
+        createMatch(mode, picked.flatMap(x => x.uids.map(userById)), false, picked.map(x => x.uids));
       }
     }
   }
 
   // ---------- матч ----------
-  function createMatch(mode, users, test) {
+  const groupsOf = m => m.groups || m.players.map(p => [p.id]);
+  function createMatch(mode, users, test, groups) {
     const m = {
       id: crypto.randomBytes(5).toString('hex'), mode, test: !!test, state: 'accept', created: Date.now(),
       acceptDeadline: Date.now() + ACCEPT_SEC * 1000, accepted: [],
       players: users.map(u => ({ id: u.id, nick: u.nick, elo: u.elo, soid: u.soid, avatar: u.bot ? null : avatarOf(u), bot: !!u.bot, team: null })),
+      groups: groups && groups.some(g => g.length > 1) ? groups : null, // пати в этом матче (играют в одной команде)
       captains: {}, host: null, maps: MAPS.slice(), bans: [], turn: null, turnDeadline: null, map: null,
       reports: {}, pending: {}, cancelVotes: [], scoreA: null, scoreB: null, winner: null, deltas: null,
     };
@@ -84,25 +139,35 @@ module.exports = function (ctx) {
   function decline(mid, uid) { const m = find(mid); if (m && m.state === 'accept' && P(m, uid)) cancelAccept(m, [uid]); }
   function cancelAccept(m, bad) {
     m.state = 'cancelled'; m.cancelReason = 'Не все игроки приняли матч'; m.requeued = [];
-    if (!m.test) for (const p of real(m)) if (!bad.includes(p.id)) { // принявшие — снова в поиск, впереди очереди
-      leave(p.id, true); queues[m.mode].push({ uid: p.id, joined: Date.now(), prio: Date.now() - 120e3 }); m.requeued.push(p.id);
+    // принявшие — снова в поиск, впереди очереди. Пати возвращается, только если приняли все её игроки и состав не менялся
+    if (!m.test) for (const g of groupsOf(m)) {
+      const ids = g.filter(id => P(m, id) && !P(m, id).bot);
+      if (!ids.length || ids.some(id => bad.includes(id))) continue;
+      const pt = partyOf(ids[0]);
+      if (ids.length > 1 ? !pt || pt.members.length !== ids.length || !ids.every(id => pt.members.includes(id)) : pt && pt.members.length > 1) continue;
+      drop(ids); queues[m.mode].push({ uids: ids, pid: ids.length > 1 ? pt.id : null, joined: Date.now(), prio: Date.now() - 120e3 }); m.requeued.push(...ids);
     }
     save(); notify(m); broadcast(); setTimeout(tick, 500);
   }
-  // делим поровну по ELO (перебор всех вариантов)
-  function balance(players) {
-    const n = players.length, h = n / 2, total = players.reduce((a, p) => a + p.elo, 0);
+  // делим поровну по ELO (перебор всех вариантов); игроки одного пати всегда в одной команде
+  function balance(m) {
+    const groups = groupsOf(m).map(g => g.map(id => P(m, id)).filter(Boolean)).filter(g => g.length);
+    const seen = new Set(groups.flat()); for (const p of m.players) if (!seen.has(p)) groups.push([p]);
+    const h = m.players.length / 2, total = m.players.reduce((a, p) => a + p.elo, 0);
     let best = null, bestDiff = Infinity;
-    const rec = (start, pick) => {
-      if (pick.length === h) { const s = pick.reduce((a, i) => a + players[i].elo, 0); const d = Math.abs(total - 2 * s); if (d < bestDiff) { bestDiff = d; best = pick.slice(); } return; }
-      for (let i = start; i < n; i++) { pick.push(i); rec(i + 1, pick); pick.pop(); }
+    const rec = (i, cnt, sum, pk) => {
+      if (cnt === h) { const d = Math.abs(total - 2 * sum); if (d < bestDiff) { bestDiff = d; best = pk.slice(); } return; }
+      if (i >= groups.length) return;
+      const g = groups[i];
+      if (cnt + g.length <= h) { pk.push(i); rec(i + 1, cnt + g.length, sum + g.reduce((a, p) => a + p.elo, 0), pk); pk.pop(); }
+      rec(i + 1, cnt, sum, pk);
     };
-    rec(0, []);
-    return best;
+    rec(0, 0, 0, []);
+    return new Set(best ? best.flatMap(i => groups[i]) : m.players.slice(0, h));
   }
   function startVeto(m) {
-    const idx = balance(m.players);
-    m.players.forEach((p, i) => (p.team = idx.includes(i) ? 'X' : 'Y'));
+    const X = balance(m);
+    m.players.forEach(p => (p.team = X.has(p) ? 'X' : 'Y'));
     const top = m.players.reduce((a, b) => (b.elo > a.elo ? b : a));         // хост — самый высокий ELO в матче
     const hostTeam = top.team; m.players.forEach(p => (p.team = p.team === hostTeam ? 'A' : 'B'));
     for (const t of ['A', 'B']) m.captains[t] = m.players.filter(p => p.team === t).reduce((a, b) => (b.elo > a.elo ? b : a)).id; // капитан — самый высокий ELO в команде
@@ -240,12 +305,14 @@ module.exports = function (ctx) {
     const me = P(m, vid), host = P(m, m.host), myTeam = me && me.team;
     const rep = r => r && { result: r.result, score: r.score };
     const votes = m.cancelVotes || [];
+    // кто пришёл в матч пати: «Пати» (или «Пати 1», «Пати 2», если их несколько)
+    const gl = {}; let gn = 0; for (const g of groupsOf(m)) if (g.length > 1) { gn++; for (const id of g) gl[id] = gn; }
     return {
       id: m.id, mode: m.mode, test: m.test, state: m.state, now: Date.now(), created: m.created,
       acceptDeadline: m.acceptDeadline, accepted: m.accepted.length, total: m.players.length, iAccepted: m.accepted.includes(vid), requeuedMe: !!(m.requeued && m.requeued.includes(vid)),
       players: m.players.map(p => ({ nick: p.nick, elo: p.elo, avatar: p.avatar, bot: p.bot, team: m.state === 'accept' ? null : p.team,
         captain: m.captains.A === p.id ? 'A' : m.captains.B === p.id ? 'B' : null, host: p.id === m.host, me: p.id === vid,
-        accepted: m.accepted.includes(p.id), delta: m.deltas ? m.deltas[p.id] : null })),
+        accepted: m.accepted.includes(p.id), delta: m.deltas ? m.deltas[p.id] : null, party: gl[p.id] ? (gn > 1 ? 'Пати ' + gl[p.id] : 'Пати') : null })),
       maps: m.maps, bans: m.bans, turn: m.turn, turnDeadline: m.turnDeadline, map: m.map, liveAt: m.liveAt || null,
       host: host ? { nick: host.nick, soid: me ? host.soid : null } : null,
       me: me ? { team: myTeam, captain: !!myTeam && m.captains[myTeam] === vid, host: m.host === vid, votedCancel: votes.includes(vid) } : null,
@@ -272,5 +339,5 @@ module.exports = function (ctx) {
   const adminList = () => open().filter(m => m.state !== 'accept').sort((a, b) => (a.state === 'dispute' ? -1 : 0) - (b.state === 'dispute' ? -1 : 0) || b.created - a.created)
     .map(m => ({ ...summary(m), state: m.state, created: m.created, reports: m.reports, disputeReason: m.disputeReason || null }));
 
-  return { join, leave, inQueue, queueEntry, searching, searchingBy, liveCount, matchOf, find, view, accept, decline, ban, report, confirm, voteCancel, adminResolve, history, testMatch, adminList, MAPS };
+  return { join, leave, stopFor, inQueue, queueEntry, searching, searchingBy, liveCount, matchOf, find, view, accept, decline, ban, report, confirm, voteCancel, adminResolve, history, testMatch, adminList, MAPS, MODES, MODE_NAME };
 };

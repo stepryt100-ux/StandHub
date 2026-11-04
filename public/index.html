@@ -103,6 +103,39 @@ footer a{display:block;margin:4px 0}footer a:hover{color:#fff}
 .slot.me{border:1px solid var(--orange);background:linear-gradient(180deg,rgba(255,85,0,.15),var(--bg2));color:#fff}
 .slot .ava{width:56px;height:56px;font-size:20px}
 .slot .plus{width:48px;height:48px;border-radius:50%;border:2px dashed var(--line);display:grid;place-items:center;font-size:22px}
+/* пати */
+.slot{position:relative;min-width:0}
+.slot b{max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.slot .crown{position:absolute;top:8px;left:8px;color:var(--yellow);display:grid;line-height:0}
+.slot .crown .ic{width:16px;height:16px}
+.slot .sst{font-size:11px;line-height:1.1;color:var(--muted)}
+.slot .sst.on{color:var(--green)}.slot .sst.m{color:var(--orange2)}
+.slot.mem{border-style:solid;color:#fff}
+.slot.off .ava,.slot.off b{opacity:.55}
+.slot.inv{color:#fff}.slot.inv .ava{opacity:.5}
+.slot .sl-a{display:flex;flex-direction:column;align-items:center;gap:10px;color:inherit;max-width:100%;min-width:0}
+.slot .sx{position:absolute;top:6px;right:6px;min-width:24px;height:24px;border-radius:12px;border:1px solid var(--line);background:var(--card2);color:var(--muted);font-size:15px;line-height:1;display:grid;place-items:center;cursor:pointer;padding:0;font-family:inherit;z-index:1}
+.slot .sx:hover,.slot .sx:focus-visible{color:#fff;border-color:var(--red)}
+.slot .sx.sure{padding:0 8px;background:var(--red);border-color:var(--red);color:#fff;font-size:11px;font-weight:800}
+.ptbar{display:flex;align-items:center;justify-content:space-between;gap:10px 16px;flex-wrap:wrap;font-size:13px;color:var(--muted);margin:-6px 0 0;min-height:32px}
+.ptbar b{color:#fff}
+.chip.lock{opacity:.55;cursor:not-allowed}.chip.na:not(.on){opacity:.38}
+.modal .card.pm{text-align:left;max-width:480px;padding:24px}
+.pm h3{margin:0 40px 6px 0;font-size:20px}
+.pm-sub{font-size:13px;margin:0 0 10px}
+.pm-list{max-height:min(60vh,460px);overflow:auto;margin:0 -6px;padding:0 6px}
+.pm-x{position:absolute;top:14px;right:14px;width:34px;height:34px;border-radius:17px;border:1px solid var(--line);background:var(--bg2);color:#fff;font-size:20px;line-height:1;cursor:pointer;font-family:inherit}
+.pm-x:hover{border-color:var(--orange)}
+.pm-empty{text-align:center;padding:14px 0 4px}.pm-empty p{margin:0 0 14px;font-size:14px}
+.pinv-wrap{position:fixed;top:72px;right:24px;z-index:150;display:grid;gap:10px;width:min(390px,calc(100vw - 32px));pointer-events:none}
+.pinv{pointer-events:auto;display:flex;align-items:center;gap:12px;padding:14px;border-color:var(--orange);box-shadow:0 18px 44px -16px rgba(0,0,0,.85),0 0 0 1px rgba(255,85,0,.3),0 0 34px -14px rgba(255,85,0,.7);animation:pinvIn .45s var(--ease) both}
+.pinv .ava{width:44px;height:44px;flex:none;font-size:16px}
+.pinv .pi-t{flex:1;min-width:0;font-size:14px;line-height:1.35}
+.pinv .pi-t b{color:#fff}
+.pinv .pi-t .muted{font-size:12px;margin-top:2px}
+.pinv .pi-a{display:flex;flex-direction:column;gap:6px;flex:none}
+.pinv-more{pointer-events:auto;justify-self:end;font-size:12px;color:var(--muted);background:var(--card2);border:1px solid var(--line);border-radius:12px;padding:3px 10px}
+@keyframes pinvIn{from{opacity:0;transform:translateY(-14px) scale(.97)}}
 .modes{display:flex;gap:8px;flex-wrap:wrap}
 .chip{height:40px;padding:0 16px;border-radius:4px;background:var(--bg2);border:1px solid var(--line);color:var(--muted);font-weight:700}
 .chip.on{border-color:var(--orange);color:#fff;background:rgba(255,85,0,.12)}
@@ -195,7 +228,7 @@ tr.click{cursor:pointer}tr.click:hover td{background:var(--card2)}
 .prow.me{background:rgba(255,85,0,.08);box-shadow:inset 3px 0 0 var(--orange)}
 .prow .pn{flex:1;min-width:0}.prow .pn b{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .prow .pr{display:flex;align-items:center;gap:8px;font-weight:800;white-space:nowrap}
-.pills{display:flex;gap:4px;flex-wrap:wrap;margin-top:2px}
+.pills{display:flex;gap:4px;flex-wrap:wrap;align-items:center;margin-top:2px}
 .pill{display:inline-block;font-size:11px;font-weight:800;text-transform:uppercase;padding:1px 6px;border-radius:3px;background:var(--card2);color:var(--muted);letter-spacing:.03em;vertical-align:middle}
 /* друзья */
 .side a{position:relative}
@@ -224,6 +257,7 @@ tr.click{cursor:pointer}tr.click:hover td{background:var(--card2)}
 .cnt{display:inline-grid;place-items:center;min-width:22px;height:22px;padding:0 6px;border-radius:11px;background:var(--card2);color:#fff;font-size:12px;margin-left:8px;vertical-align:1px}
 .fr-in{box-shadow:0 0 0 1px rgba(255,85,0,.5),0 10px 30px -18px rgba(255,85,0,.7)}
 .btn.sure{border-color:#ff4d4d;color:#ff6b6b}
+.pill.pty{background:rgba(120,140,255,.16);color:#a9b4ff}
 .pill.cap{background:rgba(255,200,0,.15);color:var(--yellow)}.pill.host{background:rgba(255,85,0,.18);color:var(--orange2)}.pill.me{background:rgba(63,207,106,.15);color:var(--green)}
 .logo-t.ta{background:linear-gradient(135deg,#3fcf6a,#1d5e31)}.logo-t.tb{background:linear-gradient(135deg,#ff4d4d,#6b1a1a)}
 .score .s.vs{font-size:40px;color:var(--muted)}
@@ -414,6 +448,11 @@ body::after{width:520px;height:520px;left:140px;bottom:-220px;background:radial-
  .userchip .nm{display:none}
  .btn-lg{font-size:15px;padding:0 16px;text-align:center}
  .toast{left:16px;right:16px;bottom:80px;text-align:center}
+ .slot .sx{top:2px;right:2px;min-width:20px;height:20px;font-size:13px}.slot .sx.sure{padding:0 5px;font-size:9px}
+ .slot .crown{top:3px;left:3px}.slot .crown .ic{width:12px;height:12px}
+ .slot{aspect-ratio:auto;min-height:118px;padding:10px 2px 8px;gap:5px}.slot .sst{font-size:9px}.slot .sl-a{gap:5px}.slot.me .sst{display:none}
+ .pinv-wrap{top:68px;left:12px;right:12px;width:auto}
+ .modal .card.pm{padding:20px 16px}
 }
 </style>
 </head>
@@ -431,6 +470,8 @@ body::after{width:520px;height:520px;left:140px;bottom:-220px;background:radial-
 
 <div class="toast" id="toast" role="status"></div>
 <div class="modal" id="accModal"></div>
+<div class="modal" id="pModal"></div>
+<div class="pinv-wrap" id="pInv" aria-live="polite"></div>
 
 <script>
 /* ===== Справочники ===== */
@@ -449,7 +490,7 @@ const wr=u=>u.matches?Math.round(u.wins/u.matches*100)+"%":"—";
 const hsp=u=>u.kills?Math.round(u.hsKills/u.kills*100)+"%":"—";
 
 /* ===== Состояние и API ===== */
-const S={token:localStorage.getItem("sh_token"),user:null,searching:false,qSince:0,timer:null,mode:"5v5",match:null,mv:{},skew:0,live:{online:null,searching:null,live:null}};
+const S={token:localStorage.getItem("sh_token"),user:null,searching:false,qSince:0,timer:null,mode:"5v5",match:null,mv:{},skew:0,live:{online:null,searching:null,live:null},party:null,psent:[],pinv:[]};
 const VID=localStorage.getItem("sh_vid")||(()=>{const v=crypto.randomUUID();localStorage.setItem("sh_vid",v);return v})();
 async function api(path,opt={}){
   const r=await fetch(path,{...opt,headers:{"Content-Type":"application/json",...(S.token?{Authorization:"Bearer "+S.token}:{})}});
@@ -472,7 +513,7 @@ function paintLive(){
 }
 // подсказка: игроки ищут в другом режиме — в один матч попадают только при одинаковом режиме
 function qHint(){
-  const md=S.live.modes;if(!md||!S.user||(S.match&&["accept","veto","live"].includes(S.match.state)))return "";
+  const md=S.live.modes;if(!md||!S.user||pMember()||(S.match&&["accept","veto","live"].includes(S.match.state)))return "";
   if((md[S.mode]||0)-(S.searching?1:0)>0)return "";
   const oth=Object.keys(MODE_NAME).filter(k=>k!==S.mode&&md[k]>0);if(!oth.length)return "";
   const names=oth.map(k=>"«"+MODE_NAME[k]+"»").join(" и ");
@@ -492,7 +533,7 @@ function renderChrome(route){
     <a class="userchip" href="#/profile" aria-label="Мой профиль">${ava(u.nick,u.avatar)}<span class="nm">${esc(u.nick)}</span>${badge(u.elo,"sm")}</a>
     <button class="btn btn-g" id="logout">Выйти</button>`:`
     <a class="btn btn-g" href="#/login">Войти</a><a class="btn btn-o" href="#/register">Регистрация</a>`;
-  const lo=document.getElementById("logout");if(lo)lo.onclick=async()=>{S.searching=false;stopQTimer();try{await api("/api/logout",{method:"POST"})}catch{}S.token=null;S.user=null;S.match=null;S.lobbyMs=null;S.fr=null;frBadge();closeAccept();localStorage.removeItem("sh_token");connectLive();if(curHash()==="/")route();else location.hash="#/"}}
+  const lo=document.getElementById("logout");if(lo)lo.onclick=async()=>{S.searching=false;stopQTimer();try{await api("/api/logout",{method:"POST"})}catch{}S.token=null;S.user=null;S.match=null;S.lobbyMs=null;S.fr=null;S.party=null;S.psent=[];S.pinv=[];S.pSeen=false;frBadge();paintPInv();closeInvite();closeAccept();localStorage.removeItem("sh_token");connectLive();if(curHash()==="/")route();else location.hash="#/"}}
   const items=[["#/","home","Главная"],["#/lobby","play","Играть"],["#/profile","user","Профиль"],["#/friends","users","Друзья"],["#/matches","swords","Матчи"],["#/leaderboard","crown","Рейтинг"]];
   if(u&&u.admin)items.push(["#/admin","shield","Админ"]);
   const sk=items.map(x=>x[0]).join();
@@ -507,7 +548,7 @@ function toast(t){const e=document.getElementById("toast");e.textContent=t;e.cla
 function needAuth(){if(!S.user){location.hash="#/login";toast("Войдите, чтобы продолжить");return true}return false}
 function empty(title,text,btn){return `<div class="empty"><div class="empty-ic">${ic("crown")}</div><b>${title}</b><p class="muted">${text}</p>${btn||""}</div>`}
 /* ===== Анимации ===== */
-const APP_V="1.4";
+const APP_V="1.5";
 // анимации включены всегда; выключить можно кнопкой «Анимации» (меню слева / низ главной)
 const RM=()=>document.documentElement.classList.contains("no-motion");
 function paintMotion(){document.querySelectorAll("[data-motion] b").forEach(b=>b.textContent=RM()?"выкл":"вкл")}
@@ -668,9 +709,10 @@ function frInner(nick,big){const x=frRel(nick);
    :`<button class="frb add" data-fact="add" data-nick="${esc(nick)}">+ ${big?"Добавить в друзья":"В друзья"}</button>`}
 function frBtn(nick,big){if(!S.user||S.user.nick===nick)return "";return `<span class="frw" data-fr="${esc(nick)}"${big?' data-big="1"':""}>${frInner(nick,big)}</span>`}
 function frBadge(){const n=S.fr?S.fr.incoming.length:0;document.querySelectorAll("[data-frn]").forEach(el=>{el.textContent=n;el.classList.toggle("z",!n)})}
-function paintFr(){frBadge();
+function paintFr(){frBadge();paintInvite();
   document.querySelectorAll("[data-fr]").forEach(el=>{const h=frInner(el.dataset.fr,!!el.dataset.big);if(el.innerHTML!==h)el.innerHTML=h});
-  const fb=document.getElementById("frBody");if(fb){const k=JSON.stringify(S.fr);if(fb.dataset.k!==k){fb.dataset.k=k;fb.innerHTML=frBody()}}}
+  const fb=document.getElementById("frBody");if(fb){const k=frKey();if(fb.dataset.k!==k){fb.dataset.k=k;fb.innerHTML=frBody()}}}
+const frKey=()=>JSON.stringify([S.fr,S.party&&S.party.members.map(x=>x.nick),(S.psent||[]).map(r=>r.user.nick)]);
 function onFriends(d){const prev=S.fr;S.fr={friends:d.friends||[],incoming:d.incoming||[],outgoing:d.outgoing||[]};
   if(prev){const seen=new Set(prev.incoming.map(r=>r.id)),nw=S.fr.incoming.filter(r=>!seen.has(r.id));
     if(nw.length)toast(nw.length>1?`Новые заявки в друзья: ${nw.length}`:`${nw[0].user.nick} хочет добавить вас в друзья`);
@@ -696,7 +738,7 @@ document.addEventListener("click",async e=>{const b=e.target.closest("[data-fact
 function frRow(u,act,st){return `<div class="frow">${ava(u.nick,u.avatar)}<div class="fn"><a href="#/player/${encodeURIComponent(u.nick)}"><b>${esc(u.nick)}</b></a>${st?`<div class="st${u.inMatch?" m":u.online?" on":""}">${u.inMatch?"● в матче":u.online?"● на сайте":"не в сети"}</div>`:""}</div>${badge(u.elo,"sm")}<div class="fa">${act}</div></div>`}
 function frBody(){if(!S.fr)return `<div class="card pad">${skel(3,false)}</div>`;const {friends,incoming,outgoing}=S.fr;
   return (incoming.length?`<div class="card pad fr-in"><h3>Заявки в друзья<span class="cnt">${incoming.length}</span></h3>${incoming.map(r=>frRow(r.user,`<button class="btn btn-o btn-sm" data-fact="accept" data-id="${r.id}">Принять</button><button class="btn btn-g btn-sm" data-fact="decline" data-id="${r.id}">Отклонить</button>`)).join("")}</div>`:"")
-   +`<div class="card pad"><h3>Мои друзья<span class="cnt">${friends.length}</span></h3>${friends.length?friends.map(u=>frRow(u,`<button class="btn btn-g btn-sm" data-fact="remove" data-nick="${esc(u.nick)}">Удалить</button>`,1)).join(""):`<p class="muted" style="margin:0">Пока никого нет. Добавьте игрока по ID в игре или нику — или прямо после матча, в комнате матча.</p>`}</div>`
+   +`<div class="card pad"><h3>Мои друзья<span class="cnt">${friends.length}</span></h3>${friends.length?friends.map(u=>frRow(u,`${pInvBtn(u.nick,"Позвать в пати")}<button class="btn btn-g btn-sm" data-fact="remove" data-nick="${esc(u.nick)}">Удалить</button>`,1)).join(""):`<p class="muted" style="margin:0">Пока никого нет. Добавьте игрока по ID в игре или нику — или прямо после матча, в комнате матча.</p>`}</div>`
    +(outgoing.length?`<div class="card pad"><h3>Отправленные заявки<span class="cnt">${outgoing.length}</span></h3>${outgoing.map(r=>frRow(r.user,`<button class="btn btn-g btn-sm" data-fact="cancel" data-id="${r.id}">Отменить</button>`)).join("")}</div>`:"")}
 function pageFriends(){
   if(needAuth())return;
@@ -706,7 +748,7 @@ function pageFriends(){
     <div class="fsug" id="fsug"></div>
     <p class="muted" style="font-size:13px;margin:10px 0 0">Игрок должен быть зарегистрирован на StandHub. После матча добавить можно прямо в комнате матча — кнопкой «+ В друзья» рядом с ником.</p></div>
    <div id="frBody" style="display:grid;gap:16px"></div></div></div>`;
-  const fb=document.getElementById("frBody");fb.innerHTML=frBody();fb.dataset.k=JSON.stringify(S.fr);
+  const fb=document.getElementById("frBody");fb.innerHTML=frBody();fb.dataset.k=frKey();
   const f=document.getElementById("faddF"),q=document.getElementById("fq"),sug=document.getElementById("fsug");
   f.onsubmit=async e=>{e.preventDefault();const v=q.value.trim();if(!v)return q.focus();const bt=f.querySelector("button");bt.disabled=true;
     try{const r=await api("/api/friends/request",{method:"POST",body:JSON.stringify({q:v})});toast(frMsg(r));q.value="";sug.innerHTML="";await loadFr()}catch(err){toast(err.message)}
@@ -722,18 +764,20 @@ function pageFriends(){
 const MODE_NAME={"5v5":"5 на 5","2v2":"2 на 2","1v1":"1 на 1"};
 function pageLobby(){
   if(needAuth())return;const u=S.user;const m=S.match&&["veto","live"].includes(S.match.state)?S.match:null;
+  const pt=S.party,mem=pMember();
   app.innerHTML=`<div class="wrap"><h1 class="h">Матчмейкинг</h1>
   ${m?`<div class="card pad live-banner"><div><div class="tag live">Ваш матч идёт</div><b style="font-size:18px">${MODE_NAME[m.mode]}${m.map?" · "+esc(m.map):""}${m.test?" · тест":""}</b><div class="muted" style="font-size:14px">${m.state==="veto"?"Капитаны выбирают карту":"Игра идёт — после неё капитаны загружают скриншот счёта"}</div></div><a class="btn btn-o" href="#/match/${m.id}">В комнату матча</a></div>`:""}
   <div class="lobby">
    <div class="card pad">
      <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px">
        <div><div class="tag">StandLeo</div><h3 style="margin:4px 0 0;font-size:20px">Твоё пати</h3></div>
-       <div class="modes" role="radiogroup" aria-label="Режим">${["5v5","2v2","1v1"].map(x=>`<button class="chip ${S.mode===x?"on":""}" data-mode="${x}" role="radio" aria-checked="${S.mode===x}">${MODE_NAME[x]}<span class="mq${(S.live.modes||{})[x]?"":" z"}" data-mq="${x}" title="Сейчас в поиске">${(S.live.modes||{})[x]||0}</span></button>`).join("")}</div>
+       <div class="modes" role="radiogroup" aria-label="Режим">${["5v5","2v2","1v1"].map(x=>`<button class="chip ${S.mode===x?"on":""}${mem?" lock":""}${pt&&PMAX[x]<pt.members.length?" na":""}" data-mode="${x}" role="radio" aria-checked="${S.mode===x}"${mem?' aria-disabled="true"':""}>${MODE_NAME[x]}<span class="mq${(S.live.modes||{})[x]?"":" z"}" data-mq="${x}" title="Сейчас в поиске">${(S.live.modes||{})[x]||0}</span></button>`).join("")}</div>
      </div>
      <div class="party" id="party"></div>
+     <div class="ptbar" id="ptbar"></div>
      <div class="findbox">
-       <div><div class="muted" style="font-size:13px">Подбор: все регионы · по уровню ELO</div><div id="qstatus" style="font-weight:700;margin-top:4px">Готов к поиску</div><div id="qhint" class="qhint">${m?"":qHint()}</div></div>
-       <button class="btn btn-o btn-find ${S.searching?"searching":""}" id="find" ${m?"disabled":""}>${S.searching?"Отменить поиск":"Найти матч"}</button>
+       <div><div class="muted" style="font-size:13px">Подбор: все регионы · по уровню ELO</div><div id="qstatus" style="font-weight:700;margin-top:4px">${mem?`Поиск запускает лидер пати — <span style="color:var(--orange2)">${esc(pt.leader)}</span>`:"Готов к поиску"}</div><div id="qhint" class="qhint">${m?"":qHint()}</div></div>
+       <button class="btn btn-o btn-find ${S.searching?"searching":""}" id="find" ${m||(mem&&!S.searching)?"disabled":""}>${S.searching?"Отменить поиск":mem?"Ждём лидера":"Найти матч"}</button>
      </div>
      ${u.admin?`<div class="admin-box"><div><b>Тестовый матч с ботами</b><div class="muted" style="font-size:13px;max-width:440px">Видно только администратору. Боты сами примут матч и будут убирать карты. Рейтинг не меняется.</div></div><button class="btn btn-g" id="testM" ${m||S.searching?"disabled":""}>Тест · ${MODE_NAME[S.mode]}</button></div>`:""}
    </div>
@@ -752,7 +796,7 @@ function pageLobby(){
    </div>
   </div></div>`;
   renderParty();
-  document.querySelectorAll("[data-mode]").forEach(b=>b.onclick=()=>{if(S.searching)return toast("Сначала отмените поиск");S.mode=b.dataset.mode;pageLobby();rise(document.querySelectorAll("#party .slot"),35,320,10)});
+  document.querySelectorAll("[data-mode]").forEach(b=>b.onclick=()=>pickMode(b.dataset.mode));
   document.getElementById("find").onclick=()=>S.searching?stopSearch():startSearch();
   const tb=document.getElementById("testM");if(tb)tb.onclick=async()=>{unlockAudio();tb.disabled=true;try{applyState(await api("/api/test-match",{method:"POST",body:JSON.stringify({mode:S.mode})}),true)}catch(e){toast(e.message);if(e.match)onMatch(e.match);tb.disabled=false}};
   if(S.searching)qtick();
@@ -761,11 +805,94 @@ function pageLobby(){
 }
 const lobbyMsHtml=ms=>ms.length?ms.slice(0,4).map(mini).join(""):"Вы ещё не сыграли ни одного матча";
 // лобби перерисовывается только когда что-то важное изменилось — без мерцания
-const lobbyKey=()=>JSON.stringify([S.mode,S.searching,S.match&&[S.match.id,S.match.state,S.match.map],S.user&&[S.user.nick,S.user.elo,S.user.admin]]);
+const lobbyKey=()=>JSON.stringify([S.mode,S.searching,S.match&&[S.match.id,S.match.state,S.match.map],S.user&&[S.user.nick,S.user.elo,S.user.admin],S.party&&[S.party.leader,S.party.members.length]]);
+/* ===== Пати ===== */
+const PMAX={"5v5":5,"2v2":2,"1v1":1};
+const igr=n=>n+" "+(n===1?"игрок":n<5?"игрока":"игроков");
+const pMember=()=>!!(S.party&&S.user&&S.party.leader!==S.user.nick); // в пати, но не лидер
+const CROWN=`<span class="crown" title="Лидер пати">${ic("crown")}</span>`;
 function renderParty(){
-  const n=S.mode==="5v5"?5:S.mode==="2v2"?2:1;const u=S.user;
-  document.getElementById("party").innerHTML=Array.from({length:5},(_,i)=>i===0?`<div class="slot me">${ava(u.nick,u.avatar)}<b>${esc(u.nick)}</b>${badge(u.elo,"sm")}</div>`:i<n?`<button class="slot" onclick="toast('Приглашение друзей появится позже')"><span class="plus">+</span>Пригласить</button>`:`<div class="slot" style="opacity:.25"></div>`).join("");
+  const el=document.getElementById("party");if(!el||!S.user)return;
+  const u=S.user,pt=S.party,lead=!!pt&&pt.leader===u.nick,sent=S.psent||[];
+  const mem=pt?pt.members:[],others=mem.filter(x=>x.nick!==u.nick),size=Math.max(1,mem.length);
+  const cap=Math.min(5,Math.max(PMAX[S.mode],size+sent.length));
+  const out=[`<div class="slot me">${lead?CROWN:""}${ava(u.nick,u.avatar)}<b>${esc(u.nick)}</b>${badge(u.elo,"sm")}<span class="sst">Вы</span></div>`];
+  for(const x of others)out.push(`<div class="slot mem${x.online||x.inMatch?"":" off"}">${x.leader?CROWN:""}<a class="sl-a" href="#/player/${encodeURIComponent(x.nick)}">${ava(x.nick,x.avatar)}<b>${esc(x.nick)}</b></a>${badge(x.elo,"sm")}<span class="sst${x.inMatch?" m":x.online?" on":""}">${x.inMatch?"в матче":x.online?"на сайте":"не на сайте"}</span>${lead?`<button class="sx" data-pact="kick" data-nick="${esc(x.nick)}" title="Исключить из пати" aria-label="Исключить ${esc(x.nick)} из пати">×</button>`:""}</div>`);
+  for(const r of sent)out.push(`<div class="slot inv">${ava(r.user.nick,r.user.avatar)}<b>${esc(r.user.nick)}</b><span class="sst">приглашён…</span>${r.by===u.nick||lead?`<button class="sx" data-pact="cancel" data-id="${r.id}" title="Отменить приглашение" aria-label="Отменить приглашение для ${esc(r.user.nick)}">×</button>`:""}</div>`);
+  while(out.length<cap)out.push(`<button class="slot" data-pact="open" aria-label="Пригласить друга в пати"><span class="plus">+</span>Пригласить</button>`);
+  while(out.length<5)out.push(`<div class="slot" style="opacity:.25"></div>`);
+  const h=out.join("");if(el.innerHTML!==h)el.innerHTML=h;
+  const bar=document.getElementById("ptbar");if(!bar)return;
+  const bh=pt?`<span>Пати · <b>${mem.length} из ${PMAX[S.mode]}</b> · лидер — <b>${esc(pt.leader)}</b>${lead?"":" · режим и поиск выбирает лидер"}</span><button class="btn btn-g btn-sm" data-pact="leave">Покинуть пати</button>`
+    :`<span>${S.mode==="1v1"?"В режиме «1 на 1» играют без пати — для игры с друзьями выберите «2 на 2» или «5 на 5»":"Позовите друзей — пати всегда играет в одной команде"}</span>`;
+  if(bar.innerHTML!==bh)bar.innerHTML=bh;
 }
+async function pickMode(md){
+  if(S.searching)return toast("Сначала отмените поиск");
+  const pt=S.party;
+  if(!pt){S.mode=md;pageLobby();rise(document.querySelectorAll("#party .slot"),35,320,10);return}
+  if(pMember())return toast(`Режим выбирает лидер пати — ${pt.leader}`);
+  if(PMAX[md]<pt.members.length)return toast(md==="1v1"?"В режиме «1 на 1» играют без пати":`В пати ${igr(pt.members.length)} — в режиме «${MODE_NAME[md]}» можно максимум ${PMAX[md]}`);
+  if(md===S.mode)return;
+  const was=S.mode;S.mode=pt.mode=md;pageLobby();
+  try{const r=await api("/api/party/mode",{method:"POST",body:JSON.stringify({mode:md})});onParty(r.state)}
+  catch(e){toast(e.message);if(S.party)S.mode=S.party.mode=was;refreshLobby()}
+}
+function onParty(d){
+  const seen=new Set((S.pinv||[]).map(r=>r.id)),first=!S.pSeen;S.pSeen=true;
+  S.party=d.party||null;S.psent=d.sent||[];S.pinv=d.invites||[];
+  if(S.party&&!S.searching)S.mode=S.party.mode;
+  if(d.note)toast(d.note);
+  if(!first&&S.pinv.some(r=>!seen.has(r.id))){beep(true);flash("Приглашение в пати")}
+  paintParty();
+}
+function paintParty(){
+  paintPInv();paintInvite();if(document.getElementById("frBody"))paintFr();
+  if(curHash()==="/lobby"){if(lobbyKey()!==S.lobbyK)pageLobby();else renderParty()}
+}
+async function loadParty(){if(!S.user)return;try{onParty(await api("/api/party"))}catch{}}
+// входящие приглашения — карточки в углу экрана на любой странице
+function paintPInv(){
+  const el=document.getElementById("pInv");if(!el)return;const list=S.user?(S.pinv||[]):[];
+  const k=JSON.stringify(list.map(r=>[r.id,r.size,r.mode]));if(el.dataset.k===k)return;el.dataset.k=k;
+  el.innerHTML=list.slice(0,2).map(r=>`<div class="card pinv" role="alertdialog" aria-label="Приглашение в пати от ${esc(r.from.nick)}">${ava(r.from.nick,r.from.avatar)}<div class="pi-t"><b>${esc(r.from.nick)}</b> зовёт вас в пати<div class="muted">${MODE_NAME[r.mode]} · сейчас в пати ${r.size} из ${PMAX[r.mode]}</div></div><div class="pi-a"><button class="btn btn-o btn-sm" data-pact="accept" data-id="${r.id}">Принять</button><button class="btn btn-g btn-sm" data-pact="decline" data-id="${r.id}">Отклонить</button></div></div>`).join("")
+    +(list.length>2?`<div class="pinv-more">Ещё приглашений: ${list.length-2}</div>`:"");
+}
+// окно «Пригласить в пати» со списком друзей
+function pInvBtn(nick,label){const inP=S.party&&S.party.members.some(x=>x.nick===nick),sent=(S.psent||[]).some(r=>r.user.nick===nick);
+  return inP?`<span class="frb ok">✓ В пати</span>`:sent?`<span class="frb wait">Приглашён</span>`:`<button class="btn btn-o btn-sm" data-pact="invite" data-nick="${esc(nick)}">${label||"Пригласить"}</button>`}
+function openInvite(){const el=document.getElementById("pModal");delete el.dataset.k;el.classList.add("show");paintInvite();loadFr();
+  el.onclick=e=>{if(e.target===el)closeInvite()};const x=el.querySelector(".pm-x");if(x)x.focus()}
+function closeInvite(){const el=document.getElementById("pModal");if(el)el.classList.remove("show")}
+function paintInvite(){
+  const el=document.getElementById("pModal");if(!el||!el.classList.contains("show"))return;
+  const fr=S.fr?S.fr.friends:null;
+  const k=JSON.stringify([fr,S.party&&S.party.members.map(x=>x.nick),(S.psent||[]).map(r=>r.user.nick)]);if(el.dataset.k===k)return;el.dataset.k=k;
+  const list=!fr?skel(3,false):!fr.length?`<div class="pm-empty"><p class="muted">Позвать в пати можно только друзей. Добавьте игрока в друзья по ID в игре или нику на StandHub.</p><a class="btn btn-o" href="#/friends">Открыть «Друзья»</a></div>`
+    :fr.map(f=>frRow(f,pInvBtn(f.nick),1)).join("");
+  const old=el.querySelector(".pm-list"),top=old?old.scrollTop:0;
+  el.innerHTML=`<div class="card pm" role="dialog" aria-modal="true" aria-labelledby="pmH"><button class="pm-x" data-pact="close" aria-label="Закрыть">×</button><h3 id="pmH">Пригласить в пати</h3><p class="muted pm-sub">Друг увидит приглашение на сайте и получит сообщение в Telegram. Оно действует 10 минут.</p><div class="pm-list">${list}</div></div>`;
+  const nl=el.querySelector(".pm-list");if(nl)nl.scrollTop=top;
+}
+document.addEventListener("keydown",e=>{if(e.key==="Escape")closeInvite()});
+// кнопки пати — один общий обработчик
+document.addEventListener("click",async e=>{const b=e.target.closest("[data-pact]");if(!b)return;e.preventDefault();e.stopPropagation();
+  const a=b.dataset.pact;if(a==="close")return closeInvite();
+  if(!S.user)return needAuth();if(b.disabled)return;
+  if(a==="open"){if(S.searching)return toast("Сначала отмените поиск");if(S.mode==="1v1")return toast("В режиме «1 на 1» играют без пати");return openInvite()}
+  if((a==="kick"||a==="leave")&&!b.classList.contains("sure")){const t=b.textContent;b.classList.add("sure");b.textContent=a==="kick"?"Исключить?":"Точно выйти?";setTimeout(()=>{if(b.isConnected){b.classList.remove("sure");b.textContent=t}},3000);return}
+  b.disabled=true;
+  const post=(u,o)=>api("/api/party/"+u,{method:"POST",body:JSON.stringify(o||{})});
+  try{let r;
+    if(a==="invite"){r=await post("invite",{nick:b.dataset.nick,mode:S.mode});toast(`Приглашение отправлено: ${r.nick}`)}
+    else if(a==="accept"){r=await post("accept",{id:b.dataset.id});toast(`Вы в пати ${r.leader}`);if(curHash()!=="/lobby")location.hash="#/lobby"}
+    else if(a==="decline"){r=await post("decline",{id:b.dataset.id});toast("Приглашение отклонено")}
+    else if(a==="cancel"){r=await post("cancel",{id:b.dataset.id});toast("Приглашение отменено")}
+    else if(a==="kick"){r=await post("kick",{nick:b.dataset.nick});toast(`${r.nick} исключён(а) из пати`)}
+    else if(a==="leave"){r=await post("leave");toast("Вы вышли из пати")}
+    if(r&&r.state)onParty(r.state)}
+  catch(err){toast(err.message);if(err.state)onParty(err.state);if(b.isConnected)b.disabled=false}
+},true);
 const fmtD=d=>d==null?"—":(d>=0?"+":"")+d;
 const resName=r=>r==="win"?"Победа":r==="loss"?"Поражение":"Ничья";
 function myRes(m,nick){const p=m.players.find(x=>x.nick===nick)||{};const r=p.draw?"D":p.win?"W":"L";
@@ -773,8 +900,11 @@ function myRes(m,nick){const p=m.players.find(x=>x.nick===nick)||{};const r=p.dr
 function mini(m){const x=myRes(m,S.user.nick);return `<a class="mrow" href="#/match/${m.id}"><span style="display:flex;align-items:center;gap:10px"><span class="res ${x.cls}">${x.r}</span><b style="color:#fff">${esc(m.map)}</b>${m.test?'<span class="pill">тест</span>':""}</span><span>${x.sc}</span><span class="${(x.p.delta||0)>=0?"w":"l"}">${fmtD(x.p.delta)}</span></a>`}
 async function startSearch(auto){
   unlockAudio();S.searching=true;S.qSince=Date.now();startQTimer();refreshLobby();
-  try{applyState(await api("/api/queue/join",{method:"POST",body:JSON.stringify({mode:S.mode})}),true)}
-  catch(e){S.searching=false;stopQTimer();if(e.match)onMatch(e.match);refreshLobby();if(!auto)toast(location.protocol==="file:"?"Запустите сайт через сервер (node server.js)":e.message)}
+  try{applyState(await api("/api/queue/join",{method:"POST",body:JSON.stringify({mode:S.mode})}),true);S.rj=0}
+  catch(e){S.searching=false;stopQTimer();if(e.match)onMatch(e.match);refreshLobby();
+    // после обновления сайта друзья по пати подключаются не одновременно — пробуем ещё несколько раз
+    if(auto&&e.code==="offline"&&(S.rj=(S.rj||0)+1)<=4)return setTimeout(()=>{if(!S.searching&&!S.match&&S.user)startSearch(true)},4000);
+    if(!auto)toast(location.protocol==="file:"?"Запустите сайт через сервер (node server.js)":e.message)}
 }
 async function stopSearch(silent){
   if(!S.searching)return;S.searching=false;stopQTimer();
@@ -796,6 +926,7 @@ function onLive(d){
   if(d.type==="stats"){S.live=d;paintLive();return}
   if(d.type==="state")return applyState(d);
   if(d.type==="friends")return onFriends(d);
+  if(d.type==="party")return onParty(d);
   if(d.type==="match")onMatch(d.match);
 }
 function applyState(d,fromAction){
@@ -804,8 +935,9 @@ function applyState(d,fromAction){
   else if(!fromAction||d.match){S.searching=false;stopQTimer()}
   if(d.match)onMatch(d.match,!fromAction);
   else if(S.match&&BUSY.includes(S.match.state)){S.match=null;closeAccept()}
-  // поиск сбросился (например, сайт обновлялся) — встаём в очередь снова
-  if(!fromAction&&was&&!d.queue&&!d.match&&S.user)return startSearch(true);
+  if(typeof d.stop==="string")toast(d.stop);else if(d.note)toast(d.note);
+  // поиск сбросился (например, сайт обновлялся) — встаём в очередь снова. В пати это делает только лидер
+  if(!fromAction&&was&&!d.queue&&!d.match&&S.user&&!d.stop&&!pMember())return startSearch(true);
   refreshLobby();
 }
 function onMatch(m,silent,force){
@@ -955,7 +1087,7 @@ function renderMatch(m){
   }
 }
 function prow(m,p,acc){
-  return `<div class="prow${p.me?" me":""}">${ava(p.nick,p.avatar)}<div class="pn">${p.bot?`<b>${esc(p.nick)}</b>`:`<a href="#/player/${encodeURIComponent(p.nick)}"><b>${esc(p.nick)}</b></a>`}<div class="pills">${p.captain?`<span class="pill cap">Капитан</span>`:""}${p.host?`<span class="pill host">Хост</span>`:""}${p.bot?`<span class="pill">Бот</span>`:""}${p.me?`<span class="pill me">Вы</span>`:""}${!acc&&!p.bot&&!p.me?frBtn(p.nick):""}</div></div>
+  return `<div class="prow${p.me?" me":""}">${ava(p.nick,p.avatar)}<div class="pn">${p.bot?`<b>${esc(p.nick)}</b>`:`<a href="#/player/${encodeURIComponent(p.nick)}"><b>${esc(p.nick)}</b></a>`}<div class="pills">${p.party?`<span class="pill pty" title="Пришли в матч вместе, одним пати">${esc(p.party)}</span>`:""}${p.captain?`<span class="pill cap">Капитан</span>`:""}${p.host?`<span class="pill host">Хост</span>`:""}${p.bot?`<span class="pill">Бот</span>`:""}${p.me?`<span class="pill me">Вы</span>`:""}${!acc&&!p.bot&&!p.me?frBtn(p.nick):""}</div></div>
    <div class="pr">${acc?(p.accepted?`<span class="w">✓ принял</span>`:`<span class="muted">ждём…</span>`):`${badge(p.elo,"sm")}<span>${p.elo}</span>${m.state==="finished"&&p.delta!=null?`<span class="${p.delta>=0?"w":"l"}">${fmtD(p.delta)}</span>`:""}`}</div></div>`;
 }
 function roster(m,t){const ps=m.players.filter(p=>p.team===t).sort((a,b)=>b.elo-a.elo);return `<div class="thead"><b>Команда ${esc(capName(m,t))}</b><span class="muted">${ps.length} игр.</span></div>${ps.map(p=>prow(m,p)).join("")}`}
@@ -1058,7 +1190,7 @@ async function pageLeaderboard(){
 function route(){
   S.enter=true;
   const h=location.hash.slice(1)||"/";const [,a,b]=h.split("/");
-  renderChrome("/"+(a||""));window.scrollTo(0,0);clearInterval(matchPoll);
+  renderChrome("/"+(a||""));window.scrollTo(0,0);clearInterval(matchPoll);closeInvite();
   if(!a)pageHome();else if(a==="login")pageAuth("login");else if(a==="register")pageAuth("register");else if(a==="verify")pageVerify();
   else if(a==="lobby")pageLobby();else if(a==="profile")pageProfile();else if(a==="player")pageProfile(decodeURIComponent(b));
   else if(a==="friends")pageFriends();else if(a==="matches")pageMatches();else if(a==="match")pageMatch(b);else if(a==="leaderboard")pageLeaderboard();else if(a==="admin")pageAdmin();else pageHome();
