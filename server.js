@@ -125,7 +125,7 @@ http.createServer(async (req, res) => {
     return;
   }
   if (p === '/api/stats') return send(res, 200, stats());
-  if (p === '/api/health') return send(res, 200, { ok: true, bot: botUsername, tokenSet: !!TG_TOKEN });
+  if (p === '/api/health') return send(res, 200, { ok: true, bot: botUsername, tokenSet: !!TG_TOKEN, disk: !!process.env.RAILWAY_VOLUME_MOUNT_PATH, users: db.users.filter(u => u.verified).length });
 
   if (p === '/api/register' && req.method === 'POST') {
     cleanup();
