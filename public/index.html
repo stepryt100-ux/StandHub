@@ -178,6 +178,7 @@ tr.click{cursor:pointer}tr.click:hover td{background:var(--card2)}
 .chart{width:100%;height:200px}
 .empty{padding:48px 24px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:8px}.empty b{font-size:18px}.empty p{max-width:420px}.empty .btn{margin-top:12px}.empty-ic{width:56px;height:56px;border-radius:50%;background:rgba(255,85,0,.12);color:var(--orange);display:grid;place-items:center;margin-bottom:4px}
 .steps{list-style:none;counter-reset:s;margin:20px 0;display:grid;gap:12px}.steps li{counter-increment:s;position:relative;padding:12px 12px 12px 52px;background:var(--bg2);border:1px solid var(--line);border-radius:6px;display:flex;flex-direction:column;gap:2px}.steps li::before{content:counter(s);position:absolute;left:12px;top:12px;width:28px;height:28px;border-radius:50%;background:var(--orange);display:grid;place-items:center;font-weight:900}.vcode{align-self:flex-start;margin-top:6px;background:#0f0f11;padding:6px 12px;border-radius:4px;font-size:20px;font-weight:900;letter-spacing:.2em}
+.ava-edit{position:relative;cursor:pointer;border-radius:50%;display:block;flex:none}.ava-edit .ava-cam{position:absolute;right:0;bottom:0;width:34px;height:34px;border-radius:50%;background:var(--orange);color:#fff;display:grid;place-items:center;border:3px solid #1c1c1f}.ava-edit:hover .ava{filter:brightness(.75)}.ava-edit:focus-within{outline:2px solid var(--orange);outline-offset:4px}.sr{position:absolute;width:1px;height:1px;opacity:0;overflow:hidden}
 .toast{position:fixed;bottom:24px;right:24px;background:var(--card2);border:1px solid var(--orange);padding:14px 18px;border-radius:6px;z-index:200;display:none}
 /* Responsive */
 @media (max-width:1100px){.feat{grid-template-columns:repeat(2,1fr)}.stats{grid-template-columns:repeat(3,1fr)}.lobby,.pgrid{grid-template-columns:1fr}.hero .emblem{opacity:.25}}
@@ -220,13 +221,13 @@ tr.click{cursor:pointer}tr.click:hover td{background:var(--card2)}
 <script>
 /* ===== Справочники ===== */
 const MAPS=[["Sandstone","#c89a5b,#6b4a22"],["Rust","#b5532b,#3e1c0d"],["Province","#7fa36a,#2f4524"],["Zone 7","#6a7f9e,#232c3d"],["Hanami","#d77fa1,#4a2233"],["Breeze","#5fb5c9,#1f4550"],["Dune","#d9b26a,#5c4318"],["Sakura","#e59aa8,#57303a"]];
-const TH=[0,100,501,751,901,1051,1201,1351,1531,1751,2001];
+const TH=[0,100,801,951,1101,1251,1401,1551,1701,1851,2001];
 function lvlOf(e){let l=1;for(let i=1;i<=10;i++)if(e>=TH[i])l=i;return l}
 function lvlColor(l){return l===1?"var(--l1)":l<=3?"var(--l2)":l<=7?"var(--l4)":l<=9?"var(--l8)":"var(--l10)"}
 function lvlPct(e){const l=lvlOf(e);if(l===10)return 100;return Math.round((e-TH[l])/(TH[l+1]-TH[l])*100)}
 function badge(e,cls=""){const l=lvlOf(e);return `<span class="lvl ${cls}" style="--c:${lvlColor(l)};--p:${Math.max(8,lvlPct(e))}%" title="Уровень ${l} · ${e} ELO">${l}</span>`}
 function esc(t){return String(t).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
-function ava(n){const h=[...n].reduce((a,c)=>a+c.charCodeAt(0),0)%360;return `<span class="ava" style="background:linear-gradient(135deg,hsl(${h} 70% 45%),hsl(${(h+40)%360} 60% 20%))">${esc(n[0].toUpperCase())}</span>`}
+function ava(n,url){if(url)return `<span class="ava" style="background:#26262b center/cover no-repeat url('${esc(url)}')" role="img" aria-label="${esc(n)}"></span>`;const h=[...n].reduce((a,c)=>a+c.charCodeAt(0),0)%360;return `<span class="ava" style="background:linear-gradient(135deg,hsl(${h} 70% 45%),hsl(${(h+40)%360} 60% 20%))">${esc(n[0].toUpperCase())}</span>`}
 function mapBg(m){const x=MAPS.find(a=>a[0]===m);return `linear-gradient(135deg,${x[1]})`}
 const fmt=n=>Number(n).toLocaleString("ru-RU");
 const kd=u=>u.deaths?(u.kills/u.deaths).toFixed(2):(u.kills?u.kills.toFixed(2):"—");
@@ -261,7 +262,7 @@ function renderChrome(route){
   const u=S.user;
   document.getElementById("topRight").innerHTML=u?`
     <a class="btn btn-o" href="#/lobby">Играть</a>
-    <a class="userchip" href="#/profile" aria-label="Мой профиль">${ava(u.nick)}<span class="nm">${esc(u.nick)}</span>${badge(u.elo,"sm")}</a>
+    <a class="userchip" href="#/profile" aria-label="Мой профиль">${ava(u.nick,u.avatar)}<span class="nm">${esc(u.nick)}</span>${badge(u.elo,"sm")}</a>
     <button class="btn btn-g" id="logout">Выйти</button>`:`
     <a class="btn btn-g" href="#/login">Войти</a><a class="btn btn-o" href="#/register">Регистрация</a>`;
   const lo=document.getElementById("logout");if(lo)lo.onclick=async()=>{try{await api("/api/logout",{method:"POST"})}catch{}stopSearch(true);S.token=null;S.user=null;localStorage.removeItem("sh_token");connectLive();location.hash="#/"};
@@ -317,7 +318,7 @@ async function getLb(){try{return await api("/api/leaderboard")}catch{return[]}}
 function lbEmpty(){return empty("Рейтинг пока пуст","Здесь появятся игроки после первых сыгранных матчей. Стань первым!",S.user?`<a class="btn btn-o" href="#/lobby">Найти матч</a>`:`<a class="btn btn-o" href="#/register">Регистрация</a>`)}
 function lbTable(list,compact){
   return `<table><thead><tr><th>#</th><th>Игрок</th><th>Уровень</th><th>ELO</th>${compact?"":"<th>Матчи</th><th>Победы</th><th>K/D</th><th>HS%</th>"}</tr></thead><tbody>
-  ${list.map((p,i)=>`<tr class="click" data-p="${esc(p.nick)}"><td class="rank">${p.rank||i+1}</td><td><div class="pl">${ava(p.nick)}<b>${esc(p.nick)}</b></div></td><td>${badge(p.elo,"sm")}</td><td><b>${p.elo}</b></td>${compact?"":`<td>${p.matches}</td><td>${wr(p)}</td><td>${kd(p)}</td><td>${hsp(p)}</td>`}</tr>`).join("")}</tbody></table>`;
+  ${list.map((p,i)=>`<tr class="click" data-p="${esc(p.nick)}"><td class="rank">${p.rank||i+1}</td><td><div class="pl">${ava(p.nick,p.avatar)}<b>${esc(p.nick)}</b></div></td><td>${badge(p.elo,"sm")}</td><td><b>${p.elo}</b></td>${compact?"":`<td>${p.matches}</td><td>${wr(p)}</td><td>${kd(p)}</td><td>${hsp(p)}</td>`}</tr>`).join("")}</tbody></table>`;
 }
 
 /* ===== Вход / регистрация ===== */
@@ -390,8 +391,6 @@ function pageLobby(){
        <div class="modes" role="radiogroup" aria-label="Режим">${["5v5","2v2","1v1"].map(m=>`<button class="chip ${S.mode===m?"on":""}" data-mode="${m}" role="radio" aria-checked="${S.mode===m}">${m.replace("v"," на ")}</button>`).join("")}</div>
      </div>
      <div class="party" id="party"></div>
-     <h3>Пул карт <span class="muted" style="text-transform:none;font-weight:500">— нажми, чтобы исключить</span></h3>
-     <div class="maps">${MAPS.map(([m])=>`<button class="map ${S.maps.has(m)?"on":"off"}" data-map="${m}" style="background:${mapBg(m)}" aria-pressed="${S.maps.has(m)}">${m}</button>`).join("")}</div>
      <div class="findbox">
        <div><div class="muted" style="font-size:13px">Регион: ${esc(u.region)} · Античит: активен</div><div id="qstatus" style="font-weight:700;margin-top:4px">Готов к поиску</div></div>
        <button class="btn btn-o btn-find ${S.searching?"searching":""}" id="find">${S.searching?"Отменить поиск":"Найти матч"}</button>
@@ -408,14 +407,13 @@ function pageLobby(){
   </div></div>`;
   renderParty();
   document.querySelectorAll("[data-mode]").forEach(b=>b.onclick=()=>{if(S.searching)return toast("Сначала отмените поиск");S.mode=b.dataset.mode;pageLobby()});
-  document.querySelectorAll("[data-map]").forEach(b=>b.onclick=()=>{const m=b.dataset.map;if(S.maps.has(m)){if(S.maps.size<=3)return toast("Оставьте минимум 3 карты");S.maps.delete(m)}else S.maps.add(m);b.classList.toggle("on");b.classList.toggle("off");b.setAttribute("aria-pressed",S.maps.has(m))});
   document.getElementById("find").onclick=()=>S.searching?stopSearch():startSearch();
   if(S.searching)tick();
   api("/api/matches?player="+encodeURIComponent(u.nick)).catch(()=>[]).then(ms=>{const el=document.getElementById("lobbyM");if(el)el.innerHTML=ms.length?ms.slice(0,4).map(mini).join(""):"Вы ещё не сыграли ни одного матча"});
 }
 function renderParty(){
   const n=S.mode==="5v5"?5:S.mode==="2v2"?2:1;const u=S.user;
-  document.getElementById("party").innerHTML=Array.from({length:5},(_,i)=>i===0?`<div class="slot me">${ava(u.nick)}<b>${esc(u.nick)}</b>${badge(u.elo,"sm")}</div>`:i<n?`<button class="slot" onclick="toast('Приглашение друзей появится позже')"><span class="plus">+</span>Пригласить</button>`:`<div class="slot" style="opacity:.25"></div>`).join("");
+  document.getElementById("party").innerHTML=Array.from({length:5},(_,i)=>i===0?`<div class="slot me">${ava(u.nick,u.avatar)}<b>${esc(u.nick)}</b>${badge(u.elo,"sm")}</div>`:i<n?`<button class="slot" onclick="toast('Приглашение друзей появится позже')"><span class="plus">+</span>Пригласить</button>`:`<div class="slot" style="opacity:.25"></div>`).join("");
 }
 function mini(m){return `<a class="mrow" href="#/match/${m.id}"><b>${esc(m.map)}</b><span>${m.scoreA}:${m.scoreB}</span></a>`}
 async function startSearch(){
@@ -435,9 +433,9 @@ async function pageProfile(name){
   if(!name){if(needAuth())return;try{p=S.user=await api("/api/me")}catch{p=S.user}}
   else{try{p=await api("/api/player/"+encodeURIComponent(name))}catch{app.innerHTML=`<div class="wrap">${empty("Игрок не найден","Проверьте ник и попробуйте ещё раз")}</div>`;return}}
   const l=lvlOf(p.elo);const ms=await api("/api/matches?player="+encodeURIComponent(p.nick)).catch(()=>[]);
-  const none=p.matches===0;
+  const none=p.matches===0;const own=!!(S.user&&S.user.nick===p.nick);
   app.innerHTML=`<div class="wrap">
-   <div class="phead">${ava(p.nick)}
+   <div class="phead">${own?`<label class="ava-edit" title="Сменить аватар">${ava(p.nick,p.avatar)}<span class="ava-cam" aria-hidden="true"><svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M9 4l-2 2H4a1 1 0 00-1 1v12a1 1 0 001 1h16a1 1 0 001-1V7a1 1 0 00-1-1h-3l-2-2zm3 4.5A4.5 4.5 0 1112 17.5 4.5 4.5 0 0112 8.5z"/></svg></span><input type="file" accept="image/png,image/jpeg,image/webp" id="avaIn" class="sr" aria-label="Сменить аватар"></label>`:ava(p.nick,p.avatar)}
      <div><div class="flag">${esc(p.region)} · На StandHub с ${new Date(p.created).toLocaleDateString("ru-RU")}</div><h1>${esc(p.nick)}</h1>
        <div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap"><span class="chip on" style="height:28px;font-size:12px;display:inline-flex;align-items:center">StandLeo</span></div></div>
      <div class="elo-box">${badge(p.elo,"xl")}<div class="elo-prog"><div class="muted" style="font-size:12px;font-weight:700;text-transform:uppercase">Уровень ${l}</div><div class="v">${p.elo} <span class="muted" style="font-size:14px">ELO</span></div>
@@ -449,11 +447,22 @@ async function pageProfile(name){
    ${none?`<div class="card" style="margin-top:16px">${empty("Матчей пока нет",(S.user&&S.user.nick===p.nick?"Сыграйте первый матч — здесь появятся график ELO, статистика по картам и история игр.":"Этот игрок ещё не сыграл ни одного матча."),S.user&&S.user.nick===p.nick?`<a class="btn btn-o" href="#/lobby">Найти матч</a>`:"")}</div>`:
    `<div class="card" style="margin-top:16px"><div class="thead"><b>История матчей</b></div><div class="scroll">${matchTable(ms,p.nick)}</div></div>`}
   </div>`;
+  const inp=document.getElementById("avaIn");if(inp)inp.onchange=()=>uploadAvatar(inp.files[0]);
   bind();
 }
 function matchTable(list,nick){
   return `<table><thead><tr><th>Результат</th><th>Карта</th><th>Счёт</th><th>K / D / A</th><th>ELO</th><th>Дата</th></tr></thead><tbody>
   ${list.map(m=>{const p=m.players.find(x=>x.nick===nick)||{};return `<tr class="click" data-m="${m.id}"><td><span class="res ${p.win?"w":"l"}">${p.win?"W":"L"}</span></td><td><b>${esc(m.map)}</b></td><td>${m.scoreA} : ${m.scoreB}</td><td>${p.k??"—"} / ${p.d??"—"} / ${p.a??"—"}</td><td class="${p.delta>=0?"w":"l"}">${p.delta>=0?"+":""}${p.delta??"—"}</td><td class="muted">${new Date(m.date).toLocaleDateString("ru-RU")}</td></tr>`}).join("")}</tbody></table>`;
+}
+
+async function uploadAvatar(file){
+  if(!file)return;if(!/^image\//.test(file.type))return toast("Выберите картинку");
+  try{
+    const img=await createImageBitmap(file);const S2=256,c=document.createElement("canvas");c.width=c.height=S2;
+    const k=Math.min(img.width,img.height);c.getContext("2d").drawImage(img,(img.width-k)/2,(img.height-k)/2,k,k,0,0,S2,S2);
+    const u=await api("/api/avatar",{method:"POST",body:JSON.stringify({image:c.toDataURL("image/jpeg",.88)})});
+    S.user=u;toast("Аватар обновлён");renderChrome("/profile");pageProfile();
+  }catch(e){toast(e.message||"Не удалось загрузить аватар")}
 }
 
 /* ===== Матчи / рейтинг ===== */
@@ -472,7 +481,7 @@ async function pageLeaderboard(){
   app.innerHTML=`<div class="wrap"><h1 class="h">Таблица лидеров</h1><div id="lb"><div class="card pad muted">Загрузка…</div></div></div>`;
   const list=(await getLb()).map((p,i)=>({...p,rank:i+1}));const el=document.getElementById("lb");
   if(!list.length){el.innerHTML=`<div class="card">${lbEmpty()}</div>`;return}
-  el.innerHTML=`${list.length>=3?`<div class="lb-top">${[1,0,2].map(i=>{const p=list[i];return `<a href="#/player/${encodeURIComponent(p.nick)}" class="card podium p${i+1}"><span class="rk">#${i+1}</span>${ava(p.nick)}<b style="font-size:18px;display:block">${esc(p.nick)}</b><div style="display:flex;justify-content:center;align-items:center;gap:8px;margin-top:8px">${badge(p.elo,"sm")}<b>${p.elo} ELO</b></div><div class="muted" style="font-size:13px;margin-top:4px">${p.matches} матчей · ${wr(p)} побед</div></a>`}).join("")}</div>`:""}
+  el.innerHTML=`${list.length>=3?`<div class="lb-top">${[1,0,2].map(i=>{const p=list[i];return `<a href="#/player/${encodeURIComponent(p.nick)}" class="card podium p${i+1}"><span class="rk">#${i+1}</span>${ava(p.nick,p.avatar)}<b style="font-size:18px;display:block">${esc(p.nick)}</b><div style="display:flex;justify-content:center;align-items:center;gap:8px;margin-top:8px">${badge(p.elo,"sm")}<b>${p.elo} ELO</b></div><div class="muted" style="font-size:13px;margin-top:4px">${p.matches} матчей · ${wr(p)} побед</div></a>`}).join("")}</div>`:""}
    <div class="card scroll">${lbTable(list.length>=3?list.slice(3):list,false)}</div>`;
   bind();
 }

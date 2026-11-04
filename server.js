@@ -1,7 +1,7 @@
 // StandHub server. Запуск: npm start
 const http = require('http'), fs = require('fs'), path = require('path'), crypto = require('crypto');
 const PORT = process.env.PORT || 3000;
-const DB_FILE = process.env.DB_FILE || path.join(__dirname, 'data', 'db.json');
+const DB_FILE = process.env.DB_FILE || path.join(process.env.RAILWAY_VOLUME_MOUNT_PATH || path.join(__dirname, 'data'), 'db.json');
 const PUB = path.join(__dirname, 'public');
 const TG_TOKEN = process.env.TELEGRAM_BOT_TOKEN || '';
 const SITE_URL = process.env.SITE_URL || (process.env.RAILWAY_PUBLIC_DOMAIN ? 'https://' + process.env.RAILWAY_PUBLIC_DOMAIN : 'http://localhost:' + PORT);
@@ -9,15 +9,18 @@ const PENDING_TTL = 24 * 3600e3; // неподтверждённые аккау�
 
 // ---------- хранилище ----------
 fs.mkdirSync(path.dirname(DB_FILE), { recursive: true });
-let db = { users: [], matches: [] };
-try { db = JSON.parse(fs.readFileSync(DB_FILE, 'utf8')); } catch {}
+let db = { users: [], matches: [], sessions: {} };
+try { db = { ...db, ...JSON.parse(fs.readFileSync(DB_FILE, 'utf8')) }; } catch {}
+console.log('База:', DB_FILE, '· пользователей:', db.users.length);
 const save = () => fs.writeFileSync(DB_FILE, JSON.stringify(db, null, 2));
-const sessions = new Map(); // token -> userId
+// сессии хранятся в базе, чтобы не разлогинивало после обновления сайта
+const sessions = { get: t => (t ? db.sessions[t] : undefined), set: (t, id) => { db.sessions[t] = id; save(); }, delete: t => { if (db.sessions[t]) { delete db.sessions[t]; save(); } } };
 
 const hash = (pw, salt = crypto.randomBytes(16).toString('hex')) => salt + ':' + crypto.scryptSync(pw, salt, 32).toString('hex');
 const check = (pw, stored) => { const [salt] = stored.split(':'); return hash(pw, salt) === stored; };
 const pub = u => u && ({ nick: u.nick, region: u.region, elo: u.elo, matches: u.matches, wins: u.wins,
-  kills: u.kills, deaths: u.deaths, assists: u.assists, hsKills: u.hsKills, created: u.created });
+  kills: u.kills, deaths: u.deaths, assists: u.assists, hsKills: u.hsKills, created: u.created,
+  avatar: u.avatar ? `/api/avatar/${encodeURIComponent(u.nick)}?v=${u.avatarV}` : null });
 const verified = () => db.users.filter(u => u.verified);
 function cleanup() { const n = db.users.length; db.users = db.users.filter(u => u.verified || Date.now() - new Date(u.created) < PENDING_TTL); if (db.users.length !== n) save(); }
 const newCode = () => { let c; do { c = String(crypto.randomInt(100000, 999999)); } while (db.users.some(u => u.vcode === c)); return c; };
@@ -107,7 +110,7 @@ startBot();
 
 // ---------- http ----------
 const send = (res, code, obj) => { res.writeHead(code, { 'Content-Type': 'application/json; charset=utf-8' }); res.end(JSON.stringify(obj)); };
-const body = req => new Promise(r => { let b = ''; req.on('data', c => { b += c; if (b.length > 1e5) req.destroy(); }); req.on('end', () => { try { r(JSON.parse(b || '{}')); } catch { r({}); } }); });
+const body = req => new Promise(r => { let b = ''; req.on('data', c => { b += c; if (b.length > 8e5) req.destroy(); }); req.on('end', () => { try { r(JSON.parse(b || '{}')); } catch { r({}); } }); });
 const authUser = req => { const t = (req.headers.authorization || '').replace('Bearer ', ''); const id = sessions.get(t); return db.users.find(u => u.id === id && u.verified); };
 const MIME = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript', '.css': 'text/css', '.png': 'image/png', '.svg': 'image/svg+xml' };
 
@@ -157,6 +160,20 @@ http.createServer(async (req, res) => {
   if (p === '/api/me') { const u = authUser(req); return u ? send(res, 200, pub(u)) : send(res, 401, { error: 'Не авторизован' }); }
   if (p === '/api/logout' && req.method === 'POST') { const t = (req.headers.authorization || '').replace('Bearer ', ''); queue.delete(sessions.get(t)); sessions.delete(t); broadcast(); return send(res, 200, { ok: true }); }
 
+  if (p === '/api/avatar' && req.method === 'POST') {
+    const u = authUser(req); if (!u) return send(res, 401, { error: 'Войдите в аккаунт' });
+    const m = /^data:image\/(jpeg|png|webp);base64,([A-Za-z0-9+/=]+)$/.exec(String((await body(req)).image || ''));
+    if (!m) return send(res, 400, { error: 'Неверный формат картинки' });
+    if (m[2].length > 700000) return send(res, 400, { error: 'Картинка слишком большая' });
+    u.avatar = m[2]; u.avatarType = 'image/' + m[1]; u.avatarV = Date.now(); save();
+    return send(res, 200, pub(u));
+  }
+  if (p.startsWith('/api/avatar/')) {
+    const n = decodeURIComponent(p.slice(12)).toLowerCase(); const u = verified().find(x => x.nick.toLowerCase() === n);
+    if (!u || !u.avatar) { res.writeHead(404); return res.end(); }
+    res.writeHead(200, { 'Content-Type': u.avatarType, 'Cache-Control': 'public, max-age=31536000, immutable' });
+    return res.end(Buffer.from(u.avatar, 'base64'));
+  }
   if (p === '/api/leaderboard') return send(res, 200, verified().filter(u => u.matches > 0).sort((a, b) => b.elo - a.elo).map(pub));
   if (p.startsWith('/api/player/')) { const n = decodeURIComponent(p.slice(12)).toLowerCase(); const u = verified().find(x => x.nick.toLowerCase() === n); return u ? send(res, 200, pub(u)) : send(res, 404, { error: 'Игрок не найден' }); }
   if (p === '/api/search') { const q = (url.searchParams.get('q') || '').toLowerCase(); return send(res, 200, verified().filter(u => u.nick.toLowerCase().includes(q)).slice(0, 10).map(pub)); }
