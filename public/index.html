@@ -686,7 +686,7 @@ body::after{width:520px;height:520px;left:140px;bottom:-220px;background:radial-
 .adm-shop{display:grid;gap:18px}
 .adm-sh-t{display:flex;align-items:center;gap:12px}
 .adm-sh-t .gold{width:58px;height:40px;flex:none}
-.adm-top{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap}.adm-on{font-size:13px;color:var(--muted);padding:6px 12px;border:1px solid var(--line);border-radius:999px;background:var(--bg2);white-space:nowrap}.adm-on b{color:#fff}
+.adm-top{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap}.adm-on{font-size:13px;color:var(--muted);padding:6px 12px;margin-bottom:16px;border:1px solid var(--line);border-radius:999px;background:var(--bg2);white-space:nowrap}.adm-on b{color:#fff}
 .adm-stock{text-align:center;min-width:100px;padding:8px 12px;border-radius:8px;background:rgba(63,207,106,.08);border:1px solid rgba(63,207,106,.35)}
 .adm-stock b{display:block;font-size:26px;font-weight:900;line-height:1.1;color:var(--green);font-variant-numeric:tabular-nums}
 .adm-stock span{font-size:12px;color:var(--muted)}
@@ -986,7 +986,7 @@ function toast(t){const e=document.getElementById("toast");e.textContent=t;e.cla
 function needAuth(){if(!S.user){location.hash="#/login";toast("Войдите, чтобы продолжить");return true}return false}
 function empty(title,text,btn){return `<div class="empty"><div class="empty-ic">${ic("crown")}</div><b>${title}</b><p class="muted">${text}</p>${btn||""}</div>`}
 /* ===== Анимации ===== */
-const APP_V="1.10.2";
+const APP_V="1.10.3";
 // анимации включены всегда; выключить можно кнопкой «Анимации» (меню слева / низ главной)
 const RM=()=>document.documentElement.classList.contains("no-motion");
 function paintMotion(){document.querySelectorAll("[data-motion] b").forEach(b=>b.textContent=RM()?"выкл":"вкл")}
@@ -1330,9 +1330,6 @@ function pageLobby(){
        <li><span>Капитаны по очереди убирают карты — остаётся одна</span></li>
        <li><span>Найдите хоста в StandLeo по ID и напишите ему «.» в личку</span></li>
        <li><span>После игры капитан отмечает результат, соперники подтверждают — ELO пересчитается сам</span></li></ol></div>
-     <div class="card pad"><h3>Прямо сейчас</h3>
-       <div class="qrow"><span class="muted">В поиске матча</span>${L("searching")}</div>
-       <div class="qrow"><span class="muted">Матчей идёт</span>${L("live")}</div></div>
      <div class="card pad"><h3>Последние матчи</h3><div id="lobbyM" class="muted">${S.lobbyMs?lobbyMsHtml(S.lobbyMs):skel(3,false)}</div></div>
    </div>
   </div></div>`;
@@ -1845,7 +1842,7 @@ async function pageAdmin(tab){
   if(!S.user.admin){app.innerHTML=`<div class="wrap">${empty("Нет доступа","Эта страница только для администраторов")}</div>`;return}
   tab=["reports","support","shop"].includes(tab)?tab:"";
   const sub={"":"Идущие и спорные матчи. Спорный — когда результат оспорили или капитаны отметили разное. Доказательства от игроков приходят вам в Telegram.",reports:"Жалобы игроков после матчей. Можно закрыть жалобу или закрыть нарушителю поиск матчей.",support:"Обращения в поддержку. Ответ придёт игроку на сайт и в Telegram.",shop:"Товары, цены и заказы. После покупки игрок пишет вам в Telegram и присылает скриншот заказа — сверьте номер заказа здесь, выдайте промокод и нажмите «Выдан». О каждой покупке придёт сообщение в Telegram."}[tab];
-  app.innerHTML=`<div class="wrap"><div class="adm-top"><h1 class="h">Админка</h1><span class="adm-on" title="Этот счётчик видят только админы"><span class="dot"></span>На сайте: ${L("online")}</span></div><div class="tabs" id="admTabs" style="margin-top:-6px">${ADM_TABS.map(([k,t])=>`<a href="#/admin${k?"/"+k:""}" data-tab="${k}" class="${tab===k?"on":""}">${t}<span class="nb z">0</span></a>`).join("")}</div><p class="muted" style="margin:-6px 0 20px">${sub}</p><div id="adm" class="grid"><div class="card">${skel(3)}</div></div></div>`;entered();paintAdmTabs();
+  app.innerHTML=`<div class="wrap"><div class="adm-top"><h1 class="h">Админка</h1><span class="adm-on" title="Эти цифры видят только админы"><span class="dot"></span>На сайте: ${L("online")} · В поиске: ${L("searching")} · Матчей: ${L("live")}</span></div><div class="tabs" id="admTabs" style="margin-top:-6px">${ADM_TABS.map(([k,t])=>`<a href="#/admin${k?"/"+k:""}" data-tab="${k}" class="${tab===k?"on":""}">${t}<span class="nb z">0</span></a>`).join("")}</div><p class="muted" style="margin:-6px 0 20px">${sub}</p><div id="adm" class="grid"><div class="card">${skel(3)}</div></div></div>`;entered();paintAdmTabs();
   if(tab==="reports")return admReports();if(tab==="support")return admSupport();if(tab==="shop")return admShop();
   const list=await api("/api/admin/matches").catch(()=>[]);const el=document.getElementById("adm");if(!el)return;
   if(!list.length){el.innerHTML=`<div class="card">${empty("Сейчас нет идущих матчей","Здесь появятся идущие матчи и матчи, где результат оспорили")}</div>`;return}
