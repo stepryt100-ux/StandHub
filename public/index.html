@@ -103,6 +103,11 @@ footer a{display:block;margin:4px 0}footer a:hover{color:#fff}
 .err{color:var(--red);font-size:13px;margin-top:6px;min-height:0}
 .chk{display:flex;gap:10px;align-items:flex-start;margin-top:16px;font-size:14px;color:var(--muted)}
 .chk input{margin-top:4px;accent-color:var(--orange);width:16px;height:16px}
+.fp-l{text-align:right;margin-top:10px;font-size:14px}.fp-l a{color:var(--orange2);font-weight:600}.fp-l a:hover{text-decoration:underline}
+.fp-alt{margin-top:20px;padding:14px;border:1px dashed var(--line);border-radius:6px;display:flex;flex-direction:column;gap:4px;font-size:14px}.fp-alt .btn{align-self:flex-start;margin-top:8px}
+.fp-row{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-top:16px}
+.lnk{background:none;border:0;padding:0;color:var(--orange2);font-weight:600;font-size:14px;cursor:pointer;font-family:inherit}.lnk:disabled{color:var(--muted);cursor:default}.lnk:not(:disabled):hover{text-decoration:underline}
+.acc-c{display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap}.acc-c .btn .ic,.radm .ic{width:16px;height:16px}
 .or{display:flex;align-items:center;gap:12px;color:var(--muted);font-size:13px;margin:20px 0}
 .or::before,.or::after{content:"";flex:1;height:1px;background:var(--line)}
 .social{display:grid;grid-template-columns:1fr 1fr;gap:10px}
@@ -680,8 +685,11 @@ let es;
 function connectLive(){
   if(es)es.close();
   if(location.protocol==="file:"){S.live={online:null};paintLive();return}
-  es=new EventSource(`/api/events?vid=${VID}&token=${S.token||""}`);
-  es.onmessage=e=>{try{onLive(JSON.parse(e.data))}catch(err){console.error(err)}};
+  const tok=S.token;
+  es=new EventSource(`/api/events?vid=${VID}&token=${tok||""}`);
+  es.onmessage=e=>{try{const d=JSON.parse(e.data);
+    if(d.type==="loggedout"){if(S.token&&S.token===tok){dropSession("#/login");toast(d.text)}return} // пароль сменили на другом устройстве
+    onLive(d)}catch(err){console.error(err)}};
   es.onerror=()=>{S.live={online:null,searching:null,live:null};paintLive()};
 }
 function paintLive(){
@@ -702,7 +710,7 @@ function qHint(){
 const L=k=>`<b data-live="${k}">${S.live[k]==null?"—":fmt(S.live[k])}</b>`;
 
 /* ===== Каркас ===== */
-const ICONS={"users":"<circle cx=\"9\" cy=\"8\" r=\"3.6\"/><path d=\"M2.5 20c0-3.7 2.9-5.8 6.5-5.8s6.5 2.1 6.5 5.8z\"/><circle cx=\"16.6\" cy=\"8.8\" r=\"2.9\"/><path d=\"M16.3 13.4c3.2.1 5.2 2.1 5.2 5.4h-4.6c-.1-2.1-.9-3.9-2.3-5.2.5-.1 1.1-.2 1.7-.2z\"/>","home":"<path d=\"M3 11l9-8 9 8v10h-6v-6H9v6H3z\"/>","play":"<path d=\"M7 4l13 8-13 8z\"/>","user":"<circle cx=\"12\" cy=\"8\" r=\"4\"/><path d=\"M4 21c0-4 4-6 8-6s8 2 8 6z\"/>","swords":"<path d=\"M3 3h4l10 10-2 2-2-2-3 3-2-2 3-3zM21 3h-4l-5 5 2 2 1-1 2 2-6 6 2 2 3-3 2 2 2-2-2-2 3-3z\"/>","crown":"<path d=\"M3 7l5 4 4-7 4 7 5-4-2 12H5z\"/>","shield":"<path d=\"M12 2l8 3v6c0 5-3.5 9-8 11-4.5-2-8-6-8-11V5z\"/>","spark":"<path d=\"M12 2l2.4 6.6L21 11l-6.6 2.4L12 20l-2.4-6.6L3 11l6.6-2.4z\"/>","help":"<circle cx=\"12\" cy=\"12\" r=\"10\"/><path d=\"M9.5 9a2.5 2.5 0 115 0c0 2-2.5 2-2.5 4M12 17h0\" stroke=\"#0f0f11\" stroke-width=\"2\" fill=\"none\"/>",
+const ICONS={"lock":"<path fill-rule=\"evenodd\" d=\"M8 10V7a4 4 0 018 0v3h-2V7a2 2 0 00-4 0v3zM5 10h14a1 1 0 011 1v10a1 1 0 01-1 1H5a1 1 0 01-1-1V11a1 1 0 011-1zm7 3.5a1.5 1.5 0 00-.75 2.8V18h1.5v-1.7a1.5 1.5 0 00-.75-2.8z\"/>","users":"<circle cx=\"9\" cy=\"8\" r=\"3.6\"/><path d=\"M2.5 20c0-3.7 2.9-5.8 6.5-5.8s6.5 2.1 6.5 5.8z\"/><circle cx=\"16.6\" cy=\"8.8\" r=\"2.9\"/><path d=\"M16.3 13.4c3.2.1 5.2 2.1 5.2 5.4h-4.6c-.1-2.1-.9-3.9-2.3-5.2.5-.1 1.1-.2 1.7-.2z\"/>","home":"<path d=\"M3 11l9-8 9 8v10h-6v-6H9v6H3z\"/>","play":"<path d=\"M7 4l13 8-13 8z\"/>","user":"<circle cx=\"12\" cy=\"8\" r=\"4\"/><path d=\"M4 21c0-4 4-6 8-6s8 2 8 6z\"/>","swords":"<path d=\"M3 3h4l10 10-2 2-2-2-3 3-2-2 3-3zM21 3h-4l-5 5 2 2 1-1 2 2-6 6 2 2 3-3 2 2 2-2-2-2 3-3z\"/>","crown":"<path d=\"M3 7l5 4 4-7 4 7 5-4-2 12H5z\"/>","shield":"<path d=\"M12 2l8 3v6c0 5-3.5 9-8 11-4.5-2-8-6-8-11V5z\"/>","spark":"<path d=\"M12 2l2.4 6.6L21 11l-6.6 2.4L12 20l-2.4-6.6L3 11l6.6-2.4z\"/>","help":"<circle cx=\"12\" cy=\"12\" r=\"10\"/><path d=\"M9.5 9a2.5 2.5 0 115 0c0 2-2.5 2-2.5 4M12 17h0\" stroke=\"#0f0f11\" stroke-width=\"2\" fill=\"none\"/>",
  "tasks":"<path fill-rule=\"evenodd\" d=\"M7 2h2v2h6V2h2v2h2a2 2 0 012 2v13a2 2 0 01-2 2H5a2 2 0 01-2-2V6a2 2 0 012-2h2zM7.4 13.1l1.5-1.5 2.1 2.1 4.6-4.6 1.5 1.5-6.1 6.1z\"/>",
  "shop":"<path d=\"M3.6 8h16.8l-1.3 13H4.9zM8 8V6.5a4 4 0 018 0V8h-2V6.5a2 2 0 00-4 0V8z\"/>",
  "book":"<path d=\"M5 3.5A1.5 1.5 0 016.5 2H20v15H6.6a1.6 1.6 0 000 3.2H20V22H6.5A2.5 2.5 0 014 19.5v-15c0-.4.4-1 1-1zM8 6v2h8V6z\"/>",
@@ -747,9 +755,10 @@ function toggleMore(force){const m=document.getElementById("more"),bg=document.g
 const closeMore=()=>{const m=document.getElementById("more");if(m&&m.classList.contains("show"))toggleMore(false)};
 document.getElementById("moreBg").onclick=()=>closeMore();
 document.getElementById("more").addEventListener("click",e=>{if(e.target.closest("a[href^='#/']"))closeMore()});
-async function logout(){S.searching=false;stopQTimer();try{await api("/api/logout",{method:"POST"})}catch{}
+async function logout(){S.searching=false;stopQTimer();try{await api("/api/logout",{method:"POST"})}catch{}dropSession()}
+function dropSession(to="#/"){S.searching=false;stopQTimer();
   S.token=null;S.user=null;S.match=null;S.lobbyMs=null;S.fr=null;S.party=null;S.psent=[];S.pinv=[];S.pSeen=false;S.tasks=null;S.ban=null;S.misses=0;S.badges={};S.chat=null;S.sup=null;
-  frBadge();paintBadges();paintPInv();closeInvite();closeAccept();closeX();closeMore();localStorage.removeItem("sh_token");connectLive();if(curHash()==="/")route();else location.hash="#/"}
+  frBadge();paintBadges();paintPInv();closeInvite();closeAccept();closeX();closeMore();localStorage.removeItem("sh_token");connectLive();if(location.hash===to||curHash()===to.slice(1))route();else location.hash=to}
 document.addEventListener("click",e=>{if(!e.target.closest("[data-logout]"))return;e.preventDefault();logout()});
 // монеты и значки в меню
 function paintCoins(){const t=fmt(S.tasks?S.tasks.coins:0);document.querySelectorAll("[data-coins]").forEach(el=>{if(el.textContent===t)return;const was=el.textContent;el.textContent=t;const c=el.closest(".coins");if(c&&was&&!RM()){c.classList.remove("bump");void c.offsetWidth;c.classList.add("bump")}});paintBadges()}
@@ -769,7 +778,7 @@ function toast(t){const e=document.getElementById("toast");e.textContent=t;e.cla
 function needAuth(){if(!S.user){location.hash="#/login";toast("Войдите, чтобы продолжить");return true}return false}
 function empty(title,text,btn){return `<div class="empty"><div class="empty-ic">${ic("crown")}</div><b>${title}</b><p class="muted">${text}</p>${btn||""}</div>`}
 /* ===== Анимации ===== */
-const APP_V="1.6";
+const APP_V="1.7";
 // анимации включены всегда; выключить можно кнопкой «Анимации» (меню слева / низ главной)
 const RM=()=>document.documentElement.classList.contains("no-motion");
 function paintMotion(){document.querySelectorAll("[data-motion] b").forEach(b=>b.textContent=RM()?"выкл":"вкл")}
@@ -869,12 +878,14 @@ function pageAuth(type){
    <div class="field"><label for="soid">Игровой ID в StandLeo</label><input id="soid" inputmode="numeric" placeholder="123456789"><div class="err" id="e-soid"></div></div>`:""}
    <div class="field"><label for="email">Email</label><input id="email" type="email" autocomplete="email" placeholder="you@mail.ru"><div class="err" id="e-email"></div></div>
    <div class="field"><label for="pw">Пароль</label><input id="pw" type="password" autocomplete="${reg?"new-password":"current-password"}" placeholder="••••••••"><div class="err" id="e-pw"></div></div>
+   ${reg?"":`<div class="fp-l"><a href="#/forgot" id="fpLink">Забыли пароль?</a></div>`}
    ${reg?`<div class="field"><label for="region">Регион</label><select id="region"><option>Европа</option><option>СНГ</option></select></div>
    <label class="chk"><input type="checkbox" id="tos"> <span>Я принимаю условия использования и правила античита StandHub</span></label><div class="err" id="e-tos"></div>`:""}
    <button class="btn btn-o btn-lg" style="width:100%;margin-top:20px" type="submit">${reg?"Зарегистрироваться":"Войти"}</button>
    <p class="muted" style="text-align:center;margin-top:20px;font-size:14px">${reg?'Уже есть аккаунт? <a href="#/login" style="color:var(--orange)">Войти</a>':'Нет аккаунта? <a href="#/register" style="color:var(--orange)">Регистрация</a>'}</p>
   </form></div>`;
   entered();
+  const fl=document.getElementById("fpLink");if(fl)fl.onclick=()=>{const e=document.getElementById("email").value.trim();if(e)sessionStorage.setItem("sh_fp_login",e)};
   document.getElementById("f").onsubmit=async e=>{
     e.preventDefault();const v=id=>(document.getElementById(id)||{}).value?.trim()||"";
     const set=(id,m)=>{const el=document.getElementById("e-"+id);if(el)el.textContent=m};
@@ -918,6 +929,107 @@ function pageVerify(){
       else if(r.linked){document.getElementById("vstatus").innerHTML='<span class="dot" style="background:var(--orange)"></span>Бот на связи — пришлите ему скриншот экрана «Мой профиль»'}
     }catch{}
   },3000);
+}
+
+/* ===== Восстановление и смена пароля ===== */
+// код приходит в Telegram — в чат с ботом, через которого подтверждали аккаунт
+async function botName(){if(S.bot===undefined){try{S.bot=(await api("/api/health")).bot||null}catch{return null}}return S.bot}
+function paintBot(){botName().then(b=>{document.querySelectorAll("[data-botl]").forEach(a=>{if(b)a.href=`https://t.me/${b}${a.dataset.botl}`;a.classList.toggle("hid",!b)});document.querySelectorAll("[data-botn]").forEach(x=>x.textContent=b?"ботом @"+b:"ботом StandHub")})}
+function loginWith(r,msg){S.token=r.token;S.user=r.user;localStorage.setItem("sh_token",r.token);connectLive();toast(msg);location.hash="#/lobby"}
+const pwFields=()=>`<div class="field"><label for="pw">Новый пароль</label><input id="pw" type="password" autocomplete="new-password" placeholder="Минимум 6 символов"><div class="err" id="e-pw"></div></div>
+   <div class="field"><label for="pw2">Повторите пароль</label><input id="pw2" type="password" autocomplete="new-password" placeholder="Ещё раз новый пароль"><div class="err" id="e-pw2"></div></div>`;
+// ошибки — под полем, а если такого поля нет — всплывающим сообщением
+function fErr(){const set=(id,m)=>{const el=document.getElementById("e-"+id);if(el)el.textContent=m;return !!el};
+  return {set,clear:ids=>ids.forEach(k=>set(k,"")),show:err=>{if(!(err.field&&set(err.field,err.message)))toast(err.message)},
+    pw:()=>{const a=document.getElementById("pw").value,b=document.getElementById("pw2").value;if(a.length<6){set("pw","Минимум 6 символов");return null}if(a!==b){set("pw2","Пароли не совпадают");return null}return a}}}
+let fpTick=null;
+const fpSt=(login,r)=>({login,next:Date.now()+(r.wait||0)*1000,exp:Date.now()+(r.ttl||1800)*1000});
+function pageForgot(){
+  clearInterval(fpTick);
+  const st=JSON.parse(sessionStorage.getItem("sh_fp")||"null");
+  if(st&&st.exp>Date.now())return fpCode(st);
+  sessionStorage.removeItem("sh_fp");
+  app.innerHTML=`<div class="auth"><form class="card" id="fpf" novalidate>
+   <div class="tag">Шаг 1 из 2</div>
+   <h1 style="margin-top:6px">Восстановление пароля</h1>
+   <p class="muted">Пришлём код в Telegram — в чат с <span data-botn>ботом StandHub</span>, через которого вы подтверждали аккаунт.</p>
+   <div class="field"><label for="fpl">Email или ник</label><input id="fpl" autocomplete="username" placeholder="you@mail.ru или ваш ник" value="${esc(sessionStorage.getItem("sh_fp_login")||(S.user&&S.user.email)||"")}"><div class="err" id="e-login"></div></div>
+   <button class="btn btn-o btn-lg" style="width:100%;margin-top:20px" type="submit">Получить код</button>
+   <div class="fp-alt"><b>Не помните email?</b><span class="muted">Напишите боту команду /password — он покажет email для входа и пришлёт ссылку для нового пароля.</span><a class="btn btn-g btn-sm hid" data-botl="?start=reset" target="_blank" rel="noopener">Открыть бота</a></div>
+   <p class="muted" style="text-align:center;margin-top:20px;font-size:14px">Вспомнили пароль? <a href="#/login" style="color:var(--orange)">Войти</a></p>
+  </form></div>`;
+  entered();paintBot();
+  const f=document.getElementById("fpf"),E=fErr();
+  f.onsubmit=async e=>{e.preventDefault();E.clear(["login"]);const l=document.getElementById("fpl").value.trim();if(!l)return E.set("login","Введите email или ник");
+    const b=f.querySelector("[type=submit]");b.disabled=true;
+    try{const r=await api("/api/forgot",{method:"POST",body:JSON.stringify({login:l})});sessionStorage.setItem("sh_fp_login",l);fpCode(fpSt(l,r));toast("Код отправлен в Telegram")}
+    catch(err){b.disabled=false;if(err.sent){fpCode(fpSt(l,err));return toast(err.message)}E.show(err)}};
+}
+function fpCode(st){
+  sessionStorage.setItem("sh_fp",JSON.stringify(st));
+  app.innerHTML=`<div class="auth"><form class="card" id="fpf2" novalidate>
+   <div class="tag">Шаг 2 из 2</div>
+   <h1 style="margin-top:6px">Введите код</h1>
+   <p class="muted">Код отправлен в Telegram — в чат с <span data-botn>ботом StandHub</span>. Аккаунт: <b style="color:#fff">${esc(st.login)}</b></p>
+   <a class="btn btn-g hid" style="width:100%;margin-top:16px" data-botl="" target="_blank" rel="noopener">Открыть Telegram</a>
+   <input class="sr" tabindex="-1" aria-hidden="true" autocomplete="username" value="${esc(st.login)}">
+   <div class="field"><label for="fpc">Код из Telegram</label><input id="fpc" inputmode="numeric" autocomplete="one-time-code" maxlength="6" placeholder="6 цифр"><div class="err" id="e-code"></div></div>
+   ${pwFields()}
+   <button class="btn btn-o btn-lg" style="width:100%;margin-top:20px" type="submit">Сменить пароль</button>
+   <div class="fp-row"><button type="button" class="lnk" id="fpRe"></button><button type="button" class="lnk" id="fpBack">Другой email или ник</button></div>
+  </form></div>`;
+  entered();paintBot();
+  const re=document.getElementById("fpRe"),f=document.getElementById("fpf2"),E=fErr();
+  const tick=()=>{if(!document.body.contains(re))return clearInterval(fpTick);const s=Math.ceil((st.next-Date.now())/1000);re.disabled=s>0;re.textContent=s>0?`Отправить код ещё раз · ${s} с`:"Отправить код ещё раз"};
+  clearInterval(fpTick);fpTick=setInterval(tick,1000);tick();
+  const keep=r=>{Object.assign(st,fpSt(st.login,r));sessionStorage.setItem("sh_fp",JSON.stringify(st));tick()};
+  re.onclick=async()=>{re.disabled=true;try{keep(await api("/api/forgot",{method:"POST",body:JSON.stringify({login:st.login})}));toast("Код отправлен ещё раз")}catch(err){if(err.wait)keep(err);else tick();toast(err.message)}};
+  document.getElementById("fpBack").onclick=()=>{sessionStorage.removeItem("sh_fp");pageForgot()};
+  f.onsubmit=async e=>{e.preventDefault();E.clear(["code","pw","pw2"]);
+    const code=document.getElementById("fpc").value.replace(/\D/g,"");if(code.length!==6)return E.set("code","Введите 6 цифр из сообщения бота");
+    const pw=E.pw();if(!pw)return;
+    const b=f.querySelector("[type=submit]");b.disabled=true;
+    try{const r=await api("/api/reset",{method:"POST",body:JSON.stringify({login:st.login,code,pw})});sessionStorage.removeItem("sh_fp");sessionStorage.removeItem("sh_fp_login");clearInterval(fpTick);loginWith(r,"Пароль изменён — вы вошли в аккаунт")}
+    catch(err){b.disabled=false;if(err.expired){st.next=Date.now();sessionStorage.setItem("sh_fp",JSON.stringify(st));tick()}E.show(err)}};
+}
+// ссылка из Telegram: сразу новый пароль
+async function pageReset(tok){
+  const h0=location.hash;
+  app.innerHTML=`<div class="auth"><div class="card">${skel(3)}</div></div>`;
+  let r;try{r=await api("/api/reset/check?token="+encodeURIComponent(tok||""))}
+  catch{if(location.hash===h0){app.innerHTML=`<div class="auth"><div class="card">${empty("Ссылка устарела","Ссылка для нового пароля действует 30 минут и работает один раз. Запросите новую — это быстро.",`<a class="btn btn-o" href="#/forgot">Восстановить пароль</a>`)}</div></div>`;entered()}return}
+  if(location.hash!==h0)return;
+  app.innerHTML=`<div class="auth"><form class="card" id="rsf" novalidate>
+   <h1>Новый пароль</h1>
+   <p class="muted">Аккаунт <b style="color:#fff">${esc(r.nick)}</b> · вход по email <b style="color:#fff">${esc(r.email)}</b></p>
+   <input class="sr" tabindex="-1" aria-hidden="true" autocomplete="username" value="${esc(r.email)}">
+   ${pwFields()}
+   <button class="btn btn-o btn-lg" style="width:100%;margin-top:20px" type="submit">Сохранить пароль</button>
+   <p class="muted" style="text-align:center;margin-top:16px;font-size:13px">На других устройствах нужно будет войти заново — уже с новым паролем.</p>
+  </form></div>`;
+  entered();
+  const f=document.getElementById("rsf"),E=fErr();
+  f.onsubmit=async e=>{e.preventDefault();E.clear(["pw","pw2"]);const pw=E.pw();if(!pw)return;const b=f.querySelector("[type=submit]");b.disabled=true;
+    try{const x=await api("/api/reset",{method:"POST",body:JSON.stringify({token:tok,pw})});sessionStorage.removeItem("sh_fp");loginWith(x,"Пароль изменён — вы вошли в аккаунт")}
+    catch(err){b.disabled=false;if(err.expired)return pageReset(tok);E.show(err)}};
+}
+// смена пароля в профиле: нужен текущий пароль
+function pagePassword(){
+  if(needAuth())return;
+  app.innerHTML=`<div class="auth"><form class="card" id="cpf" novalidate>
+   <h1>Сменить пароль</h1>
+   <p class="muted">Аккаунт <b style="color:#fff">${esc(S.user.nick)}</b>. После смены на других устройствах нужно будет войти заново.</p>
+   <input class="sr" tabindex="-1" aria-hidden="true" autocomplete="username" value="${esc(S.user.email||S.user.nick)}">
+   <div class="field"><label for="old">Текущий пароль</label><input id="old" type="password" autocomplete="current-password" placeholder="••••••••"><div class="err" id="e-old"></div></div>
+   ${pwFields()}
+   <button class="btn btn-o btn-lg" style="width:100%;margin-top:20px" type="submit">Сохранить пароль</button>
+   <p class="muted" style="text-align:center;margin-top:16px;font-size:14px">Не помните текущий пароль? <a href="#/forgot" style="color:var(--orange)">Восстановить через Telegram</a></p>
+  </form></div>`;
+  entered();
+  const f=document.getElementById("cpf"),E=fErr();
+  f.onsubmit=async e=>{e.preventDefault();E.clear(["old","pw","pw2"]);const old=document.getElementById("old").value;if(!old)return E.set("old","Введите текущий пароль");const pw=E.pw();if(!pw)return;
+    const b=f.querySelector("[type=submit]");b.disabled=true;
+    try{const r=await api("/api/password",{method:"POST",body:JSON.stringify({old,pw})});S.user=r.user;toast("Пароль изменён");location.hash="#/profile"}catch(err){b.disabled=false;E.show(err)}};
 }
 
 /* ===== Друзья ===== */
@@ -1251,7 +1363,7 @@ async function pageProfile(name){
   app.innerHTML=`<div class="wrap">
    <div class="phead">${own?`<label class="ava-edit" title="Сменить аватар">${ava(p.nick,p.avatar)}<span class="ava-cam" aria-hidden="true"><svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M9 4l-2 2H4a1 1 0 00-1 1v12a1 1 0 001 1h16a1 1 0 001-1V7a1 1 0 00-1-1h-3l-2-2zm3 4.5A4.5 4.5 0 1112 17.5 4.5 4.5 0 0112 8.5z"/></svg></span><input type="file" accept="image/png,image/jpeg,image/webp" id="avaIn" class="sr" aria-label="Сменить аватар"></label>`:ava(p.nick,p.avatar)}
      <div><div class="flag">${esc(p.region)} · На StandHub с ${new Date(p.created).toLocaleDateString("ru-RU")}</div><h1>${esc(p.nick)}</h1>
-       <div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap;align-items:center"><span class="chip on" style="height:28px;font-size:12px;display:inline-flex;align-items:center">StandLeo</span>${p.commends?`<span class="pill cmd" title="Столько раз игроки сказали «Спасибо» после матчей">👍 ${fmt(p.commends)} «Спасибо»</span>`:""}${own?"":frBtn(p.nick,true)}</div></div>
+       <div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap;align-items:center"><span class="chip on" style="height:28px;font-size:12px;display:inline-flex;align-items:center">StandLeo</span>${p.commends?`<span class="pill cmd" title="Столько раз игроки сказали «Спасибо» после матчей">👍 ${fmt(p.commends)} «Спасибо»</span>`:""}${own?"":frBtn(p.nick,true)}${!own&&S.user&&S.user.admin?`<button class="btn btn-g btn-sm radm" data-rlink title="Для игрока, у которого нет доступа к Telegram">${ic("lock")}Ссылка для смены пароля</button>`:""}</div></div>
      <div class="elo-box">${badge(p.elo,"xl")}<div class="elo-prog"><div class="muted" style="font-size:12px;font-weight:700;text-transform:uppercase">Уровень ${l}</div><div class="v"><span data-count="${p.elo}">${p.elo}</span> <span class="muted" style="font-size:14px">ELO</span></div>
        <div class="bar"><div style="width:${lvlPct(p.elo)}%"></div></div><div class="muted" style="font-size:12px">${l<10?`${TH[l]} — ${TH[l+1]-1}`:"Уровень 10 · 2001+"}</div></div></div>
    </div>
@@ -1260,8 +1372,11 @@ async function pageProfile(name){
    </div>
    ${none?`<div class="card" style="margin-top:16px">${empty("Матчей пока нет",(S.user&&S.user.nick===p.nick?"Сыграйте первый матч — здесь появятся график ELO, статистика по картам и история игр.":"Этот игрок ещё не сыграл ни одного матча."),S.user&&S.user.nick===p.nick?`<a class="btn btn-o" href="#/lobby">Найти матч</a>`:"")}</div>`:
    `<div class="card" style="margin-top:16px"><div class="thead"><b>История матчей</b></div><div class="scroll">${matchTable(ms,p.nick)}</div></div>`}
+   ${own?`<div class="card pad acc-c" style="margin-top:16px"><div><b>Аккаунт</b><div class="muted" style="font-size:14px;margin-top:4px">Вход по email: <b style="color:#fff">${esc(p.email||"")}</b></div></div><a class="btn btn-g" href="#/password">${ic("lock")}Сменить пароль</a></div>`:""}
   </div>`;
   const inp=document.getElementById("avaIn");if(inp)inp.onchange=()=>uploadAvatar(inp.files[0]);
+  const rl=document.querySelector("[data-rlink]");if(rl)rl.onclick=async()=>{if(!confirm(`Создать ссылку для смены пароля игрока ${p.nick}? Отправляйте её только самому игроку — когда убедитесь, что аккаунт его.`))return;
+    try{const r=await api("/api/admin/reset-link",{method:"POST",body:JSON.stringify({nick:p.nick})});prompt("Ссылка для смены пароля (действует 24 часа). Скопируйте и отправьте игроку:",r.link)}catch(e){toast(e.message)}};
   entered();bind();
 }
 function matchTable(list,nick){
@@ -1561,19 +1676,20 @@ function pageRules(sec){
   app.innerHTML=`<div class="wrap"><h1 class="h">Правила StandHub</h1><div class="doc">
    <p class="lead">Играем честно и уважаем друг друга. За нарушения — ограничения поиска матчей.</p>
    <div class="doc-nav"><a href="#/rules/account">Аккаунт</a><a href="#/rules/accept">Принятие матча</a><a href="#/rules/match">Матч</a><a href="#/rules/anticheat">Античит</a><a href="#/rules/penalties">Наказания</a><a href="#/rules/privacy">Конфиденциальность</a></div>
-   <div class="card" id="r-account"><h2>${ic("user")}Аккаунт</h2>${li(["Один игрок — один аккаунт. Привязывайте только свой игровой ID.","Аккаунт подтверждается скриншотом экрана «Мой профиль» через Telegram-бота.","Нельзя играть с чужого аккаунта или давать играть другим со своего (бустинг)."])}</div>
+   <div class="card" id="r-account"><h2>${ic("user")}Аккаунт</h2>${li(["Один игрок — один аккаунт. Привязывайте только свой игровой ID.","Аккаунт подтверждается скриншотом экрана «Мой профиль» через Telegram-бота.","Забыли пароль — на странице входа нажмите «Забыли пароль?»: код придёт от нашего Telegram-бота. Не помните email — напишите боту /password.","Нельзя играть с чужого аккаунта или давать играть другим со своего (бустинг)."])}</div>
    <div class="card" id="r-accept"><h2>${ic("play")}Поиск и принятие матча</h2>${li(["Найденный матч нужно принять за <b>15 секунд</b>. Не приняли или отклонили — штраф: поиск матчей закрывается на время.","Пропуски считаются за последние 24 часа. Тестовые матчи не считаются.","Если сайт обновлялся, пока шло принятие, — штрафа нет."])}
      <div class="pen"><div><span>1-й пропуск за сутки</span><b>Предупреждение</b></div><div><span>2-й пропуск</span><b>Поиск закрыт на 5 минут</b></div><div><span>3-й пропуск</span><b>30 минут</b></div><div><span>4-й и дальше</span><b>2 часа</b></div></div></div>
    <div class="card" id="r-match"><h2>${ic("swords")}Матч</h2>${li(["Хост создаёт лобби в StandLeo на выбранной карте — 13 раундов до победы.","Игроки находят хоста по ID и пишут ему «.» в личные сообщения — он приглашает в лобби.","Играйте за свою команду до конца матча. Уходить из матча нельзя.","Если лобби так и не собралось — проголосуйте «Матч не состоялся», ELO не изменится.","После игры капитаны загружают честный скриншот итогового экрана. Подделка результата — запрет поиска."])}</div>
    <div class="card" id="r-anticheat"><h2>${ic("shield")}Античит и честная игра</h2>${li(["Запрещены читы, макросы, изменённые версии игры и любые программы, дающие преимущество.","Запрещены договорные матчи и намеренный проигрыш.","Запрещены оскорбления, угрозы, спам и реклама — в том числе в чате матча.","Заметили нарушение — после матча нажмите «Жалоба» рядом с игроком в комнате матча. Администратор проверит."])}</div>
    <div class="card" id="r-penalties"><h2>${ic("crown")}Наказания</h2>${li(["Предупреждение или запрет поиска матчей на 1 день или на 7 дней — решает администратор.","За серьёзные и повторные нарушения ограничения могут быть дольше.","Считаете наказание ошибкой — напишите в <a href='#/support' style='color:var(--orange2)'>поддержку</a>."])}</div>
-   <div class="card" id="r-privacy"><h2>${ic("help")}Конфиденциальность</h2>${li(["Мы храним ник, email, игровой ID, регион, аватар, историю матчей и Telegram-чат для уведомлений.","Скриншоты профиля и результатов только распознаются и нигде не сохраняются.","Пароль хранится в зашифрованном виде.","Мы не передаём ваши данные третьим лицам."])}</div>
+   <div class="card" id="r-privacy"><h2>${ic("help")}Конфиденциальность</h2>${li(["Мы храним ник, email, игровой ID, регион, аватар, историю матчей и Telegram-чат для уведомлений и восстановления пароля.","Скриншоты профиля и результатов только распознаются и нигде не сохраняются.","Пароль хранится в зашифрованном виде.","Мы не передаём ваши данные третьим лицам."])}</div>
   </div></div>`;entered();
   const t=sec&&document.getElementById("r-"+sec);if(t){setTimeout(()=>{t.scrollIntoView({behavior:RM()?"auto":"smooth",block:"start"});t.classList.add("hl")},60)}
 }
 /* ===== Поддержка ===== */
 const TOPICS={question:"Вопрос",match:"Проблема с матчем",account:"Аккаунт и подтверждение",player:"Жалоба на игрока",idea:"Предложение",other:"Другое"};
 const FAQ=[["Бот не принимает скриншот профиля","Нужен скриншот экрана «Мой профиль» (вкладка «Общее») целиком, без обрезки — с надписью «Мой профиль» и вашим ID. Чужой профиль («Профиль друга») не подходит. Если ID не читается, отправьте скриншот боту как файл, без сжатия."],
+ ["Забыл пароль или email","На странице входа нажмите «Забыли пароль?» — код придёт в Telegram от нашего бота (того, через которого вы подтверждали аккаунт). Не помните email — напишите боту команду /password: он покажет email для входа и пришлёт ссылку для нового пароля."],
  ["Почему у меня закрыт поиск матчей?","Скорее всего, вы не приняли несколько найденных матчей за сутки. 1-й пропуск — предупреждение, 2-й — 5 минут, 3-й — 30 минут, дальше — 2 часа. Сколько осталось, видно в «Играть»."],
  ["Как зайти в матч?","Когда карта выбрана, в комнате матча появится ID хоста. Найдите его в StandLeo, напишите «.» в личные сообщения — хост пригласит вас в лобби."],
  ["Засчитали неверный результат","Если капитаны прислали разные результаты, матч проверит администратор. Если результат уже засчитан неверно — напишите сюда и укажите номер матча (он есть в комнате матча)."],
@@ -1599,7 +1715,7 @@ function pageSupport(){
       <div><label for="supM">Номер матча <span style="font-weight:400">(если вопрос о матче)</span></label><input id="supM" maxlength="20" placeholder="например, 3fa9c01b2d" autocomplete="off"></div></div>
      <div><label for="supX">Сообщение</label><textarea class="txa" id="supX" maxlength="1500" rows="5" placeholder="Опишите, что случилось. Ответ придёт сюда и в Telegram."></textarea></div>
      <div><button class="btn btn-o" type="submit">Отправить</button></div></form></div>`
-    :`<div class="card">${empty("Нужен аккаунт","Войдите, чтобы написать в поддержку — ответ придёт сюда и в Telegram.",`<a class="btn btn-o" href="#/login">Войти</a>`)}</div>`}
+    :`<div class="card">${empty("Нужен аккаунт","Войдите, чтобы написать в поддержку — ответ придёт сюда и в Telegram. Забыли пароль — восстановите его через Telegram-бота.",`<div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center"><a class="btn btn-o" href="#/login">Войти</a><a class="btn btn-g" href="#/forgot">Забыли пароль?</a></div>`)}</div>`}
    <div class="card faq"><h2>${ic("book")}Частые вопросы</h2>${FAQ.map(([q,a])=>`<details><summary>${q}</summary><p>${a}</p></details>`).join("")}</div>
   </div></div>`;entered();
   if(!u)return;
@@ -1645,6 +1761,7 @@ function route(){
   const h=location.hash.slice(1)||"/";const [,a,b]=h.split("/");
   renderChrome("/"+(a||""));window.scrollTo(0,0);clearInterval(matchPoll);closeInvite();closeX();closeMore();
   if(!a)pageHome();else if(a==="login")pageAuth("login");else if(a==="register")pageAuth("register");else if(a==="verify")pageVerify();
+  else if(a==="forgot")pageForgot();else if(a==="reset")pageReset(b);else if(a==="password")pagePassword();
   else if(a==="lobby")pageLobby();else if(a==="profile")pageProfile();else if(a==="player")pageProfile(decodeURIComponent(b));
   else if(a==="friends")pageFriends();else if(a==="matches")pageMatches();else if(a==="match")pageMatch(b);else if(a==="leaderboard")pageLeaderboard();else if(a==="admin")pageAdmin(b);
   else if(a==="tasks")pageTasks();else if(a==="shop")pageShop();else if(a==="rules")pageRules(b);else if(a==="support")pageSupport();else pageHome();

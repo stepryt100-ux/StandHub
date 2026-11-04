@@ -29,12 +29,19 @@ const pendingInfo = u => ({ pending: true, code: u.vcode, bot: botUsername, nick
 // администраторы: ники через запятую в переменной ADMIN_NICKS (в Railway → Variables). По умолчанию — владелец сайта Kartez.
 const ADMINS = (process.env.ADMIN_NICKS || 'Kartez').split(',').map(s => s.trim().toLowerCase()).filter(Boolean);
 const isAdmin = u => !!u && ADMINS.includes(u.nick.toLowerCase());
-const meOf = u => ({ ...pub(u), admin: isAdmin(u) });
+const meOf = u => ({ ...pub(u), email: u.email, admin: isAdmin(u) });
 
 // ---------- онлайн (реальные подключения) ----------
 const clients = new Map(); // res -> {visitorId, userId}
 let match = null; // модуль матчей (подключается ниже)
 const sse = (r, obj) => r.write(`data: ${JSON.stringify(obj)}\n\n`);
+const newSession = u => { const t = crypto.randomBytes(24).toString('hex'); sessions.set(t, u.id); return t; };
+// пароль сменили — выходим из аккаунта на всех устройствах, кроме текущего (keep); открытые вкладки узнают об этом сразу
+function dropSessions(uid, keep) {
+  for (const [t, id] of Object.entries(db.sessions)) if (id === uid && t !== keep) delete db.sessions[t];
+  save();
+  for (const [r, c] of clients) if (c.userId === uid && c.token !== keep) { sse(r, { type: 'loggedout', text: 'Пароль от аккаунта изменён — войдите заново' }); c.userId = null; }
+}
 function stats() { const v = new Set([...clients.values()].map(c => c.visitorId)); return { type: 'stats', online: v.size, searching: match ? match.searching() : 0, modes: match ? match.searchingBy() : {}, live: match ? match.liveCount() : 0 }; }
 let bTimer = null; // рассылаем счётчики не чаще раза в 150 мс
 function broadcast() { if (bTimer) return; bTimer = setTimeout(() => { bTimer = null; const d = `data: ${JSON.stringify(stats())}\n\n`; for (const r of clients.keys()) r.write(d); }, 150); }
@@ -135,6 +142,8 @@ function linkChat(chatId, code) {
 async function handlePhoto(msg) {
   const chatId = msg.chat.id;
   const u = db.users.find(x => x.tgChat === chatId && !x.verified);
+  const done = !u && verified().find(x => x.tgChat === chatId);
+  if (done) return say(chatId, `✅ Аккаунт <b>${escH(done.nick)}</b> уже подтверждён — скриншоты профиля больше не нужны.\n\nЗабыли пароль? Отправьте /password`);
   if (!u) return say(chatId, 'Сначала зарегистрируйтесь на сайте и нажмите кнопку «Открыть бота» на странице подтверждения, или пришлите сюда 6-значный код с сайта.\n' + go('/#/register'));
   if (botBusy.has(chatId)) return say(chatId, '⏳ Ещё проверяю предыдущий скриншот — подождите несколько секунд.');
   botBusy.add(chatId);
@@ -172,14 +181,19 @@ async function onUpdate(upd) {
   const msg = upd.message; if (!msg || msg.chat.type !== 'private') return;
   const text = (msg.text || '').trim();
   if (msg.photo || (msg.document && /^image\//.test(msg.document.mime_type || ''))) return handlePhoto(msg);
+  if (account.isCmd(text)) return account.botReset(msg.chat.id);
   const m = text.match(/^\/start\s+(\d{6})$/) || text.match(/^(\d{6})$/);
   if (m) return linkChat(msg.chat.id, m[1]);
+  const mine = verified().filter(x => x.tgChat === msg.chat.id);
+  if (mine.length && !db.users.some(x => !x.verified && x.tgChat === msg.chat.id))
+    return say(msg.chat.id, `👋 Это бот <b>StandHub</b>. Аккаунт ${mine.map(x => `<b>${escH(x.nick)}</b>`).join(', ')} подтверждён — сюда приходят уведомления о матчах, друзьях и ответы поддержки.\n\n🔑 Забыли пароль или email? Отправьте /password\n${go('/#/lobby')}`);
   return say(msg.chat.id, `Привет! Это бот подтверждения аккаунтов <b>StandHub</b>.\n\n1. Зарегистрируйтесь на сайте ${siteA('/#/register')}\n2. Нажмите «Открыть бота» или пришлите сюда 6-значный код с сайта\n3. Пришлите скриншот экрана «Мой профиль» из StandLeo — весь экран, чтобы был виден ваш ID`);
 }
 async function startBot() {
   if (!TG_TOKEN) return console.log('TELEGRAM_BOT_TOKEN не задан — бот выключен');
   const me = await tg('getMe', {}); if (!me.ok) return console.error('Бот: неверный токен', me);
   botUsername = me.result.username; console.log('Бот запущен: @' + botUsername);
+  tg('setMyCommands', { commands: [{ command: 'password', description: 'Забыли пароль? Ссылка для нового пароля' }] }).catch(() => {});
   await tg('deleteWebhook', {});
   let offset = 0;
   for (;;) {
@@ -194,6 +208,8 @@ const tgUser = (uid, text) => { const u = db.users.find(x => x.id === uid); if (
 const adminUsers = () => db.users.filter(u => u.verified && isAdmin(u));
 const alertAdmins = text => adminUsers().forEach(u => tgUser(u.id, text));
 
+// ---------- пароль: восстановление через Telegram и смена в профиле ----------
+const account = require('./account')({ db, save, hash, check, say, escH, siteUrl: SITE_URL, bot: () => botUsername, newSession, dropSessions, meOf });
 // ---------- ежедневные задания и монеты ----------
 const tasks = require('./tasks')({ db, save, sendTo });
 // ---------- матчи ----------
@@ -230,7 +246,7 @@ http.createServer(async (req, res) => {
   if (p === '/api/events') {
     res.writeHead(200, { 'Content-Type': 'text/event-stream', 'Cache-Control': 'no-cache', Connection: 'keep-alive', 'X-Accel-Buffering': 'no' });
     const userId = sessions.get(url.searchParams.get('token')) || null;
-    clients.set(res, { visitorId: url.searchParams.get('vid') || crypto.randomUUID(), userId });
+    clients.set(res, { visitorId: url.searchParams.get('vid') || crypto.randomUUID(), userId, token: userId ? url.searchParams.get('token') : null });
     if (userId) { sse(res, party.state(userId)); sse(res, stateOf(userId)); sse(res, friends.state(userId)); sse(res, tasks.state(userId)); sse(res, badges(userId)); party.touch(userId); }
     sse(res, stats()); broadcast();
     // закрыл сайт — через 20 секунд убираем из поиска (если не вернулся); если искало пати — поиск останавливается у всех
@@ -271,8 +287,19 @@ http.createServer(async (req, res) => {
     const u = db.users.find(x => x.email === email && x.verified) || db.users.find(x => x.email === email);
     if (!u || !check(String(b.pw || ''), u.pw)) return send(res, 401, { field: 'pw', error: 'Неверный email или пароль' });
     if (!u.verified) return send(res, 403, { ...pendingInfo(u), error: 'Аккаунт ещё не подтверждён' });
-    const token = crypto.randomBytes(24).toString('hex'); sessions.set(token, u.id);
-    return send(res, 200, { token, user: meOf(u) });
+    return send(res, 200, { token: newSession(u), user: meOf(u) });
+  }
+  // ---------- восстановление и смена пароля ----------
+  if (p === '/api/forgot' && req.method === 'POST') { const { status, ...r } = await account.forgot((await body(req, 2e3)).login); return send(res, status || 200, r); }
+  if (p === '/api/reset/check') { const r = account.checkToken(url.searchParams.get('token')); return send(res, r.error ? 400 : 200, r); }
+  if (p === '/api/reset' && req.method === 'POST') { const r = account.reset(await body(req, 2e3)); return send(res, r.error ? 400 : 200, r); }
+  if (p === '/api/password' && req.method === 'POST') {
+    const u = authUser(req); if (!u) return send(res, 401, { error: 'Войдите в аккаунт' });
+    const r = account.change(u, await body(req, 2e3), (req.headers.authorization || '').replace('Bearer ', '')); return send(res, r.error ? 400 : 200, r);
+  }
+  if (p === '/api/admin/reset-link' && req.method === 'POST') {
+    const u = authUser(req); if (!isAdmin(u)) return send(res, 403, { error: 'Только для администратора' });
+    const r = account.adminLink((await body(req, 2e3)).nick); return send(res, r.error ? 400 : 200, r);
   }
   if (p === '/api/me') { const u = authUser(req); return u ? send(res, 200, meOf(u)) : send(res, 401, { error: 'Не авторизован' }); }
   if (p === '/api/me/state') { const u = authUser(req); return u ? send(res, 200, stateOf(u.id)) : send(res, 401, { error: 'Не авторизован' }); }
