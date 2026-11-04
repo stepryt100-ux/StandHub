@@ -38,7 +38,7 @@ module.exports = function ({ db, save, sendTo, sendAll, tell, alertAdmins, go, e
     const o = { id: crypto.randomBytes(6).toString('hex'), uid: u.id, item: id, code, price: c.price, at: Date.now() };
     S.orders.push(o); save();
     onCoins(u.id); pushAll();
-    tell(u.id, `🛒 <b>Покупка в магазине StandHub</b>\n${escH(it.full)} — ${c.price} монет\n\nВаш промокод:\n<code>${escH(code)}</code>\n\nАктивируйте его в игре StandLeo. Код всегда можно найти на сайте в «Мои покупки»:\n${go('/#/shop')}`);
+    tell(u.id, `🛒 <b>Покупка в магазине StandHub</b>\n${escH(it.full)} — ${c.price} монет\n\nВаш промокод:\n<code>${escH(code)}</code>\n(нажмите на код — он скопируется)\n\n<b>Как активировать:</b>\n1. Зайдите в StandLeo\n2. На главном экране нажмите «События»\n3. Откройте «Секретный код» и вставьте промокод\n\nКод всегда есть на сайте в «Мои покупки»:\n${go('/#/shop')}`);
     const left = stock(id), more = left === 0 ? `\n\n⚠️ Промокоды закончились — добавьте новые:\n${go('/#/admin/shop')}` : left <= 3 ? `\n\nСкоро закончатся — добавьте новые:\n${go('/#/admin/shop')}` : '';
     alertAdmins(`🛒 <b>${escH(u.nick)}</b> купил(а) «${escH(it.full)}» за ${c.price} монет\nОсталось кодов: <b>${left}</b>${more}`);
     return { ok: true, order: ord(o), coins: u.coins };

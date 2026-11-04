@@ -622,6 +622,14 @@ body::after{width:520px;height:520px;left:140px;bottom:-220px;background:radial-
 .sh-step b{display:block;font-size:15px}
 .sh-step p{font-size:13px;margin:2px 0 0}
 .sh-help{font-size:13px}
+.sh-how{margin-top:14px;padding:12px 14px;border-radius:10px;background:var(--bg2);border:1px solid var(--line);text-align:left}
+.sh-how-t{display:block;font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-bottom:8px}
+.sh-how ol{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+.sh-how li{display:flex;align-items:center;gap:10px;font-size:14px;line-height:1.35}
+.sh-how li i{width:22px;height:22px;flex:none;border-radius:50%;display:grid;place-items:center;font-style:normal;font-size:12px;font-weight:900;color:#fff;background:linear-gradient(180deg,#ff6c22,#ff4f00)}
+.sh-how li b{color:#fff}
+.sh-mhint{margin-top:10px}
+.sh-mhint b{color:var(--text,#fff)}
 .modal .card.pm.sh-pm{text-align:center}
 .sh-pv{height:116px;margin:-8px -24px 12px;display:grid;place-items:center;background:radial-gradient(60% 90% at 50% 100%,rgba(255,170,0,.35),transparent 70%)}
 .sh-pv .gold{width:156px;height:107px}
@@ -951,7 +959,7 @@ function toast(t){const e=document.getElementById("toast");e.textContent=t;e.cla
 function needAuth(){if(!S.user){location.hash="#/login";toast("Войдите, чтобы продолжить");return true}return false}
 function empty(title,text,btn){return `<div class="empty"><div class="empty-ic">${ic("crown")}</div><b>${title}</b><p class="muted">${text}</p>${btn||""}</div>`}
 /* ===== Анимации ===== */
-const APP_V="1.9";
+const APP_V="1.9.1";
 // анимации включены всегда; выключить можно кнопкой «Анимации» (меню слева / низ главной)
 const RM=()=>document.documentElement.classList.contains("no-motion");
 function paintMotion(){document.querySelectorAll("[data-motion] b").forEach(b=>b.textContent=RM()?"выкл":"вкл")}
@@ -1926,17 +1934,18 @@ function shItem(x){
     <div class="sh-meta"><span class="sh-price">${COIN}<b>${fmt(x.price)}</b></span>${st}</div>${x.limit?`<div class="sh-lim muted">Не больше ${x.limit} в неделю на игрока</div>`:""}${prog}${act}</div></div>`;
 }
 const shSoon=()=>`<div class="card sh-item sh-soon"><div class="sh-vis"><div class="sh-q">${ic("gift")}</div></div><div class="sh-body"><b class="sh-name">Скоро новые товары</b><div class="muted sh-desc">Готовим новые награды. Есть идея, что добавить? Напишите в <a href="#/support">поддержку</a>.</div></div></div>`;
-const shMine=o=>o.length?`<h3 class="tk-sub">Мои покупки</h3><div class="card sh-mine">${o.map(x=>`<div class="sh-ord"><div class="sh-oic">${GOLD()}</div><div class="sh-om"><b>${esc(x.title)}</b><div class="muted">${dtm(x.at)} · ${fmt(x.price)} монет</div></div><div class="sh-oc"><code class="sh-code">${esc(x.code)}</code><button class="btn btn-g btn-sm" data-copyc="${esc(x.code)}" aria-label="Скопировать код ${esc(x.code)}">${ic("copy")}<span>Скопировать</span></button></div></div>`).join("")}</div>`:"";
+const shMine=o=>o.length?`<h3 class="tk-sub">Мои покупки</h3><div class="card sh-mine">${o.map(x=>`<div class="sh-ord"><div class="sh-oic">${GOLD()}</div><div class="sh-om"><b>${esc(x.title)}</b><div class="muted">${dtm(x.at)} · ${fmt(x.price)} монет</div></div><div class="sh-oc"><code class="sh-code">${esc(x.code)}</code><button class="btn btn-g btn-sm" data-copyc="${esc(x.code)}" aria-label="Скопировать код ${esc(x.code)}">${ic("copy")}<span>Скопировать</span></button></div></div>`).join("")}</div><p class="muted sh-help sh-mhint">Куда вводить код: в StandLeo на главном экране нажмите <b>«События»</b> → <b>«Секретный код»</b>.</p>`:"";
 function shHero(){const u=S.user;
   return `<section class="card sh-hero"><div class="sh-stripes" aria-hidden="true"></div>
    <div class="sh-art" aria-hidden="true"><span class="cw c1">${COIN}</span><span class="cw c2">${COIN}</span><span class="cw c3">${COIN}</span></div>
    <div class="sh-in"><div class="sh-kick">${ic("shop")}StandHub Shop</div><h1>Магазин <span>наград</span></h1><p>Играйте матчи, выполняйте задания и меняйте монеты на голду для StandLeo.</p>
     ${u?`<div class="sh-row"><div class="sh-bal"><span>Ваш баланс</span><div>${COIN}<b data-coins>${fmt(S.tasks?S.tasks.coins:0)}</b></div></div><a class="btn btn-g" href="#/tasks">${ic("tasks")}Заработать<span class="sh-mh">&nbsp;монеты</span></a></div>`
      :`<div class="sh-row"><a class="btn btn-o" href="#/login">Войти</a><a class="btn btn-g" href="#/register">Регистрация</a></div>`}</div></section>`}
+const SH_HOW=`<div class="sh-how"><b class="sh-how-t">Как активировать в StandLeo</b><ol><li><i>1</i><span>На главном экране игры нажмите <b>«События»</b></span></li><li><i>2</i><span>Откройте <b>«Секретный код»</b></span></li><li><i>3</i><span>Вставьте промокод</span></li></ol></div>`;
 const shSteps=`<h3 class="tk-sub">Как это работает</h3><div class="sh-steps">
   <div class="card sh-step"><span class="n">1</span><div><b>Копите монеты</b><p class="muted">Выполняйте ежедневные задания и забирайте бонус за вход</p></div></div>
   <div class="card sh-step"><span class="n">2</span><div><b>Купите промокод</b><p class="muted">Код появится сразу — на сайте и в Telegram</p></div></div>
-  <div class="card sh-step"><span class="n">3</span><div><b>Активируйте в StandLeo</b><p class="muted">Введите код в игре и получите голду</p></div></div></div>
+  <div class="card sh-step"><span class="n">3</span><div><b>Активируйте в StandLeo</b><p class="muted">В игре: «События» → «Секретный код» → вставьте код</p></div></div></div>
   <p class="muted sh-help">Код не сработал? Напишите в <a href="#/support">поддержку</a> — тема «Магазин и промокоды».</p>`;
 function pageShop(){
   try{localStorage.setItem("sh_shop_seen","1")}catch{}paintBadges();
@@ -1963,7 +1972,7 @@ function openGot(o){
   openX(`<div class="card pm sh-pm sh-got" role="dialog" aria-modal="true" aria-labelledby="xH"><button type="button" class="pm-x" data-x aria-label="Закрыть">×</button>
    <div class="sh-pv">${GOLD()}</div><h3 id="xH">Готово! Ваш промокод</h3><p class="muted pm-sub">${esc(o.title)} для StandLeo</p>
    <div class="sh-codebox"><code>${esc(o.code)}</code><button class="btn btn-o btn-sm" data-copyc="${esc(o.code)}">${ic("copy")}Скопировать</button></div>
-   <p class="muted" style="font-size:13px;margin-top:12px">Введите код в игре StandLeo. Мы также отправили его вам в Telegram, а ещё он всегда есть в разделе «Мои покупки».</p>
+   ${SH_HOW}<p class="muted" style="font-size:13px;margin-top:12px">Код также отправлен вам в Telegram и всегда есть в разделе «Мои покупки».</p>
    <div class="row2" style="margin-top:16px"><button class="btn btn-g" type="button" data-x>Готово</button></div></div>`);
   confetti();
 }
@@ -1984,7 +1993,7 @@ function pageRules(sec){
      <div class="pen"><div><span>1-й пропуск за сутки</span><b>Предупреждение</b></div><div><span>2-й пропуск</span><b>Поиск закрыт на 5 минут</b></div><div><span>3-й пропуск</span><b>30 минут</b></div><div><span>4-й и дальше</span><b>2 часа</b></div></div></div>
    <div class="card" id="r-match"><h2>${ic("swords")}Матч</h2>${li(["Хост создаёт лобби в StandLeo на выбранной карте — 13 раундов до победы.","Игроки находят хоста по ID и пишут ему «.» в личные сообщения — он приглашает в лобби.","Играйте за свою команду до конца матча. Уходить из матча нельзя.","Если лобби так и не собралось — проголосуйте «Матч не состоялся», ELO не изменится.","После игры капитан отмечает результат на сайте: «Мы победили» или «Мы проиграли». Кнопки открываются через 10 минут после начала игры.","Соперники подтверждают результат или оспаривают его в течение 30 минут. Не ответили — результат засчитывается.","Оспоренный матч проверяет администратор. Записывайте экран во время игры: запись или скриншот итогового счёта — лучшее доказательство, его можно отправить нашему Telegram-боту.","Ложный результат или ложный спор — запрет поиска на 7 дней."])}</div>
    <div class="card" id="r-anticheat"><h2>${ic("shield")}Античит и честная игра</h2>${li(["Запрещены читы, макросы, изменённые версии игры и любые программы, дающие преимущество.","Запрещены договорные матчи и намеренный проигрыш.","Запрещены оскорбления, угрозы, спам и реклама — в том числе в чате матча.","Заметили нарушение — после матча нажмите «Жалоба» рядом с игроком в комнате матча. Администратор проверит."])}</div>
-   <div class="card" id="r-shop"><h2>${ic("shop")}Монеты и магазин</h2>${li(["Монеты даются за ежедневные задания и бонус за вход. Купить монеты или передать их другому игроку нельзя.","В магазине монеты меняются на награды — например, на промокод на 1000 голды для StandLeo. Код выдаётся сразу после покупки и хранится в разделе «Мои покупки».","Покупку нельзя отменить, монеты не возвращаются. Если код не сработал — напишите в поддержку, тема «Магазин и промокоды».","Фарм монет с нескольких аккаунтов или договорными матчами запрещён — за это закрываем поиск матчей."])}</div>
+   <div class="card" id="r-shop"><h2>${ic("shop")}Монеты и магазин</h2>${li(["Монеты даются за ежедневные задания и бонус за вход. Купить монеты или передать их другому игроку нельзя.","В магазине монеты меняются на награды — например, на промокод на 1000 голды для StandLeo. Код выдаётся сразу после покупки и хранится в разделе «Мои покупки».","Чтобы активировать код, в StandLeo на главном экране нажмите «События» → «Секретный код» и вставьте промокод.","Покупку нельзя отменить, монеты не возвращаются. Если код не сработал — напишите в поддержку, тема «Магазин и промокоды».","Фарм монет с нескольких аккаунтов или договорными матчами запрещён — за это закрываем поиск матчей."])}</div>
    <div class="card" id="r-penalties"><h2>${ic("crown")}Наказания</h2>${li(["Предупреждение или запрет поиска матчей на 1 день или на 7 дней — решает администратор.","Ложный результат матча или ложный спор — запрет поиска на 7 дней.","За серьёзные и повторные нарушения ограничения могут быть дольше.","Считаете наказание ошибкой — напишите в <a href='#/support' style='color:var(--orange2)'>поддержку</a>."])}</div>
    <div class="card" id="r-privacy"><h2>${ic("help")}Конфиденциальность</h2>${li(["Мы храним ник, email, игровой ID, регион, аватар, историю матчей, покупки в магазине и Telegram-чат для уведомлений и восстановления пароля.","Скриншоты профиля только распознаются и нигде не сохраняются.","Доказательства по матчам (видео и скриншоты) бот пересылает администратору в Telegram — на сайте они не хранятся.","Пароль хранится в зашифрованном виде.","Мы не передаём ваши данные третьим лицам."])}</div>
   </div></div>`;entered();
@@ -1999,8 +2008,9 @@ const FAQ=[["Бот не принимает скриншот профиля","Н
  ["Как отметить результат матча?","После игры капитан нажимает в комнате матча «Мы победили» или «Мы проиграли» — кнопки открываются через 10 минут после начала. Соперники подтверждают результат или оспаривают его в течение 30 минут. Если не ответят — результат засчитается сам."],
  ["Засчитали неверный результат","Пока результат не засчитан — нажмите «Оспорить» в комнате матча и отправьте Telegram-боту запись экрана или скриншот итогового счёта: администратор проверит матч. Если результат уже засчитан — напишите сюда и укажите номер матча (он есть в комнате матча)."],
  ["Как получить монеты?","Выполняйте ежедневные задания и забирайте бонус за вход в разделе «Задания». Тратить монеты можно в «Магазине»."],
- ["Как купить промокод на голду?","Откройте «Магазин» и нажмите «Купить». Промокод появится сразу, придёт вам в Telegram и всегда хранится в разделе «Мои покупки». Введите его в игре StandLeo."],
- ["Промокод не сработал","Напишите в поддержку, тема «Магазин и промокоды», и укажите код — администратор проверит и поможет."],
+ ["Как купить промокод на голду?","Откройте «Магазин» и нажмите «Купить». Промокод появится сразу, придёт вам в Telegram и всегда хранится в разделе «Мои покупки»."],
+ ["Где ввести промокод в StandLeo?","На главном экране игры нажмите «События», затем «Секретный код» — и вставьте туда промокод. Скопировать его можно в «Магазине», в разделе «Мои покупки»."],
+ ["Промокод не сработал","Проверьте, что вводите его в StandLeo через «События» → «Секретный код», без лишних пробелов. Если всё равно не работает — напишите в поддержку, тема «Магазин и промокоды», и укажите код: администратор проверит и поможет."],
  ["Как пожаловаться на игрока?","После матча откройте комнату матча и нажмите «Жалоба» рядом с игроком — это быстрее, чем писать в поддержку."]];
 function supHtml(list){
   return list.map(x=>{const last=x.msgs[x.msgs.length-1],st=x.status==="closed"?["","Закрыто"]:last.by==="admin"?["ans","Есть ответ"]:["open","Ждёт ответа"];
