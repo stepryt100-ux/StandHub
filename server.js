@@ -26,26 +26,39 @@ function cleanup() { const n = db.users.length; db.users = db.users.filter(u => 
 const newCode = () => { let c; do { c = String(crypto.randomInt(100000, 999999)); } while (db.users.some(u => u.vcode === c)); return c; };
 let botUsername = null;
 const pendingInfo = u => ({ pending: true, code: u.vcode, bot: botUsername, nick: u.nick, soid: u.soid });
+// администраторы: ники через запятую в переменной ADMIN_NICKS (в Railway → Variables). По умолчанию админов нет.
+const ADMINS = (process.env.ADMIN_NICKS || '').split(',').map(s => s.trim().toLowerCase()).filter(Boolean);
+const isAdmin = u => !!u && ADMINS.includes(u.nick.toLowerCase());
+const meOf = u => ({ ...pub(u), admin: isAdmin(u) });
 
 // ---------- онлайн (реальные подключения) ----------
 const clients = new Map(); // res -> {visitorId, userId}
-const queue = new Set();
-function stats() { const v = new Set([...clients.values()].map(c => c.visitorId)); return { online: v.size, searching: queue.size, live: db.matches.filter(m => m.live).length }; }
-function broadcast() { const d = `data: ${JSON.stringify(stats())}\n\n`; for (const r of clients.keys()) r.write(d); }
+let match = null; // модуль матчей (подключается ниже)
+const sse = (r, obj) => r.write(`data: ${JSON.stringify(obj)}\n\n`);
+function stats() { const v = new Set([...clients.values()].map(c => c.visitorId)); return { type: 'stats', online: v.size, searching: match ? match.searching() : 0, live: match ? match.liveCount() : 0 }; }
+let bTimer = null; // рассылаем счётчики не чаще раза в 150 мс
+function broadcast() { if (bTimer) return; bTimer = setTimeout(() => { bTimer = null; const d = `data: ${JSON.stringify(stats())}\n\n`; for (const r of clients.keys()) r.write(d); }, 150); }
+function sendTo(uid, obj) { const d = `data: ${JSON.stringify(obj)}\n\n`; for (const [r, c] of clients) if (c.userId === uid) r.write(d); }
+const isOnline = uid => [...clients.values()].some(c => c.userId === uid);
+const stateOf = uid => { const am = match.matchOf(uid); return { type: 'state', queue: match.queueEntry(uid), match: am ? match.view(am, uid) : null }; };
 setInterval(() => { for (const r of clients.keys()) r.write(': ping\n\n'); }, 25000);
 
 // ---------- Telegram-бот: проверка ID по скриншоту ----------
-let ocrWorker = null;
-async function ocr(buf) {
-  if (!ocrWorker) { const { createWorker } = require('tesseract.js'); ocrWorker = await createWorker('eng'); }
-  const { data } = await ocrWorker.recognize(buf);
-  return data.text || '';
+// распознавание текста: 'eng' — для ID в профиле, 'eng+rus' — для итогового экрана матча.
+// Обработчик создаётся при первой картинке и выгружается после 10 минут простоя, чтобы не занимать память.
+const workers = {};
+async function ocr(buf, langs = 'eng') {
+  let w = workers[langs];
+  if (!w) { const { createWorker } = require('tesseract.js'); w = workers[langs] = { p: createWorker(langs).catch(e => { delete workers[langs]; throw e; }) }; }
+  clearTimeout(w.t); w.busy = (w.busy || 0) + 1;
+  try { const { data } = await (await w.p).recognize(buf); return data.text || ''; }
+  finally { w.busy--; w.t = setTimeout(async () => { if (w.busy || workers[langs] !== w) return; delete workers[langs]; try { (await w.p).terminate(); } catch {} }, 10 * 60e3); }
 }
 // ищем ID на скриншоте: убираем пробелы, путаницу O/0 и I/1
 function findIds(text) {
   const ids = new Set();
   for (const line of text.split('\n')) {
-    const norm = line.replace(/[Oo]/g, '0').replace(/[Il|]/g, '1');
+    const norm = line.replace(/[OoОо]/g, '0').replace(/[Il|І]/g, '1');
     for (const m of norm.match(/\d[\d\s]{3,}\d/g) || []) { const d = m.replace(/\s/g, ''); if (d.length >= 5 && d.length <= 12) ids.add(d); }
   }
   return [...ids];
@@ -107,10 +120,19 @@ async function startBot() {
   }
 }
 startBot();
+const tgUser = (uid, text) => { const u = db.users.find(x => x.id === uid); if (TG_TOKEN && u && u.tgChat) say(u.tgChat, text).catch(() => {}); };
+
+// ---------- матчи ----------
+match = require('./match')({ db, save, sendTo, broadcast, siteUrl: SITE_URL,
+  ocr: buf => ocr(buf, 'eng+rus'), avatarOf: u => pub(u).avatar, tell: tgUser,
+  alertAdmins: text => db.users.filter(u => u.verified && isAdmin(u)).forEach(u => tgUser(u.id, text)) });
 
 // ---------- http ----------
 const send = (res, code, obj) => { res.writeHead(code, { 'Content-Type': 'application/json; charset=utf-8' }); res.end(JSON.stringify(obj)); };
-const body = req => new Promise(r => { let b = ''; req.on('data', c => { b += c; if (b.length > 8e5) req.destroy(); }); req.on('end', () => { try { r(JSON.parse(b || '{}')); } catch { r({}); } }); });
+// тело запроса; слишком большое не читаем дальше и возвращаем { tooBig: true }
+const body = (req, max = 8e5) => new Promise(r => { let b = '', big = false; req.on('data', c => { if (big) return; b += c; if (b.length > max) { big = true; b = ''; } }); req.on('end', () => { if (big) return r({ tooBig: true }); try { r(JSON.parse(b || '{}')); } catch { r({}); } }); req.on('error', () => r({})); });
+const ocrBusy = new Set(); // один скриншот за раз от каждого игрока
+const dataImg = s => { const m = /^data:image\/(jpeg|png|webp);base64,([A-Za-z0-9+/=]+)$/.exec(String(s || '')); return m ? Buffer.from(m[2], 'base64') : null; };
 const authUser = req => { const t = (req.headers.authorization || '').replace('Bearer ', ''); const id = sessions.get(t); return db.users.find(u => u.id === id && u.verified); };
 const MIME = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript', '.css': 'text/css', '.png': 'image/png', '.svg': 'image/svg+xml' };
 
@@ -120,8 +142,11 @@ http.createServer(async (req, res) => {
   if (p === '/api/events') {
     res.writeHead(200, { 'Content-Type': 'text/event-stream', 'Cache-Control': 'no-cache', Connection: 'keep-alive', 'X-Accel-Buffering': 'no' });
     const userId = sessions.get(url.searchParams.get('token')) || null;
-    clients.set(res, { visitorId: url.searchParams.get('vid') || crypto.randomUUID(), userId }); broadcast();
-    req.on('close', () => { clients.delete(res); if (userId && ![...clients.values()].some(c => c.userId === userId)) queue.delete(userId); broadcast(); });
+    clients.set(res, { visitorId: url.searchParams.get('vid') || crypto.randomUUID(), userId });
+    if (userId) sse(res, stateOf(userId));
+    sse(res, stats()); broadcast();
+    // закрыл сайт — через 20 секунд убираем из поиска (если не вернулся)
+    req.on('close', () => { clients.delete(res); if (userId) setTimeout(() => { if (!isOnline(userId)) match.leave(userId); }, 20000); broadcast(); });
     return;
   }
   if (p === '/api/stats') return send(res, 200, stats());
@@ -155,10 +180,11 @@ http.createServer(async (req, res) => {
     if (!u || !check(String(b.pw || ''), u.pw)) return send(res, 401, { field: 'pw', error: 'Неверный email или пароль' });
     if (!u.verified) return send(res, 403, { ...pendingInfo(u), error: 'Аккаунт ещё не подтверждён' });
     const token = crypto.randomBytes(24).toString('hex'); sessions.set(token, u.id);
-    return send(res, 200, { token, user: pub(u) });
+    return send(res, 200, { token, user: meOf(u) });
   }
-  if (p === '/api/me') { const u = authUser(req); return u ? send(res, 200, pub(u)) : send(res, 401, { error: 'Не авторизован' }); }
-  if (p === '/api/logout' && req.method === 'POST') { const t = (req.headers.authorization || '').replace('Bearer ', ''); queue.delete(sessions.get(t)); sessions.delete(t); broadcast(); return send(res, 200, { ok: true }); }
+  if (p === '/api/me') { const u = authUser(req); return u ? send(res, 200, meOf(u)) : send(res, 401, { error: 'Не авторизован' }); }
+  if (p === '/api/me/state') { const u = authUser(req); return u ? send(res, 200, stateOf(u.id)) : send(res, 401, { error: 'Не авторизован' }); }
+  if (p === '/api/logout' && req.method === 'POST') { const t = (req.headers.authorization || '').replace('Bearer ', ''); const id = sessions.get(t); if (id) match.leave(id); sessions.delete(t); return send(res, 200, { ok: true }); }
 
   if (p === '/api/avatar' && req.method === 'POST') {
     const u = authUser(req); if (!u) return send(res, 401, { error: 'Войдите в аккаунт' });
@@ -166,7 +192,7 @@ http.createServer(async (req, res) => {
     if (!m) return send(res, 400, { error: 'Неверный формат картинки' });
     if (m[2].length > 700000) return send(res, 400, { error: 'Картинка слишком большая' });
     u.avatar = m[2]; u.avatarType = 'image/' + m[1]; u.avatarV = Date.now(); save();
-    return send(res, 200, pub(u));
+    return send(res, 200, meOf(u));
   }
   if (p.startsWith('/api/avatar/')) {
     const n = decodeURIComponent(p.slice(12)).toLowerCase(); const u = verified().find(x => x.nick.toLowerCase() === n);
@@ -177,11 +203,48 @@ http.createServer(async (req, res) => {
   if (p === '/api/leaderboard') return send(res, 200, verified().filter(u => u.matches > 0).sort((a, b) => b.elo - a.elo).map(pub));
   if (p.startsWith('/api/player/')) { const n = decodeURIComponent(p.slice(12)).toLowerCase(); const u = verified().find(x => x.nick.toLowerCase() === n); return u ? send(res, 200, pub(u)) : send(res, 404, { error: 'Игрок не найден' }); }
   if (p === '/api/search') { const q = (url.searchParams.get('q') || '').toLowerCase(); return send(res, 200, verified().filter(u => u.nick.toLowerCase().includes(q)).slice(0, 10).map(pub)); }
-  if (p === '/api/matches') { const n = (url.searchParams.get('player') || '').toLowerCase(); return send(res, 200, db.matches.filter(m => !n || m.players.some(x => x.nick.toLowerCase() === n))); }
-  if (p.startsWith('/api/match/')) { const m = db.matches.find(x => x.id === p.slice(11)); return m ? send(res, 200, m) : send(res, 404, { error: 'Матч не найден' }); }
-
-  if (p === '/api/queue/join' && req.method === 'POST') { const u = authUser(req); if (!u) return send(res, 401, {}); queue.add(u.id); broadcast(); return send(res, 200, stats()); }
-  if (p === '/api/queue/leave' && req.method === 'POST') { const u = authUser(req); if (u) queue.delete(u.id); broadcast(); return send(res, 200, stats()); }
+  // ---------- матчи ----------
+  if (p === '/api/matches') { const n = (url.searchParams.get('player') || '').toLowerCase(); return send(res, 200, match.history(n || null, isAdmin(authUser(req)))); }
+  const mm = p.match(/^\/api\/match\/([a-f0-9]+)(?:\/(accept|decline|ban|report|confirm|cancel))?$/);
+  if (mm) {
+    const m = match.find(mm[1]); if (!m) return send(res, 404, { error: 'Матч не найден' });
+    const u = authUser(req);
+    if (!mm[2]) return send(res, 200, match.view(m, u && u.id));
+    if (req.method !== 'POST') return send(res, 405, { error: 'Нужен POST' });
+    if (!u) return send(res, 401, { error: 'Войдите в аккаунт' });
+    const b = await body(req, mm[2] === 'report' ? 6e6 : 8e5);
+    let r = { ok: true };
+    if (mm[2] === 'accept') match.accept(m.id, u.id);
+    else if (mm[2] === 'decline') match.decline(m.id, u.id);
+    else if (mm[2] === 'ban') r = match.ban(m.id, u.id, String(b.map || ''));
+    else if (mm[2] === 'confirm') r = match.confirm(m.id, u.id, String(b.result || ''));
+    else if (mm[2] === 'cancel') r = match.voteCancel(m.id, u.id);
+    else {
+      if (b.tooBig) return send(res, 413, { error: 'Картинка слишком большая' });
+      const imgs = [b.image2, b.image].map(dataImg).filter(Boolean); // сначала контрастная копия, потом оригинал
+      if (!imgs.length) return send(res, 400, { error: 'Неверный формат картинки' });
+      if (ocrBusy.has(u.id)) return send(res, 429, { error: 'Предыдущий скриншот ещё распознаётся, подождите' });
+      ocrBusy.add(u.id); try { r = await match.report(m.id, u.id, imgs); } finally { ocrBusy.delete(u.id); }
+    }
+    return send(res, r.error ? 400 : 200, { ...r, match: match.view(match.find(m.id), u.id) });
+  }
+  if (p === '/api/queue/join' && req.method === 'POST') {
+    const u = authUser(req); if (!u) return send(res, 401, { error: 'Войдите в аккаунт' });
+    const r = match.join(u, String((await body(req)).mode || '5v5'));
+    return send(res, r.error ? 409 : 200, { ...r, ...stateOf(u.id) });
+  }
+  if (p === '/api/queue/leave' && req.method === 'POST') { const u = authUser(req); if (u) match.leave(u.id); return send(res, 200, { ok: true }); }
+  if (p === '/api/test-match' && req.method === 'POST') {
+    const u = authUser(req); if (!isAdmin(u)) return send(res, 403, { error: 'Только для администратора' });
+    const r = match.testMatch(u, String((await body(req)).mode || '5v5'));
+    return send(res, r.error ? 409 : 200, { ...r, ...stateOf(u.id) });
+  }
+  if (p === '/api/admin/matches') { const u = authUser(req); if (!isAdmin(u)) return send(res, 403, { error: 'Только для администратора' }); return send(res, 200, match.adminList()); }
+  const am = p.match(/^\/api\/admin\/match\/([a-f0-9]+)\/resolve$/);
+  if (am && req.method === 'POST') {
+    const u = authUser(req); if (!isAdmin(u)) return send(res, 403, { error: 'Только для администратора' });
+    const r = match.adminResolve(am[1], String((await body(req)).winner || '')); return send(res, r.error ? 400 : 200, r);
+  }
 
   let f = path.join(PUB, p === '/' ? 'index.html' : path.normalize(p).replace(/^(\.\.[\/\\])+/, ''));
   if (!f.startsWith(PUB) || !fs.existsSync(f) || fs.statSync(f).isDirectory()) f = path.join(PUB, 'index.html');
