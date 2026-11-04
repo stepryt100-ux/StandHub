@@ -26,8 +26,8 @@ function cleanup() { const n = db.users.length; db.users = db.users.filter(u => 
 const newCode = () => { let c; do { c = String(crypto.randomInt(100000, 999999)); } while (db.users.some(u => u.vcode === c)); return c; };
 let botUsername = null;
 const pendingInfo = u => ({ pending: true, code: u.vcode, bot: botUsername, nick: u.nick, soid: u.soid });
-// администраторы: ники через запятую в переменной ADMIN_NICKS (в Railway → Variables). По умолчанию админов нет.
-const ADMINS = (process.env.ADMIN_NICKS || '').split(',').map(s => s.trim().toLowerCase()).filter(Boolean);
+// администраторы: ники через запятую в переменной ADMIN_NICKS (в Railway → Variables). По умолчанию — владелец сайта Kartez.
+const ADMINS = (process.env.ADMIN_NICKS || 'Kartez').split(',').map(s => s.trim().toLowerCase()).filter(Boolean);
 const isAdmin = u => !!u && ADMINS.includes(u.nick.toLowerCase());
 const meOf = u => ({ ...pub(u), admin: isAdmin(u) });
 
