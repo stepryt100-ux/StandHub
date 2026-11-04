@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>StandHub — соревновательный StandLeo</title>
+<style>
+:root{
+  --bg:#141416;--bg2:#1c1c1f;--card:#232327;--card2:#2b2b30;--line:#34343a;
+  --text:#fff;--muted:#a3a3ad;--orange:#ff5500;--orange2:#ff7a33;
+  --green:#3fcf6a;--red:#ff4d4d;--yellow:#ffc800;
+  --l1:#eeeeee;--l2:#1ce400;--l4:#ffc800;--l8:#ff6309;--l10:#fe1f00;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;background:var(--bg);color:var(--text);font-size:15px;line-height:1.5}
+a{color:inherit;text-decoration:none}
+button{font:inherit;cursor:pointer;border:0}
+input,select{font:inherit}
+:focus-visible{outline:2px solid var(--orange);outline-offset:2px}
+.upper{text-transform:uppercase;letter-spacing:.02em}
+/* Topbar */
+.top{position:fixed;inset:0 0 auto 0;height:60px;background:#0f0f11;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:16px;padding:0 20px;z-index:50}
+.logo{display:flex;align-items:center;gap:10px;font-weight:900;font-size:22px;letter-spacing:.04em;font-style:italic}
+.logo b{color:var(--orange)}
+.logo svg{width:30px;height:30px}
+.search{flex:1;max-width:420px;margin-left:24px;position:relative}
+.search input{width:100%;height:38px;background:var(--card);border:1px solid var(--line);border-radius:6px;color:#fff;padding:0 12px 0 36px}
+.search span{position:absolute;left:12px;top:8px;color:var(--muted)}
+.top .right{margin-left:auto;display:flex;align-items:center;gap:12px}
+.btn{height:40px;padding:0 20px;border-radius:4px;font-weight:800;text-transform:uppercase;letter-spacing:.03em;display:inline-flex;align-items:center;justify-content:center;gap:8px;transition:.15s}
+.btn-o{background:var(--orange);color:#fff}.btn-o:hover{background:var(--orange2)}
+.btn-g{background:var(--card2);color:#fff;border:1px solid var(--line)}.btn-g:hover{background:#38383e}
+.btn-lg{height:52px;padding:0 36px;font-size:17px}
+.userchip{display:flex;align-items:center;gap:10px;padding:4px 10px 4px 4px;border-radius:6px;background:var(--card)}
+.ava{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#ff5500,#7a2a00);display:grid;place-items:center;font-weight:800;font-size:13px;flex:none}
+/* Sidebar */
+.side{position:fixed;top:60px;bottom:0;left:0;width:220px;background:#0f0f11;border-right:1px solid var(--line);padding:16px 10px;display:flex;flex-direction:column;gap:4px;z-index:40}
+.side a{display:flex;align-items:center;gap:12px;height:44px;padding:0 14px;border-radius:6px;color:var(--muted);font-weight:600}
+.side a:hover{background:var(--card);color:#fff}
+.side a.on{background:var(--card);color:#fff;box-shadow:inset 3px 0 0 var(--orange)}
+.side .ic{width:20px;text-align:center}
+.side .sep{height:1px;background:var(--line);margin:12px 6px}
+.side .online{margin-top:auto;font-size:13px;color:var(--muted);padding:12px 14px}
+.dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--green);margin-right:6px}
+main{margin:60px 0 0 220px;min-height:calc(100vh - 60px)}
+.wrap{max-width:1180px;margin:0 auto;padding:32px}
+h1.h{font-size:30px;font-weight:900;text-transform:uppercase;font-style:italic;margin-bottom:24px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:8px}
+.pad{padding:20px}
+.muted{color:var(--muted)}
+.grid{display:grid;gap:16px}
+/* Level badge */
+.lvl{--c:var(--l4);width:38px;height:38px;border-radius:50%;display:grid;place-items:center;font-weight:900;font-size:15px;color:var(--c);background:radial-gradient(circle,#1a1a1d 58%,transparent 60%),conic-gradient(var(--c) var(--p,70%),#3a3a40 0);flex:none}
+.lvl.sm{width:28px;height:28px;font-size:12px}
+.lvl.xl{width:84px;height:84px;font-size:34px}
+/* Home */
+.hero{position:relative;overflow:hidden;min-height:560px;display:flex;align-items:center;background:
+ radial-gradient(800px 400px at 80% 40%,rgba(255,85,0,.35),transparent 60%),
+ radial-gradient(600px 300px at 10% 90%,rgba(255,85,0,.12),transparent 60%),#0c0c0e;border-bottom:1px solid var(--line)}
+.hero .wrap{position:relative;z-index:2;width:100%}
+.hero h1{font-size:72px;line-height:.95;font-weight:900;font-style:italic;text-transform:uppercase}
+.hero h1 .rot{color:var(--orange);display:block;height:72px;overflow:hidden}
+.hero h1 .rot span{display:block;animation:rot 14s infinite}
+@keyframes rot{0%,12%{transform:translateY(0)}14%,26%{transform:translateY(-100%)}28%,40%{transform:translateY(-200%)}42%,54%{transform:translateY(-300%)}56%,68%{transform:translateY(-400%)}70%,82%{transform:translateY(-500%)}84%,100%{transform:translateY(-600%)}}
+@media (prefers-reduced-motion:reduce){.hero h1 .rot span{animation:none}}
+.hero p{max-width:520px;color:#d0d0d6;font-size:18px;margin:24px 0 32px}
+.hero .stripes{position:absolute;right:-80px;top:0;bottom:0;width:55%;background:repeating-linear-gradient(115deg,transparent 0 60px,rgba(255,85,0,.07) 60px 64px);mask:linear-gradient(90deg,transparent,#000 40%)}
+.hero .emblem{position:absolute;right:8%;top:50%;transform:translateY(-50%);width:340px;height:340px;opacity:.9}
+.online-big{margin-top:20px;color:var(--muted)}
+.online-big b{color:#fff}
+.sec{padding:64px 0}
+.sec h2{font-size:38px;font-weight:900;font-style:italic;text-transform:uppercase;margin-bottom:12px}
+.feat{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-top:32px}
+.feat .card{padding:24px;display:flex;flex-direction:column;gap:10px;min-height:240px}
+.tag{font-size:12px;font-weight:800;color:var(--orange);text-transform:uppercase;letter-spacing:.06em}
+.tag.live::before{content:"";display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--red);margin-right:6px}
+.feat h3{font-size:22px;font-weight:900;text-transform:uppercase;font-style:italic}
+.feat .btn{margin-top:auto;align-self:flex-start}
+.cta{text-align:center;padding:72px 0;background:linear-gradient(90deg,#1b0d05,#2a1206,#1b0d05);border-top:1px solid var(--line)}
+footer{border-top:1px solid var(--line);padding:40px 32px;color:var(--muted);font-size:14px;display:grid;grid-template-columns:repeat(4,1fr);gap:24px;max-width:1180px;margin:0 auto}
+footer h4{color:#fff;margin-bottom:10px;text-transform:uppercase;font-size:13px}
+footer a{display:block;margin:4px 0}footer a:hover{color:#fff}
+/* Auth */
+.auth{min-height:calc(100vh - 60px);display:grid;place-items:center;padding:32px;background:radial-gradient(600px 300px at 50% 0,rgba(255,85,0,.18),transparent 70%)}
+.auth .card{width:100%;max-width:420px;padding:32px}
+.auth h1{font-size:26px;font-weight:900;font-style:italic;text-transform:uppercase;margin-bottom:6px}
+.field{margin-top:16px}
+.field label{display:block;font-size:13px;color:var(--muted);margin-bottom:6px;font-weight:600}
+.field input,.field select{width:100%;height:46px;background:var(--bg2);border:1px solid var(--line);border-radius:6px;color:#fff;padding:0 14px}
+.field input:focus{border-color:var(--orange);outline:none}
+.err{color:var(--red);font-size:13px;margin-top:6px;min-height:0}
+.chk{display:flex;gap:10px;align-items:flex-start;margin-top:16px;font-size:14px;color:var(--muted)}
+.chk input{margin-top:4px;accent-color:var(--orange);width:16px;height:16px}
+.or{display:flex;align-items:center;gap:12px;color:var(--muted);font-size:13px;margin:20px 0}
+.or::before,.or::after{content:"";flex:1;height:1px;background:var(--line)}
+.social{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+/* Lobby */
+.lobby{display:grid;grid-template-columns:1fr 340px;gap:16px}
+.party{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin:20px 0}
+.slot{aspect-ratio:3/4;border-radius:8px;background:var(--bg2);border:1px dashed var(--line);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;color:var(--muted);font-size:13px;text-align:center;padding:8px}
+.slot.me{border:1px solid var(--orange);background:linear-gradient(180deg,rgba(255,85,0,.15),var(--bg2));color:#fff}
+.slot .ava{width:56px;height:56px;font-size:20px}
+.slot .plus{width:48px;height:48px;border-radius:50%;border:2px dashed var(--line);display:grid;place-items:center;font-size:22px}
+.modes{display:flex;gap:8px;flex-wrap:wrap}
+.chip{height:40px;padding:0 16px;border-radius:4px;background:var(--bg2);border:1px solid var(--line);color:var(--muted);font-weight:700}
+.chip.on{border-color:var(--orange);color:#fff;background:rgba(255,85,0,.12)}
+.findbox{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-top:24px;padding-top:24px;border-top:1px solid var(--line)}
+.btn-find{height:64px;min-width:280px;font-size:20px;font-style:italic;font-weight:900}
+.btn-find.searching{background:var(--card2);border:1px solid var(--orange)}
+.maps{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:12px}
+.map{color:#fff;text-shadow:0 1px 3px rgba(0,0,0,.8);height:64px;border-radius:6px;display:flex;align-items:flex-end;padding:8px;font-weight:800;font-size:13px;text-transform:uppercase;border:2px solid transparent;cursor:pointer;position:relative;overflow:hidden}
+.map.on{border-color:var(--orange)}
+.map.off{opacity:.35}
+.qrow{display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--line);font-size:14px}
+.qrow:last-child{border:0}
+/* modal */
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.75);display:none;place-items:center;z-index:100;padding:20px}
+.modal.show{display:grid}
+.modal .card{max-width:560px;width:100%;padding:32px;text-align:center;border-color:var(--orange)}
+.modal h2{font-size:32px;font-weight:900;font-style:italic;text-transform:uppercase;color:var(--orange)}
+.accepts{display:flex;justify-content:center;gap:6px;margin:20px 0}
+.accepts i{width:28px;height:8px;border-radius:2px;background:var(--line)}
+.accepts i.ok{background:var(--green)}
+.bar{height:6px;border-radius:3px;background:var(--line);overflow:hidden;margin:16px 0}
+.bar div{height:100%;background:var(--orange);transition:width 1s linear}
+/* Profile */
+.phead{background:linear-gradient(120deg,#2a1206 0%,#1c1c1f 60%);border:1px solid var(--line);border-radius:8px;padding:28px;display:flex;gap:24px;align-items:center;flex-wrap:wrap}
+.phead .ava{width:96px;height:96px;font-size:36px;border:3px solid var(--orange)}
+.phead h1{font-size:32px;font-weight:900}
+.flag{font-size:13px;color:var(--muted)}
+.elo-box{margin-left:auto;display:flex;align-items:center;gap:16px}
+.elo-box .v{font-size:32px;font-weight:900}
+.elo-prog{width:220px}
+.elo-prog .bar{margin:6px 0}
+.tabs{display:flex;gap:4px;border-bottom:1px solid var(--line);margin:24px 0 20px;overflow-x:auto}
+.tabs button{background:none;color:var(--muted);height:46px;padding:0 18px;font-weight:700;text-transform:uppercase;font-size:14px;border-bottom:2px solid transparent;white-space:nowrap}
+.tabs button.on{color:#fff;border-color:var(--orange)}
+.stats{display:grid;grid-template-columns:repeat(6,1fr);gap:12px}
+.stat{padding:16px}
+.stat .k{font-size:12px;color:var(--muted);text-transform:uppercase;font-weight:700}
+.stat .v{font-size:26px;font-weight:900;margin-top:4px}
+.pgrid{display:grid;grid-template-columns:2fr 1fr;gap:16px;margin-top:16px}
+.card h3{font-size:15px;text-transform:uppercase;font-weight:800;margin-bottom:14px}
+table{width:100%;border-collapse:collapse}
+th{font-size:12px;color:var(--muted);text-transform:uppercase;text-align:left;font-weight:700;padding:10px 12px;border-bottom:1px solid var(--line)}
+td{white-space:nowrap;padding:12px;border-bottom:1px solid var(--line);font-size:14px}
+tr.click{cursor:pointer}tr.click:hover td{background:var(--card2)}
+.w{color:var(--green);font-weight:800}.l{color:var(--red);font-weight:800}
+.res{display:inline-block;width:26px;height:26px;border-radius:4px;text-align:center;line-height:26px;font-weight:900;font-size:12px}
+.res.w{background:rgba(63,207,106,.15)}.res.l{background:rgba(255,77,77,.15)}
+.mrow{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--line);font-size:14px}
+.mrow:last-child{border:0}
+.pbar{height:6px;background:var(--line);border-radius:3px;flex:1;margin:0 12px;overflow:hidden}.pbar div{height:100%;background:var(--orange)}
+.scroll{overflow-x:auto}
+/* Match */
+.mhead{border-radius:8px;border:1px solid var(--line);padding:32px;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:24px;background:linear-gradient(90deg,rgba(63,207,106,.12),#1c1c1f 40%,#1c1c1f 60%,rgba(255,77,77,.12))}
+.team{display:flex;align-items:center;gap:14px}
+.team.r{justify-content:flex-end;text-align:right}
+.team .logo-t{width:60px;height:60px;border-radius:8px;display:grid;place-items:center;font-weight:900;font-size:22px}
+.score{text-align:center}
+.score .s{font-size:56px;font-weight:900;font-style:italic;line-height:1}
+.score .s span{color:var(--muted);margin:0 10px}
+.score .st{display:inline-block;margin-top:8px;font-size:12px;font-weight:800;padding:4px 10px;border-radius:4px;background:var(--card2);text-transform:uppercase}
+.board th:first-child,.board td:first-child{min-width:200px}
+.pl{display:flex;align-items:center;gap:10px}
+.thead{display:flex;justify-content:space-between;align-items:center;padding:14px 16px;border-bottom:1px solid var(--line)}
+.thead b{font-size:16px;text-transform:uppercase}
+/* Leaderboard */
+.lb-top{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:20px;align-items:end}
+.podium{padding:24px;text-align:center;position:relative}
+.podium .ava{width:72px;height:72px;font-size:26px;margin:0 auto 12px}
+.podium .rk{position:absolute;top:12px;left:16px;font-size:28px;font-weight:900;font-style:italic;color:var(--muted)}
+.podium.p1{border-color:var(--yellow);padding:36px 24px;background:linear-gradient(180deg,rgba(255,200,0,.1),var(--card))}
+.podium.p1 .rk{color:var(--yellow)}
+.filters{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap}
+.filters select{height:40px;background:var(--card);color:#fff;border:1px solid var(--line);border-radius:4px;padding:0 12px}
+.rank{font-weight:900;font-style:italic;color:var(--muted)}
+.chart{width:100%;height:200px}
+.empty{padding:48px 24px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:8px}.empty b{font-size:18px}.empty p{max-width:420px}.empty .btn{margin-top:12px}.empty-ic{width:56px;height:56px;border-radius:50%;background:rgba(255,85,0,.12);color:var(--orange);display:grid;place-items:center;margin-bottom:4px}
+.toast{position:fixed;bottom:24px;right:24px;background:var(--card2);border:1px solid var(--orange);padding:14px 18px;border-radius:6px;z-index:200;display:none}
+/* Responsive */
+@media (max-width:1100px){.feat{grid-template-columns:repeat(2,1fr)}.stats{grid-template-columns:repeat(3,1fr)}.lobby,.pgrid{grid-template-columns:1fr}.hero .emblem{opacity:.25}}
+@media (max-width:760px){
+ .side{top:auto;bottom:0;width:100%;height:64px;flex-direction:row;padding:6px;border-right:0;border-top:1px solid var(--line);justify-content:space-around}
+ .side a{flex-direction:column;gap:2px;height:52px;padding:4px 6px;font-size:11px;justify-content:center}
+ .side a.on{box-shadow:inset 0 -3px 0 var(--orange)}
+ .side .sep,.side .online,.side .hide-m{display:none}
+ main{margin-left:0;padding-bottom:64px}
+ .search{display:none}.top .right .btn-g,.top .right a[href="#/lobby"]{display:none}.top{padding:0 12px}.logo{font-size:18px}
+ .wrap{padding:20px 16px}
+ .hero{min-height:480px}.hero h1{font-size:44px}.hero h1 .rot{height:44px}
+ .feat,footer{grid-template-columns:1fr}
+ .party{grid-template-columns:repeat(5,1fr);gap:6px}.slot .ava{width:36px;height:36px;font-size:14px}.slot{font-size:10px}.slot .plus{width:32px;height:32px}
+ .maps{grid-template-columns:repeat(2,1fr)}
+ .btn-find{width:100%;min-width:0}
+ .stats{grid-template-columns:repeat(2,1fr)}
+ .elo-box{margin-left:0}
+ .mhead{grid-template-columns:1fr;text-align:center}.team,.team.r{justify-content:center;text-align:center}
+ .lb-top{grid-template-columns:1fr}
+ .userchip .nm{display:none}
+}
+</style>
+</head>
+<body>
+<header class="top">
+  <a href="#/" class="logo" aria-label="StandHub — на главную">
+    <svg viewBox="0 0 32 32" aria-hidden="true"><path d="M4 4h24l-6 8h6L10 28l4-11H6z" fill="#ff5500"/></svg>
+    STAND<b>HUB</b>
+  </a>
+  <div class="search"><span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="margin-top:3px"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg></span><input placeholder="Поиск игроков, матчей, команд" aria-label="Поиск" id="q"></div>
+  <div class="right" id="topRight"></div>
+</header>
+<nav class="side" id="side" aria-label="Основная навигация"></nav>
+<main id="app"></main>
+
+<div class="toast" id="toast" role="status"></div>
+
+<script>
+/* ===== Справочники ===== */
+const MAPS=[["Sandstone","#c89a5b,#6b4a22"],["Rust","#b5532b,#3e1c0d"],["Province","#7fa36a,#2f4524"],["Zone 7","#6a7f9e,#232c3d"],["Hanami","#d77fa1,#4a2233"],["Breeze","#5fb5c9,#1f4550"],["Dune","#d9b26a,#5c4318"],["Sakura","#e59aa8,#57303a"]];
+const TH=[0,100,501,751,901,1051,1201,1351,1531,1751,2001];
+function lvlOf(e){let l=1;for(let i=1;i<=10;i++)if(e>=TH[i])l=i;return l}
+function lvlColor(l){return l===1?"var(--l1)":l<=3?"var(--l2)":l<=7?"var(--l4)":l<=9?"var(--l8)":"var(--l10)"}
+function lvlPct(e){const l=lvlOf(e);if(l===10)return 100;return Math.round((e-TH[l])/(TH[l+1]-TH[l])*100)}
+function badge(e,cls=""){const l=lvlOf(e);return `<span class="lvl ${cls}" style="--c:${lvlColor(l)};--p:${Math.max(8,lvlPct(e))}%" title="Уровень ${l} · ${e} ELO">${l}</span>`}
+function esc(t){return String(t).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
+function ava(n){const h=[...n].reduce((a,c)=>a+c.charCodeAt(0),0)%360;return `<span class="ava" style="background:linear-gradient(135deg,hsl(${h} 70% 45%),hsl(${(h+40)%360} 60% 20%))">${esc(n[0].toUpperCase())}</span>`}
+function mapBg(m){const x=MAPS.find(a=>a[0]===m);return `linear-gradient(135deg,${x[1]})`}
+const fmt=n=>Number(n).toLocaleString("ru-RU");
+const kd=u=>u.deaths?(u.kills/u.deaths).toFixed(2):(u.kills?u.kills.toFixed(2):"—");
+const wr=u=>u.matches?Math.round(u.wins/u.matches*100)+"%":"—";
+const hsp=u=>u.kills?Math.round(u.hsKills/u.kills*100)+"%":"—";
+
+/* ===== Состояние и API ===== */
+const S={token:localStorage.getItem("sh_token"),user:null,searching:false,secs:0,timer:null,mode:"5v5",maps:new Set(MAPS.map(m=>m[0])),live:{online:null,searching:null,live:null}};
+const VID=localStorage.getItem("sh_vid")||(()=>{const v=crypto.randomUUID();localStorage.setItem("sh_vid",v);return v})();
+async function api(path,opt={}){
+  const r=await fetch(path,{...opt,headers:{"Content-Type":"application/json",...(S.token?{Authorization:"Bearer "+S.token}:{})}});
+  const j=await r.json().catch(()=>({}));if(!r.ok)throw Object.assign(new Error(j.error||"Ошибка"),j);return j;
+}
+let es;
+function connectLive(){
+  if(es)es.close();
+  if(location.protocol==="file:"){S.live={online:null};paintLive();return}
+  es=new EventSource(`/api/events?vid=${VID}&token=${S.token||""}`);
+  es.onmessage=e=>{S.live=JSON.parse(e.data);paintLive()};
+  es.onerror=()=>{S.live={online:null,searching:null,live:null};paintLive()};
+}
+function paintLive(){
+  const v=k=>S.live[k]==null?"—":fmt(S.live[k]);
+  document.querySelectorAll("[data-live]").forEach(el=>el.textContent=v(el.dataset.live));
+}
+const L=k=>`<b data-live="${k}">${S.live[k]==null?"—":fmt(S.live[k])}</b>`;
+
+/* ===== Каркас ===== */
+const ICONS={"home":"<path d=\"M3 11l9-8 9 8v10h-6v-6H9v6H3z\"/>","play":"<path d=\"M7 4l13 8-13 8z\"/>","user":"<circle cx=\"12\" cy=\"8\" r=\"4\"/><path d=\"M4 21c0-4 4-6 8-6s8 2 8 6z\"/>","swords":"<path d=\"M3 3h4l10 10-2 2-2-2-3 3-2-2 3-3zM21 3h-4l-5 5 2 2 1-1 2 2-6 6 2 2 3-3 2 2 2-2-2-2 3-3z\"/>","crown":"<path d=\"M3 7l5 4 4-7 4 7 5-4-2 12H5z\"/>","shield":"<path d=\"M12 2l8 3v6c0 5-3.5 9-8 11-4.5-2-8-6-8-11V5z\"/>","help":"<circle cx=\"12\" cy=\"12\" r=\"10\"/><path d=\"M9.5 9a2.5 2.5 0 115 0c0 2-2.5 2-2.5 4M12 17h0\" stroke=\"#0f0f11\" stroke-width=\"2\" fill=\"none\"/>"};
+function ic(n){return `<svg class="ic" viewBox="0 0 24 24" width="20" height="20" fill="currentColor" aria-hidden="true">${ICONS[n]}</svg>`}
+function renderChrome(route){
+  const u=S.user;
+  document.getElementById("topRight").innerHTML=u?`
+    <a class="btn btn-o" href="#/lobby">Играть</a>
+    <a class="userchip" href="#/profile" aria-label="Мой профиль">${ava(u.nick)}<span class="nm">${esc(u.nick)}</span>${badge(u.elo,"sm")}</a>
+    <button class="btn btn-g" id="logout">Выйти</button>`:`
+    <a class="btn btn-g" href="#/login">Войти</a><a class="btn btn-o" href="#/register">Регистрация</a>`;
+  const lo=document.getElementById("logout");if(lo)lo.onclick=async()=>{try{await api("/api/logout",{method:"POST"})}catch{}stopSearch(true);S.token=null;S.user=null;localStorage.removeItem("sh_token");connectLive();location.hash="#/"};
+  const items=[["#/","home","Главная"],["#/lobby","play","Играть"],["#/profile","user","Профиль"],["#/matches","swords","Матчи"],["#/leaderboard","crown","Рейтинг"]];
+  document.getElementById("side").innerHTML=items.map(([h,i,t])=>`<a href="${h}" class="${(route===h.slice(1)||(h==="#/"&&route==="/"))?"on":""}">${ic(i)}${t}</a>`).join("")+
+   `<div class="sep"></div><a href="#" class="hide-m">${ic("shield")}Античит</a><a href="#" class="hide-m">${ic("help")}Поддержка</a>
+    <div class="online"><span class="dot"></span>${L("online")} на сайте</div>`;
+}
+const app=document.getElementById("app");
+function toast(t){const e=document.getElementById("toast");e.textContent=t;e.style.display="block";clearTimeout(e._t);e._t=setTimeout(()=>e.style.display="none",2600)}
+function needAuth(){if(!S.user){location.hash="#/login";toast("Войдите, чтобы продолжить");return true}return false}
+function empty(title,text,btn){return `<div class="empty"><div class="empty-ic">${ic("crown")}</div><b>${title}</b><p class="muted">${text}</p>${btn||""}</div>`}
+
+/* ===== Главная ===== */
+async function pageHome(){
+  const words=["ПРИЦЕЛ","СКИЛЛ","РАНГ","РЕАКЦИЮ","ТАКТИКУ","КОМАНДУ","ИГРУ"];
+  app.innerHTML=`
+  <section class="hero"><div class="stripes"></div>
+   <svg class="emblem" viewBox="0 0 200 200" aria-hidden="true"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ff7a33"/><stop offset="1" stop-color="#ff3d00"/></linearGradient></defs>
+    <circle cx="100" cy="100" r="92" fill="none" stroke="rgba(255,85,0,.25)" stroke-width="2"/><circle cx="100" cy="100" r="70" fill="none" stroke="rgba(255,85,0,.15)" stroke-width="10" stroke-dasharray="6 10"/>
+    <path d="M40 40h120l-30 40h30L70 170l20-55H50z" fill="url(#g)"/></svg>
+   <div class="wrap">
+    <h1>Прокачай<span class="rot"><span>${words.map(w=>w+"<br>").join("")}${words[0]}</span></span></h1>
+    <p>Соревновательный StandLeo на максимуме. Матчмейкинг 5 на 5, ELO-рейтинг, турниры и команды — без потолка для роста.</p>
+    <a class="btn btn-o btn-lg" href="${S.user?"#/lobby":"#/register"}">Играть сейчас</a>
+    <div class="online-big"><span class="dot"></span>${L("online")} на сайте прямо сейчас</div>
+   </div></section>
+  <section class="sec"><div class="wrap">
+    <h2>Больше чем матчмейкинг</h2>
+    <p class="muted" style="max-width:640px">StandHub — дом для любых амбиций: разные соревновательные форматы для игроков любого уровня и размера пати.</p>
+    <div class="feat">
+      <div class="card"><span class="tag live">Live</span><h3>Матчмейкинг</h3><p class="muted">Соло или пати. Поднимай ELO под защитой античита StandHub. Бесплатно.</p><a class="btn btn-o" href="#/lobby">Играть</a></div>
+      <div class="card"><span class="tag">Скоро</span><h3>Командные лиги</h3><p class="muted">Проверь, как далеко пройдёт твоя команда среди любительских составов.</p><span class="btn btn-g">Скоро</span></div>
+      <div class="card"><span class="tag">Скоро</span><h3>Кубки</h3><p class="muted">Ежедневные и еженедельные кубки по расписанию с наградами за места.</p><span class="btn btn-g">Скоро</span></div>
+      <div class="card"><span class="tag">Скоро</span><h3>Турниры</h3><p class="muted">Официальные квалификации и турниры от организаторов сообщества.</p><span class="btn btn-g">Скоро</span></div>
+    </div></div></section>
+  <section class="sec" style="padding-top:0"><div class="wrap">
+    <h2>Рейтинг игроков</h2>
+    <p class="muted" style="max-width:640px;margin-bottom:24px">Поднимайся в таблице лидеров и смотри, где ты находишься среди лучших игроков StandLeo.</p>
+    <div class="card scroll" id="homeLb"><div class="pad muted">Загрузка…</div></div>
+    <div style="margin-top:16px"><a class="btn btn-g" href="#/leaderboard">Весь рейтинг</a></div>
+  </div></section>
+  <section class="cta"><h2 style="font-size:40px;font-weight:900;font-style:italic;text-transform:uppercase;margin-bottom:24px">Готов бросить вызов?</h2><a class="btn btn-o btn-lg" href="${S.user?"#/lobby":"#/register"}">Играть сейчас</a></section>
+  <footer>
+    <div><h4>StandHub</h4><p>Соревновательная платформа для StandLeo.</p></div>
+    <div><h4>Помощь</h4><a href="#">Поддержка</a><a href="#">Античит</a><a href="#">Правила</a></div>
+    <div><h4>Платформа</h4><a href="#/lobby">Матчмейкинг</a><a href="#/leaderboard">Рейтинг</a><a href="#/matches">Матчи</a></div>
+    <div><h4>Документы</h4><a href="#">Условия использования</a><a href="#">Политика конфиденциальности</a></div>
+  </footer>`;
+  const lb=await getLb();document.getElementById("homeLb").innerHTML=lb.length?lbTable(lb.slice(0,5),true):lbEmpty();bind();
+}
+async function getLb(){try{return await api("/api/leaderboard")}catch{return[]}}
+function lbEmpty(){return empty("Рейтинг пока пуст","Здесь появятся игроки после первых сыгранных матчей. Стань первым!",S.user?`<a class="btn btn-o" href="#/lobby">Найти матч</a>`:`<a class="btn btn-o" href="#/register">Регистрация</a>`)}
+function lbTable(list,compact){
+  return `<table><thead><tr><th>#</th><th>Игрок</th><th>Уровень</th><th>ELO</th>${compact?"":"<th>Матчи</th><th>Победы</th><th>K/D</th><th>HS%</th>"}</tr></thead><tbody>
+  ${list.map((p,i)=>`<tr class="click" data-p="${esc(p.nick)}"><td class="rank">${p.rank||i+1}</td><td><div class="pl">${ava(p.nick)}<b>${esc(p.nick)}</b></div></td><td>${badge(p.elo,"sm")}</td><td><b>${p.elo}</b></td>${compact?"":`<td>${p.matches}</td><td>${wr(p)}</td><td>${kd(p)}</td><td>${hsp(p)}</td>`}</tr>`).join("")}</tbody></table>`;
+}
+
+/* ===== Вход / регистрация ===== */
+function pageAuth(type){
+  const reg=type==="register";
+  app.innerHTML=`<div class="auth"><form class="card" id="f" novalidate>
+   <h1>${reg?"Создать аккаунт":"Вход в StandHub"}</h1>
+   <p class="muted">${reg?"Присоединяйся к соревновательному StandLeo":"Рады видеть снова, боец"}</p>
+   ${reg?`<div class="field"><label for="nick">Никнейм</label><input id="nick" autocomplete="nickname" placeholder="Например, Fl4mus"><div class="err" id="e-nick"></div></div>
+   <div class="field"><label for="soid">Игровой ID в StandLeo</label><input id="soid" inputmode="numeric" placeholder="123456789"><div class="err" id="e-soid"></div></div>`:""}
+   <div class="field"><label for="email">Email</label><input id="email" type="email" autocomplete="email" placeholder="you@mail.ru"><div class="err" id="e-email"></div></div>
+   <div class="field"><label for="pw">Пароль</label><input id="pw" type="password" autocomplete="${reg?"new-password":"current-password"}" placeholder="••••••••"><div class="err" id="e-pw"></div></div>
+   ${reg?`<div class="field"><label for="region">Регион</label><select id="region"><option>Европа</option><option>СНГ</option></select></div>
+   <label class="chk"><input type="checkbox" id="tos"> <span>Я принимаю условия использования и правила античита StandHub</span></label><div class="err" id="e-tos"></div>`:""}
+   <button class="btn btn-o btn-lg" style="width:100%;margin-top:20px" type="submit">${reg?"Зарегистрироваться":"Войти"}</button>
+   <p class="muted" style="text-align:center;margin-top:20px;font-size:14px">${reg?'Уже есть аккаунт? <a href="#/login" style="color:var(--orange)">Войти</a>':'Нет аккаунта? <a href="#/register" style="color:var(--orange)">Регистрация</a>'}</p>
+  </form></div>`;
+  document.getElementById("f").onsubmit=async e=>{
+    e.preventDefault();const v=id=>(document.getElementById(id)||{}).value?.trim()||"";
+    const set=(id,m)=>{const el=document.getElementById("e-"+id);if(el)el.textContent=m};
+    ["nick","soid","email","pw","tos"].forEach(k=>set(k,""));
+    if(reg&&!document.getElementById("tos").checked)return set("tos","Нужно принять условия");
+    try{
+      const r=await api(reg?"/api/register":"/api/login",{method:"POST",body:JSON.stringify(reg?{nick:v("nick"),soid:v("soid"),email:v("email"),pw:v("pw"),region:v("region")}:{email:v("email"),pw:v("pw")})});
+      S.token=r.token;S.user=r.user;localStorage.setItem("sh_token",r.token);connectLive();
+      toast(reg?"Аккаунт создан! Добро пожаловать":"Вы вошли");location.hash="#/lobby";
+    }catch(err){if(err.field)set(err.field,err.message);else toast(location.protocol==="file:"?"Запустите сайт через сервер (node server.js)":err.message)}
+  };
+}
+
+/* ===== Лобби ===== */
+function pageLobby(){
+  if(needAuth())return;const u=S.user;
+  app.innerHTML=`<div class="wrap"><h1 class="h">Матчмейкинг</h1>
+  <div class="lobby">
+   <div class="card pad">
+     <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px">
+       <div><div class="tag">StandLeo</div><h3 style="margin:4px 0 0;font-size:20px">Твоё пати</h3></div>
+       <div class="modes" role="radiogroup" aria-label="Режим">${["5v5","2v2","1v1"].map(m=>`<button class="chip ${S.mode===m?"on":""}" data-mode="${m}" role="radio" aria-checked="${S.mode===m}">${m.replace("v"," на ")}</button>`).join("")}</div>
+     </div>
+     <div class="party" id="party"></div>
+     <h3>Пул карт <span class="muted" style="text-transform:none;font-weight:500">— нажми, чтобы исключить</span></h3>
+     <div class="maps">${MAPS.map(([m])=>`<button class="map ${S.maps.has(m)?"on":"off"}" data-map="${m}" style="background:${mapBg(m)}" aria-pressed="${S.maps.has(m)}">${m}</button>`).join("")}</div>
+     <div class="findbox">
+       <div><div class="muted" style="font-size:13px">Регион: ${esc(u.region)} · Античит: активен</div><div id="qstatus" style="font-weight:700;margin-top:4px">Готов к поиску</div></div>
+       <button class="btn btn-o btn-find ${S.searching?"searching":""}" id="find">${S.searching?"Отменить поиск":"Найти матч"}</button>
+     </div>
+   </div>
+   <div class="grid" style="align-content:start">
+     <div class="card pad"><h3>Твой уровень</h3><div style="display:flex;align-items:center;gap:14px">${badge(u.elo,"xl")}<div><div style="font-size:28px;font-weight:900">${u.elo} <span class="muted" style="font-size:14px">ELO</span></div><div class="muted" style="font-size:13px">${lvlOf(u.elo)<10?`До уровня ${lvlOf(u.elo)+1}: ${TH[lvlOf(u.elo)+1]-u.elo} ELO`:"Максимальный уровень"}</div></div></div></div>
+     <div class="card pad"><h3>Сейчас на сайте</h3>
+       <div class="qrow"><span class="muted">Онлайн</span>${L("online")}</div>
+       <div class="qrow"><span class="muted">В поиске матча</span>${L("searching")}</div>
+       <div class="qrow"><span class="muted">Матчей идёт</span>${L("live")}</div></div>
+     <div class="card pad"><h3>Последние матчи</h3><div id="lobbyM" class="muted">Загрузка…</div></div>
+   </div>
+  </div></div>`;
+  renderParty();
+  document.querySelectorAll("[data-mode]").forEach(b=>b.onclick=()=>{if(S.searching)return toast("Сначала отмените поиск");S.mode=b.dataset.mode;pageLobby()});
+  document.querySelectorAll("[data-map]").forEach(b=>b.onclick=()=>{const m=b.dataset.map;if(S.maps.has(m)){if(S.maps.size<=3)return toast("Оставьте минимум 3 карты");S.maps.delete(m)}else S.maps.add(m);b.classList.toggle("on");b.classList.toggle("off");b.setAttribute("aria-pressed",S.maps.has(m))});
+  document.getElementById("find").onclick=()=>S.searching?stopSearch():startSearch();
+  if(S.searching)tick();
+  api("/api/matches?player="+encodeURIComponent(u.nick)).catch(()=>[]).then(ms=>{const el=document.getElementById("lobbyM");if(el)el.innerHTML=ms.length?ms.slice(0,4).map(mini).join(""):"Вы ещё не сыграли ни одного матча"});
+}
+function renderParty(){
+  const n=S.mode==="5v5"?5:S.mode==="2v2"?2:1;const u=S.user;
+  document.getElementById("party").innerHTML=Array.from({length:5},(_,i)=>i===0?`<div class="slot me">${ava(u.nick)}<b>${esc(u.nick)}</b>${badge(u.elo,"sm")}</div>`:i<n?`<button class="slot" onclick="toast('Приглашение друзей появится позже')"><span class="plus">+</span>Пригласить</button>`:`<div class="slot" style="opacity:.25"></div>`).join("");
+}
+function mini(m){return `<a class="mrow" href="#/match/${m.id}"><b>${esc(m.map)}</b><span>${m.scoreA}:${m.scoreB}</span></a>`}
+async function startSearch(){
+  try{await api("/api/queue/join",{method:"POST"})}catch(e){return toast(location.protocol==="file:"?"Запустите сайт через сервер (node server.js)":e.message)}
+  S.searching=true;S.secs=0;pageLobby();S.timer=setInterval(()=>{S.secs++;tick()},1000);
+}
+async function stopSearch(silent){
+  if(!S.searching)return;S.searching=false;clearInterval(S.timer);
+  try{await api("/api/queue/leave",{method:"POST"})}catch{}
+  if(!silent){pageLobby();toast("Поиск отменён")}
+}
+function tick(){const el=document.getElementById("qstatus");if(el){const m=Math.floor(S.secs/60),s=String(S.secs%60).padStart(2,"0");el.innerHTML=`<span class="dot" style="background:var(--orange)"></span>Ищем игроков… ${m}:${s} · в очереди ${L("searching")}`}}
+
+/* ===== Профиль ===== */
+async function pageProfile(name){
+  let p;
+  if(!name){if(needAuth())return;try{p=S.user=await api("/api/me")}catch{p=S.user}}
+  else{try{p=await api("/api/player/"+encodeURIComponent(name))}catch{app.innerHTML=`<div class="wrap">${empty("Игрок не найден","Проверьте ник и попробуйте ещё раз")}</div>`;return}}
+  const l=lvlOf(p.elo);const ms=await api("/api/matches?player="+encodeURIComponent(p.nick)).catch(()=>[]);
+  const none=p.matches===0;
+  app.innerHTML=`<div class="wrap">
+   <div class="phead">${ava(p.nick)}
+     <div><div class="flag">${esc(p.region)} · На StandHub с ${new Date(p.created).toLocaleDateString("ru-RU")}</div><h1>${esc(p.nick)}</h1>
+       <div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap"><span class="chip on" style="height:28px;font-size:12px;display:inline-flex;align-items:center">StandLeo</span></div></div>
+     <div class="elo-box">${badge(p.elo,"xl")}<div class="elo-prog"><div class="muted" style="font-size:12px;font-weight:700;text-transform:uppercase">Уровень ${l}</div><div class="v">${p.elo} <span class="muted" style="font-size:14px">ELO</span></div>
+       <div class="bar"><div style="width:${lvlPct(p.elo)}%"></div></div><div class="muted" style="font-size:12px">${l<10?`${TH[l]} — ${TH[l+1]-1}`:"Уровень 10 · 2001+"}</div></div></div>
+   </div>
+   <div class="stats" style="margin-top:24px">
+     ${[["Матчи",p.matches],["Победы",wr(p)],["K/D",kd(p)],["Хедшоты",hsp(p)],["Средн. убийств",p.matches?(p.kills/p.matches).toFixed(1):"—"],["Убийств всего",p.kills]].map(([k,v])=>`<div class="card stat"><div class="k">${k}</div><div class="v">${v}</div></div>`).join("")}
+   </div>
+   ${none?`<div class="card" style="margin-top:16px">${empty("Матчей пока нет",(S.user&&S.user.nick===p.nick?"Сыграйте первый матч — здесь появятся график ELO, статистика по картам и история игр.":"Этот игрок ещё не сыграл ни одного матча."),S.user&&S.user.nick===p.nick?`<a class="btn btn-o" href="#/lobby">Найти матч</a>`:"")}</div>`:
+   `<div class="card" style="margin-top:16px"><div class="thead"><b>История матчей</b></div><div class="scroll">${matchTable(ms,p.nick)}</div></div>`}
+  </div>`;
+  bind();
+}
+function matchTable(list,nick){
+  return `<table><thead><tr><th>Результат</th><th>Карта</th><th>Счёт</th><th>K / D / A</th><th>ELO</th><th>Дата</th></tr></thead><tbody>
+  ${list.map(m=>{const p=m.players.find(x=>x.nick===nick)||{};return `<tr class="click" data-m="${m.id}"><td><span class="res ${p.win?"w":"l"}">${p.win?"W":"L"}</span></td><td><b>${esc(m.map)}</b></td><td>${m.scoreA} : ${m.scoreB}</td><td>${p.k??"—"} / ${p.d??"—"} / ${p.a??"—"}</td><td class="${p.delta>=0?"w":"l"}">${p.delta>=0?"+":""}${p.delta??"—"}</td><td class="muted">${new Date(m.date).toLocaleDateString("ru-RU")}</td></tr>`}).join("")}</tbody></table>`;
+}
+
+/* ===== Матчи / рейтинг ===== */
+async function pageMatches(){
+  app.innerHTML=`<div class="wrap"><h1 class="h">Матчи</h1><div class="card" id="ml"><div class="pad muted">Загрузка…</div></div></div>`;
+  const ms=await api("/api/matches").catch(()=>[]);
+  document.getElementById("ml").innerHTML=ms.length?`<div class="scroll"><table><thead><tr><th>Карта</th><th>Счёт</th><th>Дата</th></tr></thead><tbody>${ms.map(m=>`<tr class="click" data-m="${m.id}"><td><b>${esc(m.map)}</b></td><td>${m.scoreA} : ${m.scoreB}</td><td class="muted">${new Date(m.date).toLocaleDateString("ru-RU")}</td></tr>`).join("")}</tbody></table></div>`:
+    empty("Матчей пока нет","На StandHub ещё не сыграно ни одного матча. Здесь будет история всех игр.",S.user?`<a class="btn btn-o" href="#/lobby">Найти матч</a>`:"");
+  bind();
+}
+async function pageMatch(id){
+  try{const m=await api("/api/match/"+id);app.innerHTML=`<div class="wrap"><h1 class="h">${esc(m.map)} · ${m.scoreA}:${m.scoreB}</h1></div>`}
+  catch{app.innerHTML=`<div class="wrap">${empty("Матч не найден","Возможно, ссылка устарела",`<a class="btn btn-g" href="#/matches">Все матчи</a>`)}</div>`}
+}
+async function pageLeaderboard(){
+  app.innerHTML=`<div class="wrap"><h1 class="h">Таблица лидеров</h1><div id="lb"><div class="card pad muted">Загрузка…</div></div></div>`;
+  const list=(await getLb()).map((p,i)=>({...p,rank:i+1}));const el=document.getElementById("lb");
+  if(!list.length){el.innerHTML=`<div class="card">${lbEmpty()}</div>`;return}
+  el.innerHTML=`${list.length>=3?`<div class="lb-top">${[1,0,2].map(i=>{const p=list[i];return `<a href="#/player/${encodeURIComponent(p.nick)}" class="card podium p${i+1}"><span class="rk">#${i+1}</span>${ava(p.nick)}<b style="font-size:18px;display:block">${esc(p.nick)}</b><div style="display:flex;justify-content:center;align-items:center;gap:8px;margin-top:8px">${badge(p.elo,"sm")}<b>${p.elo} ELO</b></div><div class="muted" style="font-size:13px;margin-top:4px">${p.matches} матчей · ${wr(p)} побед</div></a>`}).join("")}</div>`:""}
+   <div class="card scroll">${lbTable(list.length>=3?list.slice(3):list,false)}</div>`;
+  bind();
+}
+
+/* ===== Роутер ===== */
+function route(){
+  const h=location.hash.slice(1)||"/";const [,a,b]=h.split("/");
+  renderChrome("/"+(a||""));window.scrollTo(0,0);
+  if(!a)pageHome();else if(a==="login")pageAuth("login");else if(a==="register")pageAuth("register");
+  else if(a==="lobby")pageLobby();else if(a==="profile")pageProfile();else if(a==="player")pageProfile(decodeURIComponent(b));
+  else if(a==="matches")pageMatches();else if(a==="match")pageMatch(b);else if(a==="leaderboard")pageLeaderboard();else pageHome();
+  bind();
+}
+function bind(){
+  document.querySelectorAll("[data-p]").forEach(r=>r.onclick=()=>location.hash="#/player/"+encodeURIComponent(r.dataset.p));
+  document.querySelectorAll("[data-m]").forEach(r=>r.onclick=()=>location.hash="#/match/"+r.dataset.m);
+}
+document.getElementById("q").addEventListener("keydown",async e=>{if(e.key!=="Enter")return;const r=await api("/api/search?q="+encodeURIComponent(e.target.value)).catch(()=>[]);if(r[0])location.hash="#/player/"+encodeURIComponent(r[0].nick);else toast("Игрок не найден")});
+window.addEventListener("hashchange",route);
+(async()=>{if(S.token){try{S.user=await api("/api/me")}catch{S.token=null;localStorage.removeItem("sh_token")}}connectLive();route()})();
+</script>
+
+</body>
+</html>
