@@ -195,6 +195,8 @@ const tgUser = (uid, text) => { const u = db.users.find(x => x.id === uid); if (
 match = require('./match')({ db, save, sendTo, broadcast, siteUrl: SITE_URL,
   ocr: buf => ocr(buf, 'eng+rus'), avatarOf: u => pub(u).avatar, tell: tgUser,
   alertAdmins: text => db.users.filter(u => u.verified && isAdmin(u)).forEach(u => tgUser(u.id, text)) });
+// ---------- друзья ----------
+const friends = require('./friends')({ db, save, sendTo, tell: tgUser, go, pub, isOnline, matchOf: uid => match.matchOf(uid) });
 
 // ---------- http ----------
 const send = (res, code, obj) => { res.writeHead(code, { 'Content-Type': 'application/json; charset=utf-8' }); res.end(JSON.stringify(obj)); };
@@ -212,7 +214,7 @@ http.createServer(async (req, res) => {
     res.writeHead(200, { 'Content-Type': 'text/event-stream', 'Cache-Control': 'no-cache', Connection: 'keep-alive', 'X-Accel-Buffering': 'no' });
     const userId = sessions.get(url.searchParams.get('token')) || null;
     clients.set(res, { visitorId: url.searchParams.get('vid') || crypto.randomUUID(), userId });
-    if (userId) sse(res, stateOf(userId));
+    if (userId) { sse(res, stateOf(userId)); sse(res, friends.state(userId)); }
     sse(res, stats()); broadcast();
     // закрыл сайт — через 20 секунд убираем из поиска (если не вернулся)
     req.on('close', () => { clients.delete(res); if (userId) setTimeout(() => { if (!isOnline(userId)) match.leave(userId); }, 20000); broadcast(); });
@@ -296,6 +298,15 @@ http.createServer(async (req, res) => {
       ocrBusy.add(u.id); try { r = await match.report(m.id, u.id, imgs); } finally { ocrBusy.delete(u.id); }
     }
     return send(res, r.error ? 400 : 200, { ...r, match: match.view(match.find(m.id), u.id) });
+  }
+  if (p === '/api/friends' || p.startsWith('/api/friends/')) {
+    const u = authUser(req); if (!u) return send(res, 401, { error: 'Войдите в аккаунт' });
+    if (p === '/api/friends') return send(res, 200, friends.state(u.id));
+    if (req.method !== 'POST') return send(res, 405, { error: 'Неверный запрос' });
+    const b = await body(req, 2e3), act = p.slice(13), id = String(b.id || '');
+    const r = act === 'request' ? friends.request(u, b.nick || b.q) : act === 'accept' ? friends.accept(u, id) : act === 'decline' ? friends.decline(u, id)
+      : act === 'cancel' ? friends.cancel(u, id) : act === 'remove' ? friends.remove(u, b.nick) : { error: 'Неизвестное действие' };
+    return send(res, r.error ? 400 : 200, r);
   }
   if (p === '/api/queue/join' && req.method === 'POST') {
     const u = authUser(req); if (!u) return send(res, 401, { error: 'Войдите в аккаунт' });

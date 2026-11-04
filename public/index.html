@@ -197,6 +197,33 @@ tr.click{cursor:pointer}tr.click:hover td{background:var(--card2)}
 .prow .pr{display:flex;align-items:center;gap:8px;font-weight:800;white-space:nowrap}
 .pills{display:flex;gap:4px;flex-wrap:wrap;margin-top:2px}
 .pill{display:inline-block;font-size:11px;font-weight:800;text-transform:uppercase;padding:1px 6px;border-radius:3px;background:var(--card2);color:var(--muted);letter-spacing:.03em;vertical-align:middle}
+/* друзья */
+.side a{position:relative}
+.nb{margin-left:auto;min-width:18px;height:18px;padding:0 5px;border-radius:9px;background:var(--orange);color:#fff;font-size:11px;font-weight:800;line-height:1;display:inline-grid;place-items:center}
+.nb.z{display:none}
+.frw{display:inline-flex}
+.frb{display:inline-flex;align-items:center;height:26px;padding:0 10px;border-radius:13px;font-size:12px;font-weight:700;border:1px solid var(--line);background:var(--bg2);color:#fff;white-space:nowrap;cursor:pointer;font-family:inherit}
+.frb.add{border-color:rgba(255,85,0,.55);color:#ff8a4d}
+.frb.add:hover{background:rgba(255,85,0,.14);color:#fff}
+.frb.hot{background:linear-gradient(135deg,#ff6a1a,#ff4d00);border-color:transparent}
+.frb.ok{color:#3ddc84;cursor:default}
+.frb.wait{color:var(--muted);cursor:default}
+.frb:disabled{opacity:.6;cursor:default}
+[data-big] .frb{height:32px;padding:0 14px;border-radius:16px;font-size:13px}
+.fr-wrap{display:grid;gap:16px;max-width:780px}
+.fadd{display:flex;gap:10px}
+.fadd input{flex:1;min-width:0;height:46px;background:var(--bg2);border:1px solid var(--line);border-radius:6px;color:#fff;padding:0 14px;font-size:15px;font-family:inherit}
+.fadd input:focus{border-color:var(--orange);outline:none}
+.fsug{margin-top:6px}.fsug:empty{display:none}
+.frow{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--line)}
+.frow:last-child{border-bottom:0}
+.frow .fn{flex:1;min-width:0}
+.frow .fn b{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#fff}
+.frow .fa{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}
+.st{font-size:12px;color:var(--muted);margin-top:2px}.st.on{color:#3ddc84}.st.m{color:#ff8a4d}
+.cnt{display:inline-grid;place-items:center;min-width:22px;height:22px;padding:0 6px;border-radius:11px;background:var(--card2);color:#fff;font-size:12px;margin-left:8px;vertical-align:1px}
+.fr-in{box-shadow:0 0 0 1px rgba(255,85,0,.5),0 10px 30px -18px rgba(255,85,0,.7)}
+.btn.sure{border-color:#ff4d4d;color:#ff6b6b}
 .pill.cap{background:rgba(255,200,0,.15);color:var(--yellow)}.pill.host{background:rgba(255,85,0,.18);color:var(--orange2)}.pill.me{background:rgba(63,207,106,.15);color:var(--green)}
 .logo-t.ta{background:linear-gradient(135deg,#3fcf6a,#1d5e31)}.logo-t.tb{background:linear-gradient(135deg,#ff4d4d,#6b1a1a)}
 .score .s.vs{font-size:40px;color:var(--muted)}
@@ -369,6 +396,10 @@ body::after{width:520px;height:520px;left:140px;bottom:-220px;background:radial-
  .side a.on{box-shadow:inset 0 -3px 0 var(--orange);background:linear-gradient(0deg,rgba(255,85,0,.2),transparent)}
  .side .sep,.side .online,.side .hide-m{display:none}
  main{margin-left:0;padding-bottom:64px}
+ .side a{flex:1 1 0;min-width:0;padding:4px 2px;white-space:nowrap}
+ .side .nb{position:absolute;top:3px;left:calc(50% + 5px);margin:0;min-width:16px;height:16px;font-size:10px;padding:0 4px}
+ .fadd{flex-direction:column}.fadd .btn{width:100%}
+ .frow{flex-wrap:wrap}.frow .fa{flex-basis:100%;justify-content:flex-start;padding-left:52px}
  .search{display:none}.top .right .btn-g,.top .right a[href="#/lobby"]{display:none}.top{padding:0 12px}.logo{font-size:18px}
  .wrap{padding:20px 16px}
  .hero{min-height:480px}.hero h1{font-size:44px}
@@ -450,7 +481,7 @@ function qHint(){
 const L=k=>`<b data-live="${k}">${S.live[k]==null?"—":fmt(S.live[k])}</b>`;
 
 /* ===== Каркас ===== */
-const ICONS={"home":"<path d=\"M3 11l9-8 9 8v10h-6v-6H9v6H3z\"/>","play":"<path d=\"M7 4l13 8-13 8z\"/>","user":"<circle cx=\"12\" cy=\"8\" r=\"4\"/><path d=\"M4 21c0-4 4-6 8-6s8 2 8 6z\"/>","swords":"<path d=\"M3 3h4l10 10-2 2-2-2-3 3-2-2 3-3zM21 3h-4l-5 5 2 2 1-1 2 2-6 6 2 2 3-3 2 2 2-2-2-2 3-3z\"/>","crown":"<path d=\"M3 7l5 4 4-7 4 7 5-4-2 12H5z\"/>","shield":"<path d=\"M12 2l8 3v6c0 5-3.5 9-8 11-4.5-2-8-6-8-11V5z\"/>","spark":"<path d=\"M12 2l2.4 6.6L21 11l-6.6 2.4L12 20l-2.4-6.6L3 11l6.6-2.4z\"/>","help":"<circle cx=\"12\" cy=\"12\" r=\"10\"/><path d=\"M9.5 9a2.5 2.5 0 115 0c0 2-2.5 2-2.5 4M12 17h0\" stroke=\"#0f0f11\" stroke-width=\"2\" fill=\"none\"/>"};
+const ICONS={"users":"<circle cx=\"9\" cy=\"8\" r=\"3.6\"/><path d=\"M2.5 20c0-3.7 2.9-5.8 6.5-5.8s6.5 2.1 6.5 5.8z\"/><circle cx=\"16.6\" cy=\"8.8\" r=\"2.9\"/><path d=\"M16.3 13.4c3.2.1 5.2 2.1 5.2 5.4h-4.6c-.1-2.1-.9-3.9-2.3-5.2.5-.1 1.1-.2 1.7-.2z\"/>","home":"<path d=\"M3 11l9-8 9 8v10h-6v-6H9v6H3z\"/>","play":"<path d=\"M7 4l13 8-13 8z\"/>","user":"<circle cx=\"12\" cy=\"8\" r=\"4\"/><path d=\"M4 21c0-4 4-6 8-6s8 2 8 6z\"/>","swords":"<path d=\"M3 3h4l10 10-2 2-2-2-3 3-2-2 3-3zM21 3h-4l-5 5 2 2 1-1 2 2-6 6 2 2 3-3 2 2 2-2-2-2 3-3z\"/>","crown":"<path d=\"M3 7l5 4 4-7 4 7 5-4-2 12H5z\"/>","shield":"<path d=\"M12 2l8 3v6c0 5-3.5 9-8 11-4.5-2-8-6-8-11V5z\"/>","spark":"<path d=\"M12 2l2.4 6.6L21 11l-6.6 2.4L12 20l-2.4-6.6L3 11l6.6-2.4z\"/>","help":"<circle cx=\"12\" cy=\"12\" r=\"10\"/><path d=\"M9.5 9a2.5 2.5 0 115 0c0 2-2.5 2-2.5 4M12 17h0\" stroke=\"#0f0f11\" stroke-width=\"2\" fill=\"none\"/>"};
 function ic(n){return `<svg class="ic" viewBox="0 0 24 24" width="20" height="20" fill="currentColor" aria-hidden="true">${ICONS[n]}</svg>`}
 function renderChrome(route){
   const u=S.user,tr=document.getElementById("topRight"),side=document.getElementById("side");
@@ -461,14 +492,14 @@ function renderChrome(route){
     <a class="userchip" href="#/profile" aria-label="Мой профиль">${ava(u.nick,u.avatar)}<span class="nm">${esc(u.nick)}</span>${badge(u.elo,"sm")}</a>
     <button class="btn btn-g" id="logout">Выйти</button>`:`
     <a class="btn btn-g" href="#/login">Войти</a><a class="btn btn-o" href="#/register">Регистрация</a>`;
-  const lo=document.getElementById("logout");if(lo)lo.onclick=async()=>{S.searching=false;stopQTimer();try{await api("/api/logout",{method:"POST"})}catch{}S.token=null;S.user=null;S.match=null;S.lobbyMs=null;closeAccept();localStorage.removeItem("sh_token");connectLive();if(curHash()==="/")route();else location.hash="#/"}}
-  const items=[["#/","home","Главная"],["#/lobby","play","Играть"],["#/profile","user","Профиль"],["#/matches","swords","Матчи"],["#/leaderboard","crown","Рейтинг"]];
+  const lo=document.getElementById("logout");if(lo)lo.onclick=async()=>{S.searching=false;stopQTimer();try{await api("/api/logout",{method:"POST"})}catch{}S.token=null;S.user=null;S.match=null;S.lobbyMs=null;S.fr=null;frBadge();closeAccept();localStorage.removeItem("sh_token");connectLive();if(curHash()==="/")route();else location.hash="#/"}}
+  const items=[["#/","home","Главная"],["#/lobby","play","Играть"],["#/profile","user","Профиль"],["#/friends","users","Друзья"],["#/matches","swords","Матчи"],["#/leaderboard","crown","Рейтинг"]];
   if(u&&u.admin)items.push(["#/admin","shield","Админ"]);
   const sk=items.map(x=>x[0]).join();
-  if(side.dataset.k!==sk){side.dataset.k=sk;side.innerHTML=items.map(([h,i,t])=>`<a href="${h}" data-r="${h.slice(1)}">${ic(i)}${t}</a>`).join("")+
+  if(side.dataset.k!==sk){side.dataset.k=sk;side.innerHTML=items.map(([h,i,t])=>`<a href="${h}" data-r="${h.slice(1)}">${ic(i)}${t}${h==="#/friends"?`<span class="nb z" data-frn aria-label="Новые заявки">0</span>`:""}</a>`).join("")+
    `<div class="sep"></div><a href="#" class="hide-m">${ic("shield")}Античит</a><a href="#" class="hide-m">${ic("help")}Поддержка</a><a href="#" class="hide-m mot" data-motion>${ic("spark")}Анимации: <b>вкл</b></a>
     <div class="online"><span class="dot"></span>${L("online")} на сайте<div class="ver">Версия ${APP_V}</div></div>`}
-  paintMotion();
+  paintMotion();frBadge();
   side.querySelectorAll("a[data-r]").forEach(a=>{const on=a.dataset.r===route;a.classList.toggle("on",on);if(on)a.setAttribute("aria-current","page");else a.removeAttribute("aria-current")});
 }
 const app=document.getElementById("app");
@@ -476,7 +507,7 @@ function toast(t){const e=document.getElementById("toast");e.textContent=t;e.cla
 function needAuth(){if(!S.user){location.hash="#/login";toast("Войдите, чтобы продолжить");return true}return false}
 function empty(title,text,btn){return `<div class="empty"><div class="empty-ic">${ic("crown")}</div><b>${title}</b><p class="muted">${text}</p>${btn||""}</div>`}
 /* ===== Анимации ===== */
-const APP_V="1.3.3";
+const APP_V="1.4";
 // анимации включены всегда; выключить можно кнопкой «Анимации» (меню слева / низ главной)
 const RM=()=>document.documentElement.classList.contains("no-motion");
 function paintMotion(){document.querySelectorAll("[data-motion] b").forEach(b=>b.textContent=RM()?"выкл":"вкл")}
@@ -627,6 +658,66 @@ function pageVerify(){
   },3000);
 }
 
+/* ===== Друзья ===== */
+function frRel(nick){const f=S.fr;if(!f)return {r:"none"};const n=String(nick).toLowerCase(),eq=u=>u.nick.toLowerCase()===n;
+  if(f.friends.some(eq))return {r:"friend"};const o=f.outgoing.find(x=>eq(x.user));if(o)return {r:"out",id:o.id};
+  const i=f.incoming.find(x=>eq(x.user));if(i)return {r:"in",id:i.id};return {r:"none"}}
+function frInner(nick,big){const x=frRel(nick);
+  return x.r==="friend"?`<span class="frb ok">✓ В друзьях</span>`:x.r==="out"?`<span class="frb wait">Заявка отправлена</span>`
+   :x.r==="in"?`<button class="frb hot" data-fact="accept" data-id="${x.id}">${big?"Принять заявку в друзья":"Принять в друзья"}</button>`
+   :`<button class="frb add" data-fact="add" data-nick="${esc(nick)}">+ ${big?"Добавить в друзья":"В друзья"}</button>`}
+function frBtn(nick,big){if(!S.user||S.user.nick===nick)return "";return `<span class="frw" data-fr="${esc(nick)}"${big?' data-big="1"':""}>${frInner(nick,big)}</span>`}
+function frBadge(){const n=S.fr?S.fr.incoming.length:0;document.querySelectorAll("[data-frn]").forEach(el=>{el.textContent=n;el.classList.toggle("z",!n)})}
+function paintFr(){frBadge();
+  document.querySelectorAll("[data-fr]").forEach(el=>{const h=frInner(el.dataset.fr,!!el.dataset.big);if(el.innerHTML!==h)el.innerHTML=h});
+  const fb=document.getElementById("frBody");if(fb){const k=JSON.stringify(S.fr);if(fb.dataset.k!==k){fb.dataset.k=k;fb.innerHTML=frBody()}}}
+function onFriends(d){const prev=S.fr;S.fr={friends:d.friends||[],incoming:d.incoming||[],outgoing:d.outgoing||[]};
+  if(prev){const seen=new Set(prev.incoming.map(r=>r.id)),nw=S.fr.incoming.filter(r=>!seen.has(r.id));
+    if(nw.length)toast(nw.length>1?`Новые заявки в друзья: ${nw.length}`:`${nw[0].user.nick} хочет добавить вас в друзья`);
+    else{const was=new Set(prev.friends.map(f=>f.nick)),acc=S.fr.friends.find(f=>!was.has(f.nick)&&prev.outgoing.some(r=>r.user.nick===f.nick));if(acc)toast(`${acc.nick} принял(а) вашу заявку — теперь вы друзья`)}}
+  paintFr()}
+async function loadFr(){if(!S.user)return;try{onFriends(await api("/api/friends"))}catch{}}
+const frMsg=r=>r.accepted?`${r.nick} теперь ваш друг 🤝`:`Заявка в друзья отправлена: ${r.nick}`;
+// кнопки друзей (на странице друзей, в профиле, в комнате матча) — один общий обработчик
+document.addEventListener("click",async e=>{const b=e.target.closest("[data-fact]");if(!b)return;e.preventDefault();e.stopPropagation();
+  if(!S.user)return needAuth();if(b.disabled)return;
+  const a=b.dataset.fact,post=(u,o)=>api("/api/friends/"+u,{method:"POST",body:JSON.stringify(o)});
+  if(a==="remove"&&!b.classList.contains("sure")){const t=b.textContent;b.classList.add("sure");b.textContent="Точно удалить?";setTimeout(()=>{if(b.isConnected){b.classList.remove("sure");b.textContent=t}},3000);return}
+  b.disabled=true;
+  try{let r;
+    if(a==="add"){r=await post("request",{nick:b.dataset.nick});toast(frMsg(r))}
+    else if(a==="accept"){r=await post("accept",{id:b.dataset.id});toast(`${r.nick||"Игрок"} теперь ваш друг 🤝`)}
+    else if(a==="decline"){await post("decline",{id:b.dataset.id});toast("Заявка отклонена")}
+    else if(a==="cancel"){await post("cancel",{id:b.dataset.id});toast("Заявка отменена")}
+    else if(a==="remove"){r=await post("remove",{nick:b.dataset.nick});toast(`${r.nick} больше не в друзьях`)}
+    await loadFr()}
+  catch(err){toast(err.message);if(b.isConnected)b.disabled=false}
+},true);
+function frRow(u,act,st){return `<div class="frow">${ava(u.nick,u.avatar)}<div class="fn"><a href="#/player/${encodeURIComponent(u.nick)}"><b>${esc(u.nick)}</b></a>${st?`<div class="st${u.inMatch?" m":u.online?" on":""}">${u.inMatch?"● в матче":u.online?"● на сайте":"не в сети"}</div>`:""}</div>${badge(u.elo,"sm")}<div class="fa">${act}</div></div>`}
+function frBody(){if(!S.fr)return `<div class="card pad">${skel(3,false)}</div>`;const {friends,incoming,outgoing}=S.fr;
+  return (incoming.length?`<div class="card pad fr-in"><h3>Заявки в друзья<span class="cnt">${incoming.length}</span></h3>${incoming.map(r=>frRow(r.user,`<button class="btn btn-o btn-sm" data-fact="accept" data-id="${r.id}">Принять</button><button class="btn btn-g btn-sm" data-fact="decline" data-id="${r.id}">Отклонить</button>`)).join("")}</div>`:"")
+   +`<div class="card pad"><h3>Мои друзья<span class="cnt">${friends.length}</span></h3>${friends.length?friends.map(u=>frRow(u,`<button class="btn btn-g btn-sm" data-fact="remove" data-nick="${esc(u.nick)}">Удалить</button>`,1)).join(""):`<p class="muted" style="margin:0">Пока никого нет. Добавьте игрока по ID в игре или нику — или прямо после матча, в комнате матча.</p>`}</div>`
+   +(outgoing.length?`<div class="card pad"><h3>Отправленные заявки<span class="cnt">${outgoing.length}</span></h3>${outgoing.map(r=>frRow(r.user,`<button class="btn btn-g btn-sm" data-fact="cancel" data-id="${r.id}">Отменить</button>`)).join("")}</div>`:"")}
+function pageFriends(){
+  if(needAuth())return;
+  app.innerHTML=`<div class="wrap"><h1 class="h">Друзья</h1><div class="fr-wrap">
+   <div class="card pad"><h3>Добавить в друзья</h3>
+    <form class="fadd" id="faddF" autocomplete="off"><input id="fq" maxlength="24" placeholder="ID в игре или ник на StandHub" aria-label="ID в игре или ник на StandHub" enterkeyhint="send"><button class="btn btn-o" type="submit">Отправить заявку</button></form>
+    <div class="fsug" id="fsug"></div>
+    <p class="muted" style="font-size:13px;margin:10px 0 0">Игрок должен быть зарегистрирован на StandHub. После матча добавить можно прямо в комнате матча — кнопкой «+ В друзья» рядом с ником.</p></div>
+   <div id="frBody" style="display:grid;gap:16px"></div></div></div>`;
+  const fb=document.getElementById("frBody");fb.innerHTML=frBody();fb.dataset.k=JSON.stringify(S.fr);
+  const f=document.getElementById("faddF"),q=document.getElementById("fq"),sug=document.getElementById("fsug");
+  f.onsubmit=async e=>{e.preventDefault();const v=q.value.trim();if(!v)return q.focus();const bt=f.querySelector("button");bt.disabled=true;
+    try{const r=await api("/api/friends/request",{method:"POST",body:JSON.stringify({q:v})});toast(frMsg(r));q.value="";sug.innerHTML="";await loadFr()}catch(err){toast(err.message)}
+    bt.disabled=false};
+  let tm;q.oninput=()=>{clearTimeout(tm);const v=q.value.trim();if(v.length<2||/^\d+$/.test(v)){sug.innerHTML="";return}
+    tm=setTimeout(async()=>{const r=await api("/api/search?q="+encodeURIComponent(v)).catch(()=>[]);if(q.value.trim()!==v)return;
+      sug.innerHTML=r.filter(u=>!S.user||u.nick!==S.user.nick).slice(0,5).map(u=>frRow(u,frBtn(u.nick))).join("")},250)};
+  loadFr();entered();
+  clearInterval(S.frT);S.frT=setInterval(()=>{if(curHash()!=="/friends")return clearInterval(S.frT);loadFr()},20000);
+}
+
 /* ===== Лобби ===== */
 const MODE_NAME={"5v5":"5 на 5","2v2":"2 на 2","1v1":"1 на 1"};
 function pageLobby(){
@@ -704,6 +795,7 @@ const BUSY=["accept","veto","live"];
 function onLive(d){
   if(d.type==="stats"){S.live=d;paintLive();return}
   if(d.type==="state")return applyState(d);
+  if(d.type==="friends")return onFriends(d);
   if(d.type==="match")onMatch(d.match);
 }
 function applyState(d,fromAction){
@@ -785,7 +877,7 @@ async function pageProfile(name){
   app.innerHTML=`<div class="wrap">
    <div class="phead">${own?`<label class="ava-edit" title="Сменить аватар">${ava(p.nick,p.avatar)}<span class="ava-cam" aria-hidden="true"><svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M9 4l-2 2H4a1 1 0 00-1 1v12a1 1 0 001 1h16a1 1 0 001-1V7a1 1 0 00-1-1h-3l-2-2zm3 4.5A4.5 4.5 0 1112 17.5 4.5 4.5 0 0112 8.5z"/></svg></span><input type="file" accept="image/png,image/jpeg,image/webp" id="avaIn" class="sr" aria-label="Сменить аватар"></label>`:ava(p.nick,p.avatar)}
      <div><div class="flag">${esc(p.region)} · На StandHub с ${new Date(p.created).toLocaleDateString("ru-RU")}</div><h1>${esc(p.nick)}</h1>
-       <div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap"><span class="chip on" style="height:28px;font-size:12px;display:inline-flex;align-items:center">StandLeo</span></div></div>
+       <div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap;align-items:center"><span class="chip on" style="height:28px;font-size:12px;display:inline-flex;align-items:center">StandLeo</span>${own?"":frBtn(p.nick,true)}</div></div>
      <div class="elo-box">${badge(p.elo,"xl")}<div class="elo-prog"><div class="muted" style="font-size:12px;font-weight:700;text-transform:uppercase">Уровень ${l}</div><div class="v"><span data-count="${p.elo}">${p.elo}</span> <span class="muted" style="font-size:14px">ELO</span></div>
        <div class="bar"><div style="width:${lvlPct(p.elo)}%"></div></div><div class="muted" style="font-size:12px">${l<10?`${TH[l]} — ${TH[l+1]-1}`:"Уровень 10 · 2001+"}</div></div></div>
    </div>
@@ -863,7 +955,7 @@ function renderMatch(m){
   }
 }
 function prow(m,p,acc){
-  return `<div class="prow${p.me?" me":""}">${ava(p.nick,p.avatar)}<div class="pn">${p.bot?`<b>${esc(p.nick)}</b>`:`<a href="#/player/${encodeURIComponent(p.nick)}"><b>${esc(p.nick)}</b></a>`}<div class="pills">${p.captain?`<span class="pill cap">Капитан</span>`:""}${p.host?`<span class="pill host">Хост</span>`:""}${p.bot?`<span class="pill">Бот</span>`:""}${p.me?`<span class="pill me">Вы</span>`:""}</div></div>
+  return `<div class="prow${p.me?" me":""}">${ava(p.nick,p.avatar)}<div class="pn">${p.bot?`<b>${esc(p.nick)}</b>`:`<a href="#/player/${encodeURIComponent(p.nick)}"><b>${esc(p.nick)}</b></a>`}<div class="pills">${p.captain?`<span class="pill cap">Капитан</span>`:""}${p.host?`<span class="pill host">Хост</span>`:""}${p.bot?`<span class="pill">Бот</span>`:""}${p.me?`<span class="pill me">Вы</span>`:""}${!acc&&!p.bot&&!p.me?frBtn(p.nick):""}</div></div>
    <div class="pr">${acc?(p.accepted?`<span class="w">✓ принял</span>`:`<span class="muted">ждём…</span>`):`${badge(p.elo,"sm")}<span>${p.elo}</span>${m.state==="finished"&&p.delta!=null?`<span class="${p.delta>=0?"w":"l"}">${fmtD(p.delta)}</span>`:""}`}</div></div>`;
 }
 function roster(m,t){const ps=m.players.filter(p=>p.team===t).sort((a,b)=>b.elo-a.elo);return `<div class="thead"><b>Команда ${esc(capName(m,t))}</b><span class="muted">${ps.length} игр.</span></div>${ps.map(p=>prow(m,p)).join("")}`}
@@ -969,7 +1061,7 @@ function route(){
   renderChrome("/"+(a||""));window.scrollTo(0,0);clearInterval(matchPoll);
   if(!a)pageHome();else if(a==="login")pageAuth("login");else if(a==="register")pageAuth("register");else if(a==="verify")pageVerify();
   else if(a==="lobby")pageLobby();else if(a==="profile")pageProfile();else if(a==="player")pageProfile(decodeURIComponent(b));
-  else if(a==="matches")pageMatches();else if(a==="match")pageMatch(b);else if(a==="leaderboard")pageLeaderboard();else if(a==="admin")pageAdmin();else pageHome();
+  else if(a==="friends")pageFriends();else if(a==="matches")pageMatches();else if(a==="match")pageMatch(b);else if(a==="leaderboard")pageLeaderboard();else if(a==="admin")pageAdmin();else pageHome();
   bind();
 }
 function bind(){
