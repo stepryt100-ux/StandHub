@@ -177,6 +177,7 @@ tr.click{cursor:pointer}tr.click:hover td{background:var(--card2)}
 .rank{font-weight:900;font-style:italic;color:var(--muted)}
 .chart{width:100%;height:200px}
 .empty{padding:48px 24px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:8px}.empty b{font-size:18px}.empty p{max-width:420px}.empty .btn{margin-top:12px}.empty-ic{width:56px;height:56px;border-radius:50%;background:rgba(255,85,0,.12);color:var(--orange);display:grid;place-items:center;margin-bottom:4px}
+.steps{list-style:none;counter-reset:s;margin:20px 0;display:grid;gap:12px}.steps li{counter-increment:s;position:relative;padding:12px 12px 12px 52px;background:var(--bg2);border:1px solid var(--line);border-radius:6px;display:flex;flex-direction:column;gap:2px}.steps li::before{content:counter(s);position:absolute;left:12px;top:12px;width:28px;height:28px;border-radius:50%;background:var(--orange);display:grid;place-items:center;font-weight:900}.vcode{align-self:flex-start;margin-top:6px;background:#0f0f11;padding:6px 12px;border-radius:4px;font-size:20px;font-weight:900;letter-spacing:.2em}
 .toast{position:fixed;bottom:24px;right:24px;background:var(--card2);border:1px solid var(--orange);padding:14px 18px;border-radius:6px;z-index:200;display:none}
 /* Responsive */
 @media (max-width:1100px){.feat{grid-template-columns:repeat(2,1fr)}.stats{grid-template-columns:repeat(3,1fr)}.lobby,.pgrid{grid-template-columns:1fr}.hero .emblem{opacity:.25}}
@@ -198,6 +199,7 @@ tr.click{cursor:pointer}tr.click:hover td{background:var(--card2)}
  .mhead{grid-template-columns:1fr;text-align:center}.team,.team.r{justify-content:center;text-align:center}
  .lb-top{grid-template-columns:1fr}
  .userchip .nm{display:none}
+ .btn-lg{font-size:15px;padding:0 16px;text-align:center}
 }
 </style>
 </head>
@@ -340,10 +342,41 @@ function pageAuth(type){
     if(reg&&!document.getElementById("tos").checked)return set("tos","Нужно принять условия");
     try{
       const r=await api(reg?"/api/register":"/api/login",{method:"POST",body:JSON.stringify(reg?{nick:v("nick"),soid:v("soid"),email:v("email"),pw:v("pw"),region:v("region")}:{email:v("email"),pw:v("pw")})});
+      if(r.pending){sessionStorage.setItem("sh_pending",JSON.stringify(r));location.hash="#/verify";return}
       S.token=r.token;S.user=r.user;localStorage.setItem("sh_token",r.token);connectLive();
-      toast(reg?"Аккаунт создан! Добро пожаловать":"Вы вошли");location.hash="#/lobby";
-    }catch(err){if(err.field)set(err.field,err.message);else toast(location.protocol==="file:"?"Запустите сайт через сервер (node server.js)":err.message)}
+      toast("Вы вошли");location.hash="#/lobby";
+    }catch(err){if(err.pending){sessionStorage.setItem("sh_pending",JSON.stringify(err));location.hash="#/verify";return}if(err.field)set(err.field,err.message);else toast(location.protocol==="file:"?"Запустите сайт через сервер (node server.js)":err.message)}
   };
+}
+
+
+/* ===== Подтверждение через Telegram ===== */
+let verifyTimer=null;
+function pageVerify(){
+  const p=JSON.parse(sessionStorage.getItem("sh_pending")||"null");
+  if(!p){location.hash="#/register";return}
+  const link=p.bot?`https://t.me/${p.bot}?start=${p.code}`:null;
+  app.innerHTML=`<div class="auth"><div class="card" style="max-width:520px">
+   <div class="tag">Шаг 2 из 2</div>
+   <h1 style="margin-top:6px">Подтвердите аккаунт</h1>
+   <p class="muted">Аккаунт <b style="color:#fff">${esc(p.nick)}</b> создан. Чтобы войти, подтвердите, что игровой ID <b style="color:#fff">${esc(p.soid)}</b> — ваш.</p>
+   <ol class="steps">
+     <li><b>Откройте нашего Telegram-бота</b><span class="muted">${p.bot?"@"+esc(p.bot):"Бот пока не подключён"}</span></li>
+     <li><b>Отправьте боту код</b><span class="muted">Если нажали кнопку ниже — код отправится сам</span><code class="vcode">${esc(p.code)}</code></li>
+     <li><b>Пришлите скриншот профиля StandLeo</b><span class="muted">Так, чтобы был хорошо виден ваш ID</span></li>
+   </ol>
+   ${link?`<a class="btn btn-o btn-lg" style="width:100%" href="${link}" target="_blank" rel="noopener">Открыть бота в Telegram</a>`:`<div class="card pad" style="border-color:var(--orange)">Telegram-бот ещё не настроен администратором сайта.</div>`}
+   <div id="vstatus" class="muted" style="text-align:center;margin-top:16px"><span class="dot" style="background:var(--orange)"></span>Ждём подтверждения от бота…</div>
+   <p class="muted" style="text-align:center;margin-top:16px;font-size:13px">Код действует 24 часа. <a href="#/register" style="color:var(--orange)">Зарегистрироваться заново</a></p>
+  </div></div>`;
+  clearInterval(verifyTimer);
+  verifyTimer=setInterval(async()=>{
+    if(location.hash!=="#/verify")return clearInterval(verifyTimer);
+    try{const r=await api("/api/verify-status?code="+p.code);
+      if(r.verified){clearInterval(verifyTimer);sessionStorage.removeItem("sh_pending");toast("Аккаунт подтверждён! Теперь войдите");location.hash="#/login"}
+      else if(r.linked){document.getElementById("vstatus").innerHTML='<span class="dot" style="background:var(--orange)"></span>Бот на связи — пришлите ему скриншот профиля'}
+    }catch{}
+  },3000);
 }
 
 /* ===== Лобби ===== */
@@ -448,7 +481,7 @@ async function pageLeaderboard(){
 function route(){
   const h=location.hash.slice(1)||"/";const [,a,b]=h.split("/");
   renderChrome("/"+(a||""));window.scrollTo(0,0);
-  if(!a)pageHome();else if(a==="login")pageAuth("login");else if(a==="register")pageAuth("register");
+  if(!a)pageHome();else if(a==="login")pageAuth("login");else if(a==="register")pageAuth("register");else if(a==="verify")pageVerify();
   else if(a==="lobby")pageLobby();else if(a==="profile")pageProfile();else if(a==="player")pageProfile(decodeURIComponent(b));
   else if(a==="matches")pageMatches();else if(a==="match")pageMatch(b);else if(a==="leaderboard")pageLeaderboard();else pageHome();
   bind();

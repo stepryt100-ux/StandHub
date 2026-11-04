@@ -3,6 +3,13 @@
   "version": "1.0.0",
   "description": "StandHub — соревновательная платформа для StandLeo",
   "main": "server.js",
-  "scripts": { "start": "node server.js" },
-  "engines": { "node": ">=18" }
+  "scripts": {
+    "start": "node server.js"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "tesseract.js": "^5.1.1"
+  }
 }
