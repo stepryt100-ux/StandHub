@@ -8,7 +8,7 @@
 :root{
   --bg:#141416;--bg2:#1c1c1f;--card:#232327;--card2:#2b2b30;--line:#34343a;
   --text:#fff;--muted:#a3a3ad;--orange:#ff5500;--orange2:#ff7a33;
-  --green:#3fcf6a;--red:#ff4d4d;--yellow:#ffc800;
+  --ease:cubic-bezier(.2,.8,.2,1);--green:#3fcf6a;--red:#ff4d4d;--yellow:#ffc800;
   --l1:#eeeeee;--l2:#1ce400;--l4:#ffc800;--l8:#ff6309;--l10:#fe1f00;
 }
 *{box-sizing:border-box;margin:0;padding:0}
@@ -64,7 +64,7 @@ h1.h{font-size:30px;font-weight:900;text-transform:uppercase;font-style:italic;m
 @keyframes rot{0%,12%{transform:translateY(0)}14%,26%{transform:translateY(-100%)}28%,40%{transform:translateY(-200%)}42%,54%{transform:translateY(-300%)}56%,68%{transform:translateY(-400%)}70%,82%{transform:translateY(-500%)}84%,100%{transform:translateY(-600%)}}
 @media (prefers-reduced-motion:reduce){.hero h1 .rot span{animation:none}}
 .hero p{max-width:520px;color:#d0d0d6;font-size:18px;margin:24px 0 32px}
-.hero .stripes{position:absolute;right:-80px;top:0;bottom:0;width:55%;background:repeating-linear-gradient(115deg,transparent 0 60px,rgba(255,85,0,.07) 60px 64px);mask:linear-gradient(90deg,transparent,#000 40%)}
+.hero .stripes{position:absolute;right:-80px;top:0;bottom:0;width:55%;overflow:hidden;-webkit-mask:linear-gradient(90deg,transparent,#000 40%);mask:linear-gradient(90deg,transparent,#000 40%)}
 .hero .emblem{position:absolute;right:8%;top:50%;transform:translateY(-50%);width:340px;height:340px;opacity:.9}
 .online-big{margin-top:20px;color:var(--muted)}
 .online-big b{color:#fff}
@@ -114,8 +114,8 @@ footer a{display:block;margin:4px 0}footer a:hover{color:#fff}
 .qrow{display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--line);font-size:14px}
 .qrow:last-child{border:0}
 /* modal */
-.modal{position:fixed;inset:0;background:rgba(0,0,0,.75);display:none;place-items:center;z-index:100;padding:20px}
-.modal.show{display:grid}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.75);display:grid;place-items:center;z-index:100;padding:20px;opacity:0;visibility:hidden;transition:opacity .25s,visibility 0s .25s;-webkit-backdrop-filter:blur(3px);backdrop-filter:blur(3px)}
+.modal.show{opacity:1;visibility:visible;transition:opacity .25s}
 .modal .card{max-width:560px;width:100%;padding:32px;text-align:center;border-color:var(--orange)}
 .modal h2{font-size:32px;font-weight:900;font-style:italic;text-transform:uppercase;color:var(--orange)}
 .accepts{display:flex;justify-content:center;gap:6px;margin:20px 0}
@@ -179,7 +179,8 @@ tr.click{cursor:pointer}tr.click:hover td{background:var(--card2)}
 .empty{padding:48px 24px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:8px}.empty b{font-size:18px}.empty p{max-width:420px}.empty .btn{margin-top:12px}.empty-ic{width:56px;height:56px;border-radius:50%;background:rgba(255,85,0,.12);color:var(--orange);display:grid;place-items:center;margin-bottom:4px}
 .steps{list-style:none;counter-reset:s;margin:20px 0;display:grid;gap:12px}.steps li{counter-increment:s;position:relative;padding:12px 12px 12px 52px;background:var(--bg2);border:1px solid var(--line);border-radius:6px;display:flex;flex-direction:column;gap:2px}.steps li::before{content:counter(s);position:absolute;left:12px;top:12px;width:28px;height:28px;border-radius:50%;background:var(--orange);display:grid;place-items:center;font-weight:900}.vcode{align-self:flex-start;margin-top:6px;background:#0f0f11;padding:6px 12px;border-radius:4px;font-size:20px;font-weight:900;letter-spacing:.2em}
 .ava-edit{position:relative;cursor:pointer;border-radius:50%;display:block;flex:none}.ava-edit .ava-cam{position:absolute;right:0;bottom:0;width:34px;height:34px;border-radius:50%;background:var(--orange);color:#fff;display:grid;place-items:center;border:3px solid #1c1c1f}.ava-edit:hover .ava{filter:brightness(.75)}.ava-edit:focus-within{outline:2px solid var(--orange);outline-offset:4px}.sr{position:absolute;width:1px;height:1px;opacity:0;overflow:hidden}
-.toast{position:fixed;bottom:24px;right:24px;background:var(--card2);border:1px solid var(--orange);padding:14px 18px;border-radius:6px;z-index:200;display:none}
+.toast{position:fixed;bottom:24px;right:24px;background:var(--card2);border:1px solid var(--orange);padding:14px 18px;border-radius:6px;z-index:200;box-shadow:0 12px 32px -12px rgba(0,0,0,.7);opacity:0;visibility:hidden;transform:translateY(14px) scale(.98);pointer-events:none;transition:opacity .25s,transform .35s var(--ease),visibility 0s .35s}
+.toast.show{opacity:1;visibility:visible;transform:none;transition:opacity .25s,transform .35s var(--ease)}
 /* Match room */
 .mtop{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;margin-bottom:16px}
 .room{display:grid;grid-template-columns:1fr 1.25fr 1fr;gap:16px;margin-top:16px;align-items:start}
@@ -224,6 +225,122 @@ tr.click{cursor:pointer}tr.click:hover td{background:var(--card2)}
 .howto{counter-reset:h;list-style:none;display:grid;gap:10px;font-size:14px}.howto li{counter-increment:h;display:flex;gap:10px;align-items:flex-start}.howto li::before{content:counter(h);flex:none;width:22px;height:22px;border-radius:50%;background:var(--card2);color:var(--orange);font-weight:900;font-size:12px;display:grid;place-items:center;margin-top:1px}
 .adm-h{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
 .lobby>*,.room>*,.pgrid>*,.grid>*,.mhead>*{min-width:0}
+/* ===== Плавность и анимации ===== */
+@property --p{syntax:"<percentage>";inherits:true;initial-value:0%}
+html{scrollbar-color:#3a3a41 #141416}
+::-webkit-scrollbar{width:10px;height:10px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:#3a3a41;border-radius:6px;border:2px solid #141416}::-webkit-scrollbar-thumb:hover{background:#4a4a52}
+::selection{background:rgba(255,85,0,.45);color:#fff}
+.btn{transition:transform .18s var(--ease),background-color .18s,box-shadow .25s,border-color .18s,opacity .18s,color .18s}
+.btn:not(:disabled):not(span):active{transform:scale(.97);transition-duration:.06s}
+span.btn{cursor:default}
+.logo svg{transition:transform .35s cubic-bezier(.2,1.6,.4,1)}
+.userchip{transition:background-color .2s}
+.search input,.field input,.field select{transition:border-color .2s,box-shadow .2s}
+.search input:focus{outline:none;border-color:var(--orange)}
+.search input:focus,.field input:focus{box-shadow:0 0 0 3px rgba(255,85,0,.15)}
+.side a{transition:background-color .2s,color .2s,box-shadow .25s}
+.side a .ic{transition:transform .25s var(--ease),color .2s}
+.side a.on .ic{color:var(--orange)}
+.chip{transition:background-color .2s,border-color .2s,color .2s,transform .12s}
+.chip:active{transform:scale(.96)}
+button.slot{transition:border-color .2s,color .2s,background-color .2s}
+.slot .plus{transition:transform .35s var(--ease),border-color .2s}
+.slot.me{box-shadow:0 0 28px -12px rgba(255,85,0,.8)}
+tr.click td,.prow{transition:background-color .15s}
+.prow a b,.pl b{transition:color .15s}
+.feat .card,a.podium{transition:transform .25s var(--ease),border-color .25s,box-shadow .25s}
+.dot{position:relative}
+.dot::after{content:"";position:absolute;inset:0;border-radius:50%;background:inherit;animation:ping 2s cubic-bezier(0,0,.2,1) infinite}
+@keyframes ping{75%,100%{transform:scale(2.6);opacity:0}}
+.tag.live::before{animation:blink 1.6s ease-in-out infinite}
+@keyframes blink{50%{opacity:.3}}
+[data-live]{display:inline-block;font-variant-numeric:tabular-nums}
+[data-live].bump{animation:bump .6s var(--ease)}
+@keyframes bump{from{transform:translateY(-4px);color:var(--orange2)}}
+.rv{opacity:0;transform:translateY(26px);transition:opacity .7s var(--ease),transform .7s var(--ease);transition-delay:calc(var(--i,0)*90ms)}
+.rv.in{opacity:1;transform:none}
+.hero .emblem{animation:float 6s ease-in-out infinite}
+@keyframes float{0%,100%{transform:translateY(-50%)}50%{transform:translateY(calc(-50% - 14px))}}
+.spin-slow{transform-box:fill-box;transform-origin:center;animation:sp 40s linear infinite}
+.hero .stripes::before{content:"";position:absolute;inset:0 -140px 0 0;background:repeating-linear-gradient(115deg,transparent 0 60px,rgba(255,85,0,.07) 60px 64px);animation:drift 5s linear infinite}
+@keyframes drift{to{transform:translateX(-70.62px)}}
+.btn-find{position:relative;overflow:hidden}
+.btn-find::after{content:"";position:absolute;inset:0;background:linear-gradient(100deg,transparent 30%,rgba(255,255,255,.22) 50%,transparent 70%);transform:translateX(-120%);transition:transform .7s var(--ease);pointer-events:none}
+.btn-find.searching{animation:glow 1.8s ease-in-out infinite}
+.btn-find.searching::after{background:linear-gradient(100deg,transparent 30%,rgba(255,85,0,.28) 50%,transparent 70%);animation:sweep 2s linear infinite}
+@keyframes glow{50%{box-shadow:0 0 0 4px rgba(255,85,0,.15),0 0 30px rgba(255,85,0,.35)}}
+@keyframes sweep{from{transform:translateX(-120%)}to{transform:translateX(120%)}}
+.live-banner{position:relative}
+.live-banner::after{content:"";position:absolute;inset:-1px;border-radius:inherit;box-shadow:0 0 26px rgba(255,85,0,.4);opacity:0;animation:fadePulse 2.4s ease-in-out infinite;pointer-events:none}
+@keyframes fadePulse{50%{opacity:1}}
+.modal .card{position:relative;isolation:isolate;overflow:hidden}
+#accModal .card{box-shadow:0 0 0 1px rgba(255,85,0,.45),0 24px 70px -20px rgba(255,85,0,.6)}
+#accModal .card::before{content:"";position:absolute;inset:0;z-index:-1;background:radial-gradient(420px 170px at 50% 0,rgba(255,85,0,.22),transparent 70%);animation:aura 2.2s ease-in-out infinite;pointer-events:none}
+@keyframes aura{50%{opacity:.4}}
+#accModal .card.pop{animation:pop .5s cubic-bezier(.2,1.3,.35,1) both}
+@keyframes pop{from{opacity:0;transform:translateY(12px) scale(.86)}}
+#accModal h2{text-shadow:0 0 28px rgba(255,85,0,.55)}
+.acc-sec{transition:color .3s,text-shadow .3s}
+.acc-sec.tick{animation:tick .4s var(--ease)}
+.acc-sec.hot{color:var(--red);text-shadow:0 0 24px rgba(255,77,77,.5)}
+@keyframes tick{from{transform:scale(1.18);opacity:.55}}
+#accBar{background:linear-gradient(90deg,var(--orange),var(--yellow))}
+#accBar.hot{background:var(--red)}
+.accepts i{transition:background-color .3s}
+.accepts i.new{animation:dotPop .5s cubic-bezier(.2,1.6,.4,1)}
+@keyframes dotPop{from{transform:scale(.3);background:#fff}}
+.pop-in{animation:popIn .5s cubic-bezier(.2,1.4,.4,1) both}
+@keyframes popIn{from{opacity:0;transform:scale(.8)}}
+.vmap{overflow:hidden;transition:transform .15s var(--ease),border-color .15s,box-shadow .2s}
+.vmap.can:focus-visible{transform:translateY(-2px);box-shadow:0 8px 20px -8px rgba(255,77,77,.75)}
+.vmap.can:active{transform:scale(.97)}
+.vmap.banned::after{content:"✕";position:absolute;top:4px;right:10px;font-size:20px;font-weight:900;line-height:1.2;color:#fff}
+.vmap.just{animation:banOut .65s var(--ease) both}
+.vmap.just::after{animation:xIn .5s cubic-bezier(.2,1.6,.4,1) both}
+@keyframes banOut{0%{filter:none;opacity:1}35%{transform:scale(.93)}100%{filter:grayscale(1);opacity:.35}}
+@keyframes xIn{from{opacity:0;transform:scale(2.4) rotate(-30deg)}}
+.turn{transition:border-color .2s,background-color .2s}
+.turn.mine{animation:turnGlow 1.6s ease-in-out infinite}
+@keyframes turnGlow{50%{box-shadow:0 0 0 4px rgba(255,85,0,.15),0 0 24px rgba(255,85,0,.25)}}
+.vt{transition:color .2s;transform-origin:right center}
+.vt.hot{animation:beat 1s ease-in-out infinite}
+@keyframes beat{50%{transform:scale(1.14)}}
+.mapbig{position:relative;overflow:hidden}
+.mapbig.reveal{animation:mapIn .8s var(--ease) both}
+@keyframes mapIn{from{opacity:0;transform:scale(.92);filter:brightness(2) saturate(.4)}}
+.mapbig.reveal::after{content:"";position:absolute;inset:0;background:linear-gradient(100deg,transparent 30%,rgba(255,255,255,.35) 50%,transparent 70%);transform:translateX(-100%);animation:shine 1.1s .35s var(--ease) forwards;pointer-events:none}
+@keyframes shine{to{transform:translateX(100%)}}
+/* подсветка при наведении — только там, где есть мышь (на телефоне не «залипает») */
+@media (hover:hover){
+.btn:not(:disabled):not(span):hover{transform:translateY(-1px)}
+.btn-o:not(:disabled):not(span):hover{box-shadow:0 8px 24px -8px rgba(255,85,0,.75)}
+.btn-g:not(:disabled):not(span):hover{border-color:#4a4a52}
+.side a:hover .ic{transform:scale(1.12)}
+button.slot:hover{border-color:var(--orange);color:#fff;background:rgba(255,85,0,.06)}
+button.slot:hover .plus{transform:rotate(90deg);border-color:var(--orange)}
+.feat .card:hover,a.podium:hover{transform:translateY(-4px);border-color:rgba(255,85,0,.45);box-shadow:0 18px 40px -20px rgba(255,85,0,.55)}
+.btn-find:not(:disabled):hover::after{transform:translateX(120%)}
+.logo:hover svg{transform:rotate(-10deg) scale(1.1)}
+.userchip:hover{background:var(--card2)}
+.chip:hover{color:#fff;border-color:#4a4a52}.chip.on:hover{border-color:var(--orange)}
+.prow a:hover b,tr.click:hover .pl b{color:var(--orange2)}
+.vmap.can:hover{transform:translateY(-2px);box-shadow:0 8px 20px -8px rgba(255,77,77,.75)}
+}
+.cf{position:fixed;inset:0;pointer-events:none;z-index:300;overflow:hidden}
+.cf i{position:absolute;top:-16px;border-radius:2px}
+.sk{display:block;height:12px;border-radius:4px;background:linear-gradient(90deg,#2b2b30 25%,#3a3a41 50%,#2b2b30 75%);background-size:300% 100%;animation:shimmer 1.3s linear infinite}
+@keyframes shimmer{from{background-position:100% 0}to{background-position:0 0}}
+.sk-row{display:flex;align-items:center;gap:12px;padding:10px 0}
+.sk-row+.sk-row{border-top:1px solid var(--line)}
+.sk-c{width:28px;height:28px;border-radius:50%;flex:none}
+.scan{background:linear-gradient(90deg,var(--bg2) 30%,#26262b 50%,var(--bg2) 70%);background-size:300% 100%;animation:shimmer 1.6s linear infinite}
+.empty-ic{animation:bob 3s ease-in-out infinite}
+@keyframes bob{50%{transform:translateY(-4px)}}
+.lvl.xl{box-shadow:0 0 24px -8px var(--c)}
+.lvl.ring{animation:ring 1.1s var(--ease) .15s backwards}
+@keyframes ring{from{--p:0%}}
+@media (min-width:761px){.top{background:rgba(15,15,17,.82);-webkit-backdrop-filter:blur(12px) saturate(1.3);backdrop-filter:blur(12px) saturate(1.3)}}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;animation-delay:0s!important;transition-duration:.01ms!important;transition-delay:0s!important}.rv{opacity:1;transform:none}}
 /* Responsive */
 @media (max-width:1100px){.feat{grid-template-columns:repeat(2,1fr)}.stats{grid-template-columns:repeat(3,1fr)}.lobby,.pgrid,.room{grid-template-columns:1fr}.room .center{order:-1}.hero .emblem{opacity:.25}}
 @media (max-width:760px){
@@ -245,6 +362,7 @@ tr.click{cursor:pointer}tr.click:hover td{background:var(--card2)}
  .lb-top{grid-template-columns:1fr}
  .userchip .nm{display:none}
  .btn-lg{font-size:15px;padding:0 16px;text-align:center}
+ .toast{left:16px;right:16px;bottom:80px;text-align:center}
 }
 </style>
 </head>
@@ -296,7 +414,8 @@ function connectLive(){
 }
 function paintLive(){
   const v=k=>S.live[k]==null?"—":fmt(S.live[k]);
-  document.querySelectorAll("[data-live]").forEach(el=>el.textContent=v(el.dataset.live));
+  document.querySelectorAll("[data-live]").forEach(el=>{const t=v(el.dataset.live),was=el.textContent;if(was===t)return;el.textContent=t;
+    if(was!=="—"&&!RM()){el.classList.remove("bump");void el.offsetWidth;el.classList.add("bump")}});
 }
 const L=k=>`<b data-live="${k}">${S.live[k]==null?"—":fmt(S.live[k])}</b>`;
 
@@ -304,23 +423,65 @@ const L=k=>`<b data-live="${k}">${S.live[k]==null?"—":fmt(S.live[k])}</b>`;
 const ICONS={"home":"<path d=\"M3 11l9-8 9 8v10h-6v-6H9v6H3z\"/>","play":"<path d=\"M7 4l13 8-13 8z\"/>","user":"<circle cx=\"12\" cy=\"8\" r=\"4\"/><path d=\"M4 21c0-4 4-6 8-6s8 2 8 6z\"/>","swords":"<path d=\"M3 3h4l10 10-2 2-2-2-3 3-2-2 3-3zM21 3h-4l-5 5 2 2 1-1 2 2-6 6 2 2 3-3 2 2 2-2-2-2 3-3z\"/>","crown":"<path d=\"M3 7l5 4 4-7 4 7 5-4-2 12H5z\"/>","shield":"<path d=\"M12 2l8 3v6c0 5-3.5 9-8 11-4.5-2-8-6-8-11V5z\"/>","help":"<circle cx=\"12\" cy=\"12\" r=\"10\"/><path d=\"M9.5 9a2.5 2.5 0 115 0c0 2-2.5 2-2.5 4M12 17h0\" stroke=\"#0f0f11\" stroke-width=\"2\" fill=\"none\"/>"};
 function ic(n){return `<svg class="ic" viewBox="0 0 24 24" width="20" height="20" fill="currentColor" aria-hidden="true">${ICONS[n]}</svg>`}
 function renderChrome(route){
-  const u=S.user;
-  document.getElementById("topRight").innerHTML=u?`
+  const u=S.user,tr=document.getElementById("topRight"),side=document.getElementById("side");
+  const tk=u?[u.nick,u.elo,u.admin?1:0,(u.avatar||"").length,(u.avatar||"").slice(-24)].join("|"):"-";
+  if(tr.dataset.k!==tk){tr.dataset.k=tk;
+  tr.innerHTML=u?`
     <a class="btn btn-o" href="#/lobby">Играть</a>
     <a class="userchip" href="#/profile" aria-label="Мой профиль">${ava(u.nick,u.avatar)}<span class="nm">${esc(u.nick)}</span>${badge(u.elo,"sm")}</a>
     <button class="btn btn-g" id="logout">Выйти</button>`:`
     <a class="btn btn-g" href="#/login">Войти</a><a class="btn btn-o" href="#/register">Регистрация</a>`;
-  const lo=document.getElementById("logout");if(lo)lo.onclick=async()=>{S.searching=false;stopQTimer();try{await api("/api/logout",{method:"POST"})}catch{}S.token=null;S.user=null;S.match=null;closeAccept();localStorage.removeItem("sh_token");connectLive();location.hash="#/"};
+  const lo=document.getElementById("logout");if(lo)lo.onclick=async()=>{S.searching=false;stopQTimer();try{await api("/api/logout",{method:"POST"})}catch{}S.token=null;S.user=null;S.match=null;S.lobbyMs=null;closeAccept();localStorage.removeItem("sh_token");connectLive();if(curHash()==="/")route();else location.hash="#/"}}
   const items=[["#/","home","Главная"],["#/lobby","play","Играть"],["#/profile","user","Профиль"],["#/matches","swords","Матчи"],["#/leaderboard","crown","Рейтинг"]];
   if(u&&u.admin)items.push(["#/admin","shield","Админ"]);
-  document.getElementById("side").innerHTML=items.map(([h,i,t])=>`<a href="${h}" class="${(route===h.slice(1)||(h==="#/"&&route==="/"))?"on":""}">${ic(i)}${t}</a>`).join("")+
+  const sk=items.map(x=>x[0]).join();
+  if(side.dataset.k!==sk){side.dataset.k=sk;side.innerHTML=items.map(([h,i,t])=>`<a href="${h}" data-r="${h.slice(1)}">${ic(i)}${t}</a>`).join("")+
    `<div class="sep"></div><a href="#" class="hide-m">${ic("shield")}Античит</a><a href="#" class="hide-m">${ic("help")}Поддержка</a>
-    <div class="online"><span class="dot"></span>${L("online")} на сайте</div>`;
+    <div class="online"><span class="dot"></span>${L("online")} на сайте</div>`}
+  side.querySelectorAll("a[data-r]").forEach(a=>{const on=a.dataset.r===route;a.classList.toggle("on",on);if(on)a.setAttribute("aria-current","page");else a.removeAttribute("aria-current")});
 }
 const app=document.getElementById("app");
-function toast(t){const e=document.getElementById("toast");e.textContent=t;e.style.display="block";clearTimeout(e._t);e._t=setTimeout(()=>e.style.display="none",2600)}
+function toast(t){const e=document.getElementById("toast");e.textContent=t;e.classList.add("show");clearTimeout(e._t);e._t=setTimeout(()=>e.classList.remove("show"),2600)}
 function needAuth(){if(!S.user){location.hash="#/login";toast("Войдите, чтобы продолжить");return true}return false}
 function empty(title,text,btn){return `<div class="empty"><div class="empty-ic">${ic("crown")}</div><b>${title}</b><p class="muted">${text}</p>${btn||""}</div>`}
+/* ===== Анимации ===== */
+const RM=()=>matchMedia("(prefers-reduced-motion: reduce)").matches;
+const EASE="cubic-bezier(.2,.8,.2,1)";
+// плавное появление снизу; конечное состояние — собственные стили элемента
+function rise(els,step=60,dur=450,y=14){if(RM())return;[...els].forEach((el,i)=>{try{el.animate([{offset:0,opacity:0,transform:`translateY(${y}px)`}],{duration:dur,delay:i*step,easing:EASE,fill:"backwards"})}catch{}})}
+// числа «набегают» от нуля: data-count, data-dec (знаки после точки), data-suf (%), data-sign (+/−)
+function countUp(root){if(!root||RM())return;root.querySelectorAll("[data-count]").forEach(el=>{
+  const to=+el.dataset.count,dec=+(el.dataset.dec||0),suf=el.dataset.suf||"",sg=el.dataset.sign,fin=el.textContent;if(!isFinite(to)||!to)return;
+  const f=v=>{const r=dec?+v.toFixed(dec):(Math.round(v)||0);return (sg&&r>=0?"+":"")+(dec?r.toFixed(dec):r)+suf};
+  const t0=performance.now(),D=Math.min(1200,600+Math.abs(to)*.3);el.textContent=f(0);
+  const st=t=>{if(!el.isConnected)return;const k=Math.max(0,Math.min(1,(t-t0)/D));if(k>=1){el.textContent=fin;return}el.textContent=f(to*(1-Math.pow(1-k,3)));requestAnimationFrame(st)};
+  requestAnimationFrame(st)})}
+// появление блоков главной при прокрутке
+let rvObs=null;
+function reveal(){const els=app.querySelectorAll(".rv:not(.in)");if(!els.length)return;
+  if(RM()||!("IntersectionObserver" in window)){els.forEach(e=>e.classList.add("in"));return}
+  if(rvObs)rvObs.disconnect();
+  rvObs=new IntersectionObserver(es=>es.forEach(e=>{if(!e.isIntersecting)return;const t=e.target;rvObs.unobserve(t);t.classList.add("in");setTimeout(()=>t.classList.remove("rv","in"),1500)}),{rootMargin:"0px 0px -40px 0px"});
+  els.forEach(e=>rvObs.observe(e))}
+// вход на страницу: блоки появляются по очереди, кольцо уровня и ELO «заполняются»
+function animateIn(){if(RM())return;
+  const sel=".mtop,h1.h,.wrap>p,.hero .wrap>*,.phead,.mhead,.card,.mapbig",H=innerHeight;
+  const els=[...app.querySelectorAll(sel)].filter(el=>!el.closest(".rv")&&!el.parentElement.closest(sel)).filter(el=>{const r=el.getBoundingClientRect();return r.bottom>0&&r.top<H});
+  rise(els.slice(0,14),55,480);
+  app.querySelectorAll(".lvl.xl").forEach(el=>el.classList.add("ring"));
+  app.querySelectorAll(".elo-prog .bar div").forEach(el=>{try{el.animate([{offset:0,width:"0%"}],{duration:1000,delay:250,easing:EASE,fill:"backwards"})}catch{}});
+  countUp(app)}
+function entered(){if(!S.enter)return;S.enter=false;animateIn()}
+function fadeRows(root){if(!root||RM())return;rise(root.querySelectorAll(".podium"),70,450);rise([...root.querySelectorAll("tbody tr,.mrow,.empty")].slice(0,20),30,350,8)}
+function skel(n=4,pad=true){const w=[52,38,64,46,58,42,60,36];return `<div${pad?' class="pad"':""} aria-busy="true" aria-label="Загрузка">${Array.from({length:n},(_,i)=>`<div class="sk-row"><span class="sk sk-c"></span><span class="sk" style="width:${w[i%8]}%"></span><span class="sk" style="width:14%;margin-left:auto"></span></div>`).join("")}</div>`}
+const profSkel=()=>`<div class="wrap"><div class="sk" style="height:152px;border-radius:8px"></div><div class="stats" style="margin-top:24px">${'<div class="sk" style="height:86px;border-radius:8px"></div>'.repeat(6)}</div><div class="card" style="margin-top:16px">${skel(4)}</div></div>`;
+function numSpan(v){const s=String(v),m=s.match(/^(\d+(?:\.(\d+))?)(%?)$/);return m?`<span data-count="${m[1]}" data-dec="${m[2]?m[2].length:0}" data-suf="${m[3]}">${s}</span>`:esc(s)}
+// конфетти при победе
+function confetti(){if(RM())return;const box=document.createElement("div");box.className="cf";box.setAttribute("aria-hidden","true");document.body.appendChild(box);
+  const cols=["#ff5500","#ff7a33","#ffc800","#3fcf6a","#ffffff"],H=innerHeight;
+  for(let i=0;i<90;i++){const p=document.createElement("i"),w=6+Math.random()*6;p.style.cssText=`left:${Math.random()*100}%;width:${w}px;height:${w*.45}px;background:${cols[i%5]}`;box.appendChild(p);
+    try{p.animate([{transform:"translate(0,0) rotate(0deg)",opacity:1},{transform:`translate(${(Math.random()-.5)*260}px,${H+40}px) rotate(${(Math.random()-.5)*1440}deg)`,opacity:.85}],{duration:1800+Math.random()*1600,delay:Math.random()*500,easing:"cubic-bezier(.25,.6,.45,1)",fill:"both"})}catch{}}
+  setTimeout(()=>box.remove(),4400)}
 
 /* ===== Главная ===== */
 async function pageHome(){
@@ -328,7 +489,7 @@ async function pageHome(){
   app.innerHTML=`
   <section class="hero"><div class="stripes"></div>
    <svg class="emblem" viewBox="0 0 200 200" aria-hidden="true"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ff7a33"/><stop offset="1" stop-color="#ff3d00"/></linearGradient></defs>
-    <circle cx="100" cy="100" r="92" fill="none" stroke="rgba(255,85,0,.25)" stroke-width="2"/><circle cx="100" cy="100" r="70" fill="none" stroke="rgba(255,85,0,.15)" stroke-width="10" stroke-dasharray="6 10"/>
+    <circle cx="100" cy="100" r="92" fill="none" stroke="rgba(255,85,0,.25)" stroke-width="2"/><circle class="spin-slow" cx="100" cy="100" r="70" fill="none" stroke="rgba(255,85,0,.15)" stroke-width="10" stroke-dasharray="6 10"/>
     <path d="M40 40h120l-30 40h30L70 170l20-55H50z" fill="url(#g)"/></svg>
    <div class="wrap">
     <h1>Прокачай<span class="rot"><span>${words.map(w=>w+"<br>").join("")}${words[0]}</span></span></h1>
@@ -337,28 +498,29 @@ async function pageHome(){
     <div class="online-big"><span class="dot"></span>${L("online")} на сайте прямо сейчас</div>
    </div></section>
   <section class="sec"><div class="wrap">
-    <h2>Больше чем матчмейкинг</h2>
-    <p class="muted" style="max-width:640px">StandHub — дом для любых амбиций: разные соревновательные форматы для игроков любого уровня и размера пати.</p>
+    <h2 class="rv">Больше чем матчмейкинг</h2>
+    <p class="muted rv" style="max-width:640px;--i:1">StandHub — дом для любых амбиций: разные соревновательные форматы для игроков любого уровня и размера пати.</p>
     <div class="feat">
-      <div class="card"><span class="tag live">Live</span><h3>Матчмейкинг</h3><p class="muted">Соло или пати. Поднимай ELO под защитой античита StandHub. Бесплатно.</p><a class="btn btn-o" href="#/lobby">Играть</a></div>
-      <div class="card"><span class="tag">Скоро</span><h3>Командные лиги</h3><p class="muted">Проверь, как далеко пройдёт твоя команда среди любительских составов.</p><span class="btn btn-g">Скоро</span></div>
-      <div class="card"><span class="tag">Скоро</span><h3>Кубки</h3><p class="muted">Ежедневные и еженедельные кубки по расписанию с наградами за места.</p><span class="btn btn-g">Скоро</span></div>
-      <div class="card"><span class="tag">Скоро</span><h3>Турниры</h3><p class="muted">Официальные квалификации и турниры от организаторов сообщества.</p><span class="btn btn-g">Скоро</span></div>
+      <div class="card rv" style="--i:1"><span class="tag live">Live</span><h3>Матчмейкинг</h3><p class="muted">Соло или пати. Поднимай ELO под защитой античита StandHub. Бесплатно.</p><a class="btn btn-o" href="#/lobby">Играть</a></div>
+      <div class="card rv" style="--i:2"><span class="tag">Скоро</span><h3>Командные лиги</h3><p class="muted">Проверь, как далеко пройдёт твоя команда среди любительских составов.</p><span class="btn btn-g">Скоро</span></div>
+      <div class="card rv" style="--i:3"><span class="tag">Скоро</span><h3>Кубки</h3><p class="muted">Ежедневные и еженедельные кубки по расписанию с наградами за места.</p><span class="btn btn-g">Скоро</span></div>
+      <div class="card rv" style="--i:4"><span class="tag">Скоро</span><h3>Турниры</h3><p class="muted">Официальные квалификации и турниры от организаторов сообщества.</p><span class="btn btn-g">Скоро</span></div>
     </div></div></section>
   <section class="sec" style="padding-top:0"><div class="wrap">
-    <h2>Рейтинг игроков</h2>
-    <p class="muted" style="max-width:640px;margin-bottom:24px">Поднимайся в таблице лидеров и смотри, где ты находишься среди лучших игроков StandLeo.</p>
-    <div class="card scroll" id="homeLb"><div class="pad muted">Загрузка…</div></div>
-    <div style="margin-top:16px"><a class="btn btn-g" href="#/leaderboard">Весь рейтинг</a></div>
+    <h2 class="rv">Рейтинг игроков</h2>
+    <p class="muted rv" style="max-width:640px;margin-bottom:24px;--i:1">Поднимайся в таблице лидеров и смотри, где ты находишься среди лучших игроков StandLeo.</p>
+    <div class="card scroll rv" style="--i:2" id="homeLb">${skel(5)}</div>
+    <div class="rv" style="margin-top:16px;--i:3"><a class="btn btn-g" href="#/leaderboard">Весь рейтинг</a></div>
   </div></section>
-  <section class="cta"><h2 style="font-size:40px;font-weight:900;font-style:italic;text-transform:uppercase;margin-bottom:24px">Готов бросить вызов?</h2><a class="btn btn-o btn-lg" href="${S.user?"#/lobby":"#/register"}">Играть сейчас</a></section>
+  <section class="cta"><h2 class="rv" style="font-size:40px;font-weight:900;font-style:italic;text-transform:uppercase;margin-bottom:24px">Готов бросить вызов?</h2><div class="rv" style="--i:1"><a class="btn btn-o btn-lg" href="${S.user?"#/lobby":"#/register"}">Играть сейчас</a></div></section>
   <footer>
     <div><h4>StandHub</h4><p>Соревновательная платформа для StandLeo.</p></div>
     <div><h4>Помощь</h4><a href="#">Поддержка</a><a href="#">Античит</a><a href="#">Правила</a></div>
     <div><h4>Платформа</h4><a href="#/lobby">Матчмейкинг</a><a href="#/leaderboard">Рейтинг</a><a href="#/matches">Матчи</a></div>
     <div><h4>Документы</h4><a href="#">Условия использования</a><a href="#">Политика конфиденциальности</a></div>
   </footer>`;
-  const lb=await getLb();document.getElementById("homeLb").innerHTML=lb.length?lbTable(lb.slice(0,5),true):lbEmpty();bind();
+  entered();reveal();
+  const lb=await getLb();const hl=document.getElementById("homeLb");if(!hl)return;hl.innerHTML=lb.length?lbTable(lb.slice(0,5),true):lbEmpty();bind();
 }
 async function getLb(){try{return await api("/api/leaderboard")}catch{return[]}}
 function lbEmpty(){return empty("Рейтинг пока пуст","Здесь появятся игроки после первых сыгранных матчей. Стань первым!",S.user?`<a class="btn btn-o" href="#/lobby">Найти матч</a>`:`<a class="btn btn-o" href="#/register">Регистрация</a>`)}
@@ -382,6 +544,7 @@ function pageAuth(type){
    <button class="btn btn-o btn-lg" style="width:100%;margin-top:20px" type="submit">${reg?"Зарегистрироваться":"Войти"}</button>
    <p class="muted" style="text-align:center;margin-top:20px;font-size:14px">${reg?'Уже есть аккаунт? <a href="#/login" style="color:var(--orange)">Войти</a>':'Нет аккаунта? <a href="#/register" style="color:var(--orange)">Регистрация</a>'}</p>
   </form></div>`;
+  entered();
   document.getElementById("f").onsubmit=async e=>{
     e.preventDefault();const v=id=>(document.getElementById(id)||{}).value?.trim()||"";
     const set=(id,m)=>{const el=document.getElementById("e-"+id);if(el)el.textContent=m};
@@ -416,6 +579,7 @@ function pageVerify(){
    <div id="vstatus" class="muted" style="text-align:center;margin-top:16px"><span class="dot" style="background:var(--orange)"></span>Ждём подтверждения от бота…</div>
    <p class="muted" style="text-align:center;margin-top:16px;font-size:13px">Код действует 24 часа. <a href="#/register" style="color:var(--orange)">Зарегистрироваться заново</a></p>
   </div></div>`;
+  entered();
   clearInterval(verifyTimer);
   verifyTimer=setInterval(async()=>{
     if(location.hash!=="#/verify")return clearInterval(verifyTimer);
@@ -446,7 +610,7 @@ function pageLobby(){
      ${u.admin?`<div class="admin-box"><div><b>Тестовый матч с ботами</b><div class="muted" style="font-size:13px;max-width:440px">Видно только администратору. Боты сами примут матч и будут убирать карты. Рейтинг не меняется.</div></div><button class="btn btn-g" id="testM" ${m||S.searching?"disabled":""}>Тест · ${MODE_NAME[S.mode]}</button></div>`:""}
    </div>
    <div class="grid" style="align-content:start">
-     <div class="card pad"><h3>Твой уровень</h3><div style="display:flex;align-items:center;gap:14px">${badge(u.elo,"xl")}<div><div style="font-size:28px;font-weight:900">${u.elo} <span class="muted" style="font-size:14px">ELO</span></div><div class="muted" style="font-size:13px">${lvlOf(u.elo)<10?`До уровня ${lvlOf(u.elo)+1}: ${TH[lvlOf(u.elo)+1]-u.elo} ELO`:"Максимальный уровень"}</div></div></div></div>
+     <div class="card pad"><h3>Твой уровень</h3><div style="display:flex;align-items:center;gap:14px">${badge(u.elo,"xl")}<div><div style="font-size:28px;font-weight:900"><span data-count="${u.elo}">${u.elo}</span> <span class="muted" style="font-size:14px">ELO</span></div><div class="muted" style="font-size:13px">${lvlOf(u.elo)<10?`До уровня ${lvlOf(u.elo)+1}: ${TH[lvlOf(u.elo)+1]-u.elo} ELO`:"Максимальный уровень"}</div></div></div></div>
      <div class="card pad"><h3>Как проходит матч</h3><ol class="howto">
        <li><span>Нажмите «Найти матч» и примите его за <b>15 секунд</b></span></li>
        <li><span>Капитаны по очереди убирают карты — остаётся одна</span></li>
@@ -456,16 +620,20 @@ function pageLobby(){
        <div class="qrow"><span class="muted">Онлайн</span>${L("online")}</div>
        <div class="qrow"><span class="muted">В поиске матча</span>${L("searching")}</div>
        <div class="qrow"><span class="muted">Матчей идёт</span>${L("live")}</div></div>
-     <div class="card pad"><h3>Последние матчи</h3><div id="lobbyM" class="muted">Загрузка…</div></div>
+     <div class="card pad"><h3>Последние матчи</h3><div id="lobbyM" class="muted">${S.lobbyMs?lobbyMsHtml(S.lobbyMs):skel(3,false)}</div></div>
    </div>
   </div></div>`;
   renderParty();
-  document.querySelectorAll("[data-mode]").forEach(b=>b.onclick=()=>{if(S.searching)return toast("Сначала отмените поиск");S.mode=b.dataset.mode;pageLobby()});
+  document.querySelectorAll("[data-mode]").forEach(b=>b.onclick=()=>{if(S.searching)return toast("Сначала отмените поиск");S.mode=b.dataset.mode;pageLobby();rise(document.querySelectorAll("#party .slot"),35,320,10)});
   document.getElementById("find").onclick=()=>S.searching?stopSearch():startSearch();
   const tb=document.getElementById("testM");if(tb)tb.onclick=async()=>{unlockAudio();tb.disabled=true;try{applyState(await api("/api/test-match",{method:"POST",body:JSON.stringify({mode:S.mode})}),true)}catch(e){toast(e.message);if(e.match)onMatch(e.match);tb.disabled=false}};
   if(S.searching)qtick();
-  api("/api/matches?player="+encodeURIComponent(u.nick)).catch(()=>[]).then(ms=>{const el=document.getElementById("lobbyM");if(el)el.innerHTML=ms.length?ms.slice(0,4).map(mini).join(""):"Вы ещё не сыграли ни одного матча"});
+  S.lobbyK=lobbyKey();entered();
+  api("/api/matches?player="+encodeURIComponent(u.nick)).catch(()=>null).then(ms=>{if(!ms)ms=S.lobbyMs||[];const was=S.lobbyMs?lobbyMsHtml(S.lobbyMs):null,h=lobbyMsHtml(ms);S.lobbyMs=ms;const el=document.getElementById("lobbyM");if(!el||h===was)return;el.innerHTML=h;fadeRows(el)});
 }
+const lobbyMsHtml=ms=>ms.length?ms.slice(0,4).map(mini).join(""):"Вы ещё не сыграли ни одного матча";
+// лобби перерисовывается только когда что-то важное изменилось — без мерцания
+const lobbyKey=()=>JSON.stringify([S.mode,S.searching,S.match&&[S.match.id,S.match.state,S.match.map],S.user&&[S.user.nick,S.user.elo,S.user.admin]]);
 function renderParty(){
   const n=S.mode==="5v5"?5:S.mode==="2v2"?2:1;const u=S.user;
   document.getElementById("party").innerHTML=Array.from({length:5},(_,i)=>i===0?`<div class="slot me">${ava(u.nick,u.avatar)}<b>${esc(u.nick)}</b>${badge(u.elo,"sm")}</div>`:i<n?`<button class="slot" onclick="toast('Приглашение друзей появится позже')"><span class="plus">+</span>Пригласить</button>`:`<div class="slot" style="opacity:.25"></div>`).join("");
@@ -487,10 +655,12 @@ async function stopSearch(silent){
 }
 function startQTimer(){clearInterval(S.timer);S.timer=setInterval(qtick,1000);qtick()}
 function stopQTimer(){clearInterval(S.timer);S.timer=null}
-function qtick(){const el=document.getElementById("qstatus");if(!el||!S.searching)return;const t=Math.max(0,Math.floor((Date.now()-S.qSince)/1000));el.innerHTML=`<span class="dot" style="background:var(--orange)"></span>Ищем игроков · ${MODE_NAME[S.mode]} · ${Math.floor(t/60)}:${String(t%60).padStart(2,"0")} · в поиске ${L("searching")}`}
+function qtick(){const el=document.getElementById("qstatus");if(!el||!S.searching)return;const t=Math.max(0,Math.floor((Date.now()-S.qSince)/1000)),s=`${Math.floor(t/60)}:${String(t%60).padStart(2,"0")}`;
+  const q=document.getElementById("qt");if(q&&el.dataset.m===S.mode){q.textContent=s;return}
+  el.dataset.m=S.mode;el.innerHTML=`<span class="dot" style="background:var(--orange)"></span>Ищем игроков · ${MODE_NAME[S.mode]} · <span id="qt" style="font-variant-numeric:tabular-nums">${s}</span> · в поиске ${L("searching")}`}
 const curHash=()=>location.hash.slice(1)||"/";
-function refreshLobby(){if(curHash()==="/lobby")pageLobby()}
-function refreshMe(){api("/api/me").then(u=>{S.user=u;renderChrome(curHash().split("/").slice(0,2).join("/"))}).catch(()=>{})}
+function refreshLobby(){if(curHash()==="/lobby"&&lobbyKey()!==S.lobbyK)pageLobby()}
+function refreshMe(){api("/api/me").then(u=>{S.user=u;renderChrome(curHash().split("/").slice(0,2).join("/"));refreshLobby()}).catch(()=>{})}
 
 /* ===== Матчи: события в реальном времени ===== */
 const BUSY=["accept","veto","live"];
@@ -509,7 +679,7 @@ function applyState(d,fromAction){
   if(!fromAction&&was&&!d.queue&&!d.match&&S.user)return startSearch(true);
   refreshLobby();
 }
-function onMatch(m,silent){
+function onMatch(m,silent,force){
   const prev=S.mv[m.id]?S.mv[m.id].state:null;
   S.skew=m.now-Date.now();S.mv[m.id]=m;
   if(BUSY.includes(m.state)&&m.me){S.match=m;S.searching=false;stopQTimer()}else if(S.match&&S.match.id===m.id)S.match=null;
@@ -520,14 +690,14 @@ function onMatch(m,silent){
     if(m.requeuedMe){S.searching=true;S.mode=m.mode;S.qSince=Date.now();startQTimer();toast("Не все игроки приняли матч — вы снова в поиске")}
     else toast(m.iAccepted?"Матч отменён: не все приняли":"Вы не приняли матч")}
   if(prev==="veto"&&m.state==="live"){beep(true);toast("Карта матча: "+m.map)}
-  if(prev&&prev!=="finished"&&m.state==="finished"){refreshMe();const me=m.players.find(p=>p.me);if(me)toast(m.winner==="draw"?"Ничья":m.winner===me.team?"Победа! ELO "+fmtD(me.delta):"Поражение. ELO "+fmtD(me.delta))}
+  if(prev&&prev!=="finished"&&m.state==="finished"){refreshMe();const me=m.players.find(p=>p.me);if(me){toast(m.winner==="draw"?"Ничья":m.winner===me.team?"Победа! ELO "+fmtD(me.delta):"Поражение. ELO "+fmtD(me.delta));if(m.winner===me.team)setTimeout(confetti,200)}}
   if(prev&&prev!=="cancelled"&&prev!=="accept"&&m.state==="cancelled")toast("Матч отменён");
-  if(curHash()==="/match/"+m.id)renderMatch(m);
+  if(curHash()==="/match/"+m.id){if(force||mSig(m)!==renderMatch.sig)renderMatch(m)}
   else if(prev!==m.state)refreshLobby();
 }
 async function act(id,a,b){
   try{const r=await api(`/api/match/${id}/${a}`,{method:"POST",body:JSON.stringify(b||{})});if(r.match)onMatch(r.match);return r}
-  catch(e){toast(e.message);if(e.match)onMatch(e.match);return null}
+  catch(e){toast(e.message);const y=document.getElementById("accYes");if(y)y.disabled=false;if(e.match)onMatch(e.match,false,true);else if(curHash()==="/match/"+id&&S.mv[id])renderMatch(S.mv[id]);return null}
 }
 /* звук и мигающий заголовок, когда матч найден */
 let actx=null;
@@ -539,48 +709,57 @@ function flash(t){clearInterval(flashT);if(!document.hidden)return;let on=0;flas
 /* окно «Матч найден» */
 let accTimer=null;
 function showAccept(m){
-  const el=document.getElementById("accModal");el.classList.add("show");el.dataset.id=m.id;
-  el.innerHTML=`<div class="card" role="dialog" aria-modal="true" aria-labelledby="accH">
+  const el=document.getElementById("accModal"),same=el.dataset.id===m.id,prevN=same?+el.dataset.n||0:0,prevAcc=same&&el.dataset.acc==="1";
+  const sig=[m.id,m.accepted,m.total,m.iAccepted?1:0,m.acceptDeadline].join("|");
+  if(same&&el.dataset.sig===sig&&el.classList.contains("show"))return; // то же самое — не перерисовываем, чтобы не сбивать анимации
+  clearTimeout(el._ct);el.classList.add("show");Object.assign(el.dataset,{id:m.id,n:m.accepted,acc:m.iAccepted?"1":"",sig});
+  const total=(m.acceptDeadline-m.created)||15000,left=()=>Math.max(0,m.acceptDeadline-(Date.now()+S.skew)),sec0=Math.ceil(left()/1000);
+  el.innerHTML=`<div class="card${same?"":" pop"}" role="dialog" aria-modal="true" aria-labelledby="accH">
     <div class="tag">${MODE_NAME[m.mode]} · StandLeo${m.test?" · тестовый матч":""}</div>
     <h2 id="accH">Матч найден!</h2>
-    <div class="acc-sec" id="accSec" aria-hidden="true">15</div>
-    <div class="bar"><div id="accBar" style="width:100%"></div></div>
-    <div class="accepts">${Array.from({length:m.total},(_,i)=>`<i class="${i<m.accepted?"ok":""}"></i>`).join("")}</div>
+    <div class="acc-sec${sec0<=5?" hot":""}" id="accSec" aria-hidden="true">${sec0}</div>
+    <div class="bar"><div id="accBar" class="${sec0<=5?"hot":""}" style="width:${left()/total*100}%"></div></div>
+    <div class="accepts">${Array.from({length:m.total},(_,i)=>`<i class="${i<m.accepted?"ok":""}${i<m.accepted&&i>=prevN?" new":""}"></i>`).join("")}</div>
     <p class="muted" style="margin-bottom:20px">Приняли <b style="color:#fff">${m.accepted} из ${m.total}</b>. Матч начнётся, когда примут все.</p>
-    ${m.iAccepted?`<div class="acc-ok">✓ Вы приняли матч — ждём остальных</div>`:`<button class="btn btn-o btn-lg" style="width:100%" id="accYes">Принять</button><button class="btn btn-g" style="width:100%;margin-top:8px" id="accNo">Отклонить</button>`}
+    ${m.iAccepted?`<div class="acc-ok${prevAcc?"":" pop-in"}">✓ Вы приняли матч — ждём остальных</div>`:`<button class="btn btn-o btn-lg" style="width:100%" id="accYes">Принять</button><button class="btn btn-g" style="width:100%;margin-top:8px" id="accNo">Отклонить</button>`}
   </div>`;
   const y=document.getElementById("accYes");if(y){y.onclick=()=>{y.disabled=true;act(m.id,"accept")};y.focus()}
   const n=document.getElementById("accNo");if(n)n.onclick=()=>act(m.id,"decline");
-  clearInterval(accTimer);const total=(m.acceptDeadline-m.created)||15000;
-  const upd=()=>{const s=document.getElementById("accSec"),b=document.getElementById("accBar");if(!s)return clearInterval(accTimer);const ms=Math.max(0,m.acceptDeadline-(Date.now()+S.skew));s.textContent=Math.ceil(ms/1000);b.style.width=(ms/total*100)+"%"};
+  clearInterval(accTimer);
+  const upd=()=>{const s=document.getElementById("accSec"),b=document.getElementById("accBar");if(!s)return clearInterval(accTimer);const ms=left(),sec=Math.ceil(ms/1000);
+    if(s.textContent!==String(sec)){s.textContent=sec;if(!RM()){s.classList.remove("tick");void s.offsetWidth;s.classList.add("tick")}}
+    s.classList.toggle("hot",sec<=5);b.classList.toggle("hot",sec<=5);b.style.width=(ms/total*100)+"%"};
   upd();accTimer=setInterval(upd,200);
 }
-function closeAccept(){clearInterval(accTimer);const el=document.getElementById("accModal");el.classList.remove("show");el.innerHTML="";delete el.dataset.id}
+function closeAccept(){clearInterval(accTimer);const el=document.getElementById("accModal");el.classList.remove("show");["id","n","acc","sig"].forEach(k=>delete el.dataset[k]);clearTimeout(el._ct);el._ct=setTimeout(()=>{if(!el.classList.contains("show"))el.innerHTML=""},300)}
 /* обратный отсчёт для всех таймеров на странице */
 setInterval(()=>document.querySelectorAll("[data-dl]").forEach(el=>{const s=Math.ceil(Math.max(0,+el.dataset.dl-(Date.now()+S.skew))/1000);el.textContent=Math.floor(s/60)+":"+String(s%60).padStart(2,"0");el.classList.toggle("hot",s<=5)}),250);
 
 /* ===== Профиль ===== */
 async function pageProfile(name){
-  let p;
-  if(!name){if(needAuth())return;try{p=S.user=await api("/api/me")}catch{p=S.user}}
-  else{try{p=await api("/api/player/"+encodeURIComponent(name))}catch{app.innerHTML=`<div class="wrap">${empty("Игрок не найден","Проверьте ник и попробуйте ещё раз")}</div>`;return}}
+  let p;const h0=location.hash;
+  if(!name&&needAuth())return;
+  if(S.enter)app.innerHTML=profSkel();
+  if(!name){try{p=S.user=await api("/api/me")}catch{p=S.user}}
+  else{try{p=await api("/api/player/"+encodeURIComponent(name))}catch{if(location.hash===h0){app.innerHTML=`<div class="wrap">${empty("Игрок не найден","Проверьте ник и попробуйте ещё раз")}</div>`;entered()}return}}
   const l=lvlOf(p.elo);const ms=await api("/api/matches?player="+encodeURIComponent(p.nick)).catch(()=>[]);
+  if(location.hash!==h0)return; // пользователь уже ушёл на другую страницу
   const none=p.matches===0&&!ms.length;const own=!!(S.user&&S.user.nick===p.nick);
   app.innerHTML=`<div class="wrap">
    <div class="phead">${own?`<label class="ava-edit" title="Сменить аватар">${ava(p.nick,p.avatar)}<span class="ava-cam" aria-hidden="true"><svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M9 4l-2 2H4a1 1 0 00-1 1v12a1 1 0 001 1h16a1 1 0 001-1V7a1 1 0 00-1-1h-3l-2-2zm3 4.5A4.5 4.5 0 1112 17.5 4.5 4.5 0 0112 8.5z"/></svg></span><input type="file" accept="image/png,image/jpeg,image/webp" id="avaIn" class="sr" aria-label="Сменить аватар"></label>`:ava(p.nick,p.avatar)}
      <div><div class="flag">${esc(p.region)} · На StandHub с ${new Date(p.created).toLocaleDateString("ru-RU")}</div><h1>${esc(p.nick)}</h1>
        <div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap"><span class="chip on" style="height:28px;font-size:12px;display:inline-flex;align-items:center">StandLeo</span></div></div>
-     <div class="elo-box">${badge(p.elo,"xl")}<div class="elo-prog"><div class="muted" style="font-size:12px;font-weight:700;text-transform:uppercase">Уровень ${l}</div><div class="v">${p.elo} <span class="muted" style="font-size:14px">ELO</span></div>
+     <div class="elo-box">${badge(p.elo,"xl")}<div class="elo-prog"><div class="muted" style="font-size:12px;font-weight:700;text-transform:uppercase">Уровень ${l}</div><div class="v"><span data-count="${p.elo}">${p.elo}</span> <span class="muted" style="font-size:14px">ELO</span></div>
        <div class="bar"><div style="width:${lvlPct(p.elo)}%"></div></div><div class="muted" style="font-size:12px">${l<10?`${TH[l]} — ${TH[l+1]-1}`:"Уровень 10 · 2001+"}</div></div></div>
    </div>
    <div class="stats" style="margin-top:24px">
-     ${[["Матчи",p.matches],["Победы",wr(p)],["K/D",kd(p)],["Хедшоты",hsp(p)],["Средн. убийств",p.matches?(p.kills/p.matches).toFixed(1):"—"],["Убийств всего",p.kills]].map(([k,v])=>`<div class="card stat"><div class="k">${k}</div><div class="v">${v}</div></div>`).join("")}
+     ${[["Матчи",p.matches],["Победы",wr(p)],["K/D",kd(p)],["Хедшоты",hsp(p)],["Средн. убийств",p.matches?(p.kills/p.matches).toFixed(1):"—"],["Убийств всего",p.kills]].map(([k,v])=>`<div class="card stat"><div class="k">${k}</div><div class="v">${numSpan(v)}</div></div>`).join("")}
    </div>
    ${none?`<div class="card" style="margin-top:16px">${empty("Матчей пока нет",(S.user&&S.user.nick===p.nick?"Сыграйте первый матч — здесь появятся график ELO, статистика по картам и история игр.":"Этот игрок ещё не сыграл ни одного матча."),S.user&&S.user.nick===p.nick?`<a class="btn btn-o" href="#/lobby">Найти матч</a>`:"")}</div>`:
    `<div class="card" style="margin-top:16px"><div class="thead"><b>История матчей</b></div><div class="scroll">${matchTable(ms,p.nick)}</div></div>`}
   </div>`;
   const inp=document.getElementById("avaIn");if(inp)inp.onchange=()=>uploadAvatar(inp.files[0]);
-  bind();
+  entered();bind();
 }
 function matchTable(list,nick){
   return `<table><thead><tr><th>Результат</th><th>Карта</th><th>Режим</th><th>Счёт</th><th>ELO</th><th>Дата</th></tr></thead><tbody>
@@ -600,11 +779,11 @@ async function uploadAvatar(file){
 /* ===== Матчи / рейтинг ===== */
 const capName=(m,t)=>{const c=m.players.find(p=>p.captain===t);return c?c.nick:"Команда "+t};
 async function pageMatches(){
-  app.innerHTML=`<div class="wrap"><h1 class="h">Матчи</h1><div class="card" id="ml"><div class="pad muted">Загрузка…</div></div></div>`;
+  app.innerHTML=`<div class="wrap"><h1 class="h">Матчи</h1><div class="card" id="ml">${skel(6)}</div></div>`;entered();
   const ms=await api("/api/matches").catch(()=>[]);const el=document.getElementById("ml");if(!el)return;
   el.innerHTML=ms.length?`<div class="scroll"><table><thead><tr><th>Режим</th><th>Карта</th><th>Команды</th><th>Счёт</th><th>Дата</th></tr></thead><tbody>${ms.map(m=>{const t=x=>`<span class="${m.winner===x?"w":""}">Команда ${esc(capName(m,x))}</span>`;return `<tr class="click" data-m="${m.id}"><td>${MODE_NAME[m.mode]}${m.test?' <span class="pill">тест</span>':""}</td><td><b>${esc(m.map)}</b></td><td>${t("A")} <span class="muted">vs</span> ${t("B")}</td><td><b>${m.scoreA==null?"—":m.scoreA+" : "+m.scoreB}</b></td><td class="muted">${new Date(m.date).toLocaleString("ru-RU",{day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"})}</td></tr>`}).join("")}</tbody></table></div>`:
     empty("Матчей пока нет","На StandHub ещё не сыграно ни одного матча. Здесь будет история всех игр.",S.user?`<a class="btn btn-o" href="#/lobby">Найти матч</a>`:"");
-  bind();
+  fadeRows(el);bind();
 }
 /* ----- Комната матча ----- */
 const ST={accept:"Принятие матча",veto:"Выбор карты",live:"Идёт игра",dispute:"Проверка результата",finished:"Матч завершён",cancelled:"Матч отменён"};
@@ -612,14 +791,19 @@ let matchPoll=null;
 async function pageMatch(id){
   clearInterval(matchPoll);
   const cached=S.mv[id];
-  if(cached)renderMatch(cached);else app.innerHTML=`<div class="wrap"><div class="card pad muted">Загрузка…</div></div>`;
-  const load=async()=>{const m=await api("/api/match/"+id);S.skew=m.now-Date.now();const prev=S.mv[id];S.mv[id]=m;if(curHash()==="/match/"+id&&(!prev||prev.state!==m.state||!m.me))renderMatch(m);return m};
-  try{const m=await load();if(!cached)renderMatch(m);
+  if(cached)renderMatch(cached);else app.innerHTML=`<div class="wrap"><div class="card">${skel(5)}</div></div>`;
+  const load=async()=>{const m=await api("/api/match/"+id);S.skew=m.now-Date.now();const prev=S.mv[id];S.mv[id]=m;if(curHash()==="/match/"+id&&(!prev||prev.state!==m.state||!m.me)&&mSig(m)!==renderMatch.sig)renderMatch(m);return m};
+  try{const m=await load();
     // зрители (не участники) не получают события — обновляем страницу сами
     if(!m.me&&!["finished","cancelled"].includes(m.state))matchPoll=setInterval(()=>{if(curHash()!=="/match/"+id)return clearInterval(matchPoll);load().catch(()=>{})},4000);
-  }catch{if(!cached)app.innerHTML=`<div class="wrap">${empty("Матч не найден","Возможно, ссылка устарела",`<a class="btn btn-g" href="#/matches">Все матчи</a>`)}</div>`}
+  }catch{if(!cached&&curHash()==="/match/"+id)app.innerHTML=`<div class="wrap">${empty("Матч не найден","Возможно, ссылка устарела",`<a class="btn btn-g" href="#/matches">Все матчи</a>`)}</div>`}
 }
+let JUST=null; // карты, убранные только что (для анимации)
+const mSig=m=>JSON.stringify(m,(k,v)=>k==="now"?undefined:v);
 function renderMatch(m){
+  const L0=renderMatch.last||{},same=L0.id===m.id,stCh=same&&L0.state!==m.state,nb=(m.bans||[]).length;
+  JUST=same&&m.state==="veto"&&L0.state==="veto"&&nb>L0.bans?new Set(m.bans.slice(L0.bans).map(b=>b.map)):null;
+  renderMatch.last={id:m.id,state:m.state,bans:nb};renderMatch.sig=mSig(m);
   const fin=m.state==="finished",teams=m.players.some(p=>p.team);
   const avg=t=>{const ps=m.players.filter(p=>p.team===t);return ps.length?Math.round(ps.reduce((a,p)=>a+p.elo,0)/ps.length):"—"};
   const wt=t=>fin?(m.winner==="draw"?`<span class="wtag muted">Ничья</span>`:m.winner===t?`<span class="wtag w">Победа</span>`:`<span class="wtag l">Поражение</span>`):"";
@@ -634,6 +818,12 @@ function renderMatch(m){
    <div class="mtop"><div><div class="tag">${MODE_NAME[m.mode]} · StandLeo${m.test?" · тестовый матч":""}</div><h1 class="h" style="margin:4px 0 0">Комната матча</h1></div><div class="muted" style="font-size:13px">Матч #${m.id}</div></div>
    ${head}${body}</div>`;
   bindMatch(m);
+  if(S.enter)return entered();
+  if(stCh&&!RM()){ // этап матча сменился — плавно показываем новое
+    rise([...app.querySelectorAll(".center>*")].filter(e=>!(m.state==="live"&&e.classList.contains("mapbig"))),70,450);
+    const mb=m.state==="live"&&app.querySelector(".mapbig");if(mb)mb.classList.add("reveal");
+    if(fin){app.querySelectorAll(".score .s,.resbig").forEach(e=>e.classList.add("pop-in"));countUp(app.querySelector(".center"))}
+  }
 }
 function prow(m,p,acc){
   return `<div class="prow${p.me?" me":""}">${ava(p.nick,p.avatar)}<div class="pn">${p.bot?`<b>${esc(p.nick)}</b>`:`<a href="#/player/${encodeURIComponent(p.nick)}"><b>${esc(p.nick)}</b></a>`}<div class="pills">${p.captain?`<span class="pill cap">Капитан</span>`:""}${p.host?`<span class="pill host">Хост</span>`:""}${p.bot?`<span class="pill">Бот</span>`:""}${p.me?`<span class="pill me">Вы</span>`:""}</div></div>
@@ -648,7 +838,7 @@ function center(m){
     const my=me&&me.captain&&m.turn===me.team;
     return `<div class="card pad"><div class="vhead"><div><h3 style="margin:0">Выбор карты</h3><div class="muted" style="font-size:13px">Капитаны по очереди убирают карты. Последняя оставшаяся — карта матча.</div></div><div class="vt" data-dl="${m.turnDeadline}" aria-label="Время на ход">0:20</div></div>
      <div class="turn ${my?"mine":""}">${my?"Ваш ход — уберите одну карту":`Убирает команда ${esc(capName(m,m.turn))}`}</div>
-     <div class="vmaps">${m.maps.map(x=>{const b=m.bans.find(y=>y.map===x);return `<button class="vmap${b?" banned":""}${my&&!b?" can":""}" style="background:${mapBg(x)}" ${my&&!b?`data-ban="${esc(x)}" aria-label="Убрать карту ${esc(x)}"`:"disabled"}><span class="vn">${esc(x)}</span>${b?`<span class="vb">Убрана · ${b.auto?"время вышло":"команда "+esc(capName(m,b.team))}</span>`:my?`<span class="vb">Убрать</span>`:""}</button>`}).join("")}</div>
+     <div class="vmaps">${m.maps.map(x=>{const b=m.bans.find(y=>y.map===x);return `<button class="vmap${b?" banned":""}${b&&JUST&&JUST.has(x)?" just":""}${my&&!b?" can":""}" style="background:${mapBg(x)}" ${my&&!b?`data-ban="${esc(x)}" aria-label="Убрать карту ${esc(x)}"`:"disabled"}><span class="vn">${esc(x)}</span>${b?`<span class="vb">Убрана · ${b.auto?"время вышло":"команда "+esc(capName(m,b.team))}</span>`:my?`<span class="vb">Убрать</span>`:""}</button>`}).join("")}</div>
      <div class="muted" style="font-size:13px;margin-top:10px">Если капитан не успеет за 20 секунд, карта уберётся случайно.</div></div>`;
   }
   const mapCard=`<div class="mapbig" style="background:${mapBg(m.map)}"><div><div class="tag" style="color:#fff">Карта матча</div><b>${esc(m.map)}</b></div></div>`;
@@ -670,7 +860,7 @@ function center(m){
   const p=m.players.find(x=>x.me);
   const big=p?(m.winner==="draw"?"Ничья":m.winner===p.team?`<span class="w">Победа</span>`:`<span class="l">Поражение</span>`):(m.winner==="draw"?"Ничья":`Победила команда ${esc(capName(m,m.winner))}`);
   return mapCard+`<div class="card pad"><h3>Итог матча</h3><div class="resbig">${big}</div>${m.scoreA!=null?`<div class="muted" style="margin-top:4px">Счёт ${m.scoreA} : ${m.scoreB}</div>`:""}
-    ${p?`<div style="margin-top:12px;font-size:18px">Ваш ELO: <b class="${p.delta>=0?"w":"l"}">${fmtD(p.delta)}</b></div>`:""}
+    ${p?`<div style="margin-top:12px;font-size:18px">Ваш ELO: <b class="${p.delta>=0?"w":"l"}"${p.delta!=null?` data-count="${p.delta}" data-sign="1"`:""}>${fmtD(p.delta)}</b></div>`:""}
     ${m.test?`<p class="muted" style="font-size:13px;margin-top:8px">Тестовый матч — рейтинг игроков не изменился.</p>`:""}
     ${p?`<a class="btn btn-o" style="margin-top:16px" href="#/lobby">Найти новый матч</a>`:""}</div>`;
 }
@@ -716,26 +906,28 @@ async function uploadShot(id,file){
 async function pageAdmin(){
   if(needAuth())return;
   if(!S.user.admin){app.innerHTML=`<div class="wrap">${empty("Нет доступа","Эта страница только для администраторов")}</div>`;return}
-  app.innerHTML=`<div class="wrap"><h1 class="h">Админка · матчи</h1><p class="muted" style="margin:-12px 0 20px">Идущие и спорные матчи. Спорный — когда капитаны прислали разные результаты.</p><div id="adm" class="grid"><div class="card pad muted">Загрузка…</div></div></div>`;
+  app.innerHTML=`<div class="wrap"><h1 class="h">Админка · матчи</h1><p class="muted" style="margin:-12px 0 20px">Идущие и спорные матчи. Спорный — когда капитаны прислали разные результаты.</p><div id="adm" class="grid"><div class="card">${skel(3)}</div></div></div>`;entered();
   const list=await api("/api/admin/matches").catch(()=>[]);const el=document.getElementById("adm");if(!el)return;
   if(!list.length){el.innerHTML=`<div class="card">${empty("Сейчас нет идущих матчей","Здесь появятся идущие матчи и матчи, где капитаны не сошлись в результате")}</div>`;return}
   const rep=(m,t)=>m.reports[t]?`${resName(m.reports[t].result)}${m.reports[t].score?" "+m.reports[t].score.join(":"):""}`:"ещё нет";
   el.innerHTML=list.map(m=>`<div class="card pad"><div class="adm-h"><div><span class="st st-${m.state}" style="display:inline-block;font-size:12px;font-weight:800;padding:4px 10px;border-radius:4px;background:var(--card2);text-transform:uppercase">${ST[m.state]}</span> <b>${MODE_NAME[m.mode]} · ${esc(m.map||"карта ещё выбирается")}</b>${m.test?' <span class="pill">тест</span>':""}<div class="muted" style="font-size:13px;margin-top:4px">Матч #${m.id} · ${new Date(m.created).toLocaleString("ru-RU")}</div></div><a class="btn btn-g btn-sm" href="#/match/${m.id}">Открыть</a></div>
     <div style="font-size:14px;margin:12px 0">Капитан ${esc(capName(m,"A"))}: <b>${rep(m,"A")}</b><span class="muted"> · </span>Капитан ${esc(capName(m,"B"))}: <b>${rep(m,"B")}</b></div>
     <div class="row2">${m.map?`<button class="btn btn-o btn-sm" data-w="A" data-id="${m.id}">Победа: команда ${esc(capName(m,"A"))}</button><button class="btn btn-o btn-sm" data-w="B" data-id="${m.id}">Победа: команда ${esc(capName(m,"B"))}</button><button class="btn btn-g btn-sm" data-w="draw" data-id="${m.id}">Ничья</button>`:""}<button class="btn btn-g btn-sm" data-w="cancel" data-id="${m.id}">Отменить матч</button></div></div>`).join("");
+  rise(el.children,60,400);
   el.querySelectorAll("[data-w]").forEach(b=>b.onclick=async()=>{if(!confirm(b.dataset.w==="cancel"?"Отменить матч? ELO не изменится.":"Выставить результат: «"+b.textContent+"»?"))return;try{await api(`/api/admin/match/${b.dataset.id}/resolve`,{method:"POST",body:JSON.stringify({winner:b.dataset.w})});toast("Готово");pageAdmin()}catch(e){toast(e.message)}});
 }
 async function pageLeaderboard(){
-  app.innerHTML=`<div class="wrap"><h1 class="h">Таблица лидеров</h1><div id="lb"><div class="card pad muted">Загрузка…</div></div></div>`;
-  const list=(await getLb()).map((p,i)=>({...p,rank:i+1}));const el=document.getElementById("lb");
+  app.innerHTML=`<div class="wrap"><h1 class="h">Таблица лидеров</h1><div id="lb"><div class="card">${skel(8)}</div></div></div>`;entered();
+  const list=(await getLb()).map((p,i)=>({...p,rank:i+1}));const el=document.getElementById("lb");if(!el)return;
   if(!list.length){el.innerHTML=`<div class="card">${lbEmpty()}</div>`;return}
   el.innerHTML=`${list.length>=3?`<div class="lb-top">${[1,0,2].map(i=>{const p=list[i];return `<a href="#/player/${encodeURIComponent(p.nick)}" class="card podium p${i+1}"><span class="rk">#${i+1}</span>${ava(p.nick,p.avatar)}<b style="font-size:18px;display:block">${esc(p.nick)}</b><div style="display:flex;justify-content:center;align-items:center;gap:8px;margin-top:8px">${badge(p.elo,"sm")}<b>${p.elo} ELO</b></div><div class="muted" style="font-size:13px;margin-top:4px">${p.matches} матчей · ${wr(p)} побед</div></a>`}).join("")}</div>`:""}
    <div class="card scroll">${lbTable(list.length>=3?list.slice(3):list,false)}</div>`;
-  bind();
+  fadeRows(el);bind();
 }
 
 /* ===== Роутер ===== */
 function route(){
+  S.enter=true;
   const h=location.hash.slice(1)||"/";const [,a,b]=h.split("/");
   renderChrome("/"+(a||""));window.scrollTo(0,0);clearInterval(matchPoll);
   if(!a)pageHome();else if(a==="login")pageAuth("login");else if(a==="register")pageAuth("register");else if(a==="verify")pageVerify();
