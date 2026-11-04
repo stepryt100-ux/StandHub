@@ -685,6 +685,11 @@ body::after{width:520px;height:520px;left:140px;bottom:-220px;background:radial-
 .cup-my{display:flex;align-items:center;gap:8px;padding:10px 12px;border-radius:8px;background:rgba(63,207,106,.12);border:1px solid rgba(63,207,106,.4);font-size:14px}.cup-my .ic{color:var(--green);flex:none}
 .cup-bl{text-align:center;font-size:13px;color:var(--muted);text-decoration:underline}
 .cup-st{text-align:center;padding:10px 12px;border-radius:8px;background:rgba(255,77,77,.1);border:1px solid rgba(255,77,77,.35);font-weight:800;font-size:14px}
+.cup-r.has-f{min-width:340px}
+.cup-sts{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.cup-fund{border-color:rgba(255,200,0,.42);background:linear-gradient(180deg,rgba(255,200,0,.16),rgba(255,200,0,.05))}
+.cup-fund span{color:#e6c35c}.cup-fund b{color:var(--yellow);white-space:nowrap}.cup-fund small{font-size:14px;font-weight:800;color:#fff}
+.cup-win{color:#ffe08a}
 @media (max-width:760px){
  .cup{grid-template-columns:1fr;gap:14px;padding:18px 16px}
  .cup-ic{position:absolute;right:14px;top:14px;width:54px;height:54px;box-shadow:0 0 0 5px rgba(255,200,0,.12)}.cup-ic .ic{width:30px;height:30px}
@@ -693,6 +698,7 @@ body::after{width:520px;height:520px;left:140px;bottom:-220px;background:radial-
  .cup-b p{font-size:14px;margin-top:8px}
  .cup-r{min-width:0;gap:8px}
  .cup-cd{display:flex;align-items:baseline;justify-content:center;gap:10px;padding:7px 12px}.cup-cd b{font-size:20px}
+ .cup-r.has-f{min-width:0}.cup-sts{gap:8px}.cup-sts .cup-cd{display:block;padding:7px 8px}
  .cup-lob .cup-b p{display:none}
 }
 /* админка: турнир */
@@ -707,6 +713,7 @@ body::after{width:520px;height:520px;left:140px;bottom:-220px;background:radial-
 .adm-cfg input[type=date]:focus,.adm-cfg input[type=time]:focus,.adm-cfg input[type=password]:focus{border-color:var(--orange);outline:none;box-shadow:0 0 0 3px rgba(255,85,0,.15)}
 .adm-cfg label.w2{flex:1 1 260px}.adm-cfg label.w3{flex:1 1 100%}.adm-cfg label.w2 input,.adm-cfg label.w3 input{width:100%}
 .adm-sub2{font-size:13px;text-transform:uppercase;font-weight:800;color:var(--muted);letter-spacing:.04em;margin:4px 0 -6px}
+.adm-fh{margin-top:-6px;font-size:13px;color:var(--muted)}.adm-fh b{color:var(--yellow)}.adm-fh .ic{width:16px;height:16px;vertical-align:-3px;margin-right:6px;color:var(--yellow)}
 .adm-cupb{display:flex;gap:10px;flex-wrap:wrap}.adm-cupb .ic{width:16px;height:16px}
 .adm-pic{display:flex;gap:16px;align-items:center;padding:12px;border:1px solid var(--line);border-radius:10px;background:var(--bg2)}
 .adm-pim{flex:none;display:block;width:220px;border-radius:8px;overflow:hidden;border:1px solid var(--line)}.adm-pim img{display:block;width:100%;aspect-ratio:16/9;object-fit:cover;background:#111}
@@ -1041,7 +1048,7 @@ function toast(t){const e=document.getElementById("toast");e.textContent=t;e.cla
 function needAuth(){if(!S.user){location.hash="#/login";toast("Войдите, чтобы продолжить");return true}return false}
 function empty(title,text,btn){return `<div class="empty"><div class="empty-ic">${ic("crown")}</div><b>${title}</b><p class="muted">${text}</p>${btn||""}</div>`}
 /* ===== Анимации ===== */
-const APP_V="1.11.1";
+const APP_V="1.11.2";
 // анимации включены всегда; выключить можно кнопкой «Анимации» (меню слева / низ главной)
 const RM=()=>document.documentElement.classList.contains("no-motion");
 function paintMotion(){document.querySelectorAll("[data-motion] b").forEach(b=>b.textContent=RM()?"выкл":"вкл")}
@@ -1938,21 +1945,28 @@ function cupBanner(){const c=S.cup,ph=cupPh();if(ph==="off")return "";const link
    :ph==="open"?(link?`<a class="btn btn-o btn-lg cup-btn" href="${link}" target="_blank" rel="noopener">${ic("tg")}Регистрация в Telegram</a>`:`<span class="btn btn-g btn-lg cup-btn" aria-disabled="true">Регистрация скоро</span>`)
    :live?(c.channel?`<a class="btn btn-o btn-lg cup-btn" href="https://t.me/${encodeURIComponent(c.channel)}" target="_blank" rel="noopener">${ic("tg")}Следить в Telegram</a>`:"")
    :`<span class="cup-st">${ph==="full"?"Все места заняты":"Регистрация закрыта"}</span>`;
+  const cd=live?`<div class="cup-cd"><span>Статус</span><b>Турнир идёт</b></div>`:`<div class="cup-cd"><span>До старта</span><b data-cd="${c.start}">${cdStr(c.start-Date.now()-S.skew)}</b></div>`;
+  const fund=c.fund>0?`<div class="cup-cd cup-fund"><span>Призовой фонд</span><b>${fmt(c.fund)}<small> голды</small></b></div>`:"";
   return `<section class="card cup${live?" live":""}" aria-label="Турнир ${esc(c.title)}"><div class="cup-ic">${ic("trophy")}</div>
    <div class="cup-b">${live?`<span class="tag live">Идёт сейчас</span>`:`<span class="tag">Турнир · 5 на 5</span>`}<h2>${esc(c.title)}</h2>
-    <div class="cup-i"><span>${ic("cal")}${esc(mskWhen(c.start))}</span><span>${ic("gift")}Призы — ${esc(lc1(c.prize))}</span>${c.left!=null&&ph==="open"?`<span class="cup-left">Осталось ${c.left} ${plr(c.left,"место","места","мест")}</span>`:""}</div>
+    <div class="cup-i"><span>${ic("cal")}${esc(mskWhen(c.start))}</span>${cupPrizes(c)}${c.left!=null&&ph==="open"?`<span class="cup-left">Осталось ${c.left} ${plr(c.left,"место","места","мест")}</span>`:""}</div>
     <p>${esc(c.desc)}</p></div>
-   <div class="cup-r">${live?`<div class="cup-cd"><span>Статус</span><b>Турнир идёт</b></div>`:`<div class="cup-cd"><span>До старта</span><b data-cd="${c.start}">${cdStr(c.start-Date.now()-S.skew)}</b></div>`}${act}</div></section>`}
+   <div class="cup-r${fund?" has-f":""}">${fund?`<div class="cup-sts">${fund}${cd}</div>`:cd}${act}</div></section>`}
+// призы на плашке: доля каждого победителя из призового фонда и «другие призы»
+function cupPrizes(c){const o=[];if(c.fund>0)o.push(`<span class="cup-win">${ic("crown")}Победителям — по ${fmt(c.share)} голды каждому</span>`);
+  if(c.prize)o.push(`<span>${ic("gift")}${c.fund>0?"Также: ":"Призы — "}${esc(lc1(c.prize))}</span>`);return o.join("")}
 // карточка «Кубки» на главной: пока турнира нет — «Скоро»
 function cupCardIn(){const c=S.cup,ph=cupPh(),link=cupLink();
   if(ph==="off")return `<span class="tag">Скоро</span><h3>Кубки</h3><p class="muted">Ежедневные и еженедельные кубки по расписанию с наградами за места.</p><span class="btn btn-g">Скоро</span>`;
   const b=c.my?`<span class="btn btn-g">Вы участвуете</span>`:ph==="open"&&link?`<a class="btn btn-o" href="${link}" target="_blank" rel="noopener">Участвовать</a>`:`<span class="btn btn-g">${ph==="live"?"Идёт сейчас":ph==="full"?"Мест нет":ph==="open"?"Регистрация скоро":"Регистрация закрыта"}</span>`;
-  return `<span class="tag live">${ph==="live"?"Идёт сейчас":ph==="open"?"Регистрация":"Скоро старт"}</span><h3>Кубки</h3><p class="muted">${esc(c.title)} — ${esc(mskWhen(c.start,true))}. Турнир 5 на 5, призы — ${esc(lc1(c.prize))}.</p>${b}`}
+  return `<span class="tag live">${ph==="live"?"Идёт сейчас":ph==="open"?"Регистрация":"Скоро старт"}</span><h3>Кубки</h3><p class="muted">${esc(c.title)} — ${esc(mskWhen(c.start,true))}. Турнир 5 на 5, ${c.fund>0?`призовой фонд — ${fmt(c.fund)} голды`:`призы — ${esc(lc1(c.prize))}`}.</p>${b}`}
 function paintCup(){document.querySelectorAll("[data-cupb]").forEach(el=>{const h=cupBanner();if(el._h!==h){el._h=h;el.innerHTML=h}});document.querySelectorAll("[data-cupc]").forEach(el=>{const h=cupCardIn();if(el._h!==h){el._h=h;el.innerHTML=h}})}
 
 /* ===== Админка: турнир ===== */
 function mskParts(t){const d=new Date(t+MSK_OFF);return [`${d.getUTCFullYear()}-${p2(d.getUTCMonth()+1)}-${p2(d.getUTCDate())}`,`${p2(d.getUTCHours())}:${p2(d.getUTCMinutes())}`]}
 function mskTs(dt,tm){const a=/^(\d{4})-(\d{2})-(\d{2})$/.exec(dt||""),b=/^(\d{1,2}):(\d{2})/.exec(tm||"");return a&&b?Date.UTC(+a[1],+a[2]-1,+a[3],+b[1],+b[2])-MSK_OFF:NaN}
+// подсказка под призовым фондом: сколько получит каждый из команды-победителя
+function fundHint(f,t=5){return f>0?`${ic("crown")}Весь фонд забирает команда-победитель — по <b>${fmt(Math.floor(f/t))} голды</b> каждому из ${t} игроков`:`Без призового фонда — на сайте и в Telegram будут только «Другие призы»`}
 const PH_T={open:"Регистрация открыта",closed:"Регистрация закрыта",full:"Все места заняты",live:"Турнир идёт",off:"Плашка скрыта"};
 async function admCup(){const el=document.getElementById("adm");if(!el)return;
   try{paintAdmCup(await api("/api/admin/cup"))}catch(e){el.innerHTML=`<div class="card">${empty("Не удалось загрузить турнир",esc(e.message))}</div>`}}
@@ -1999,8 +2013,10 @@ function paintAdmCup(d){const el=document.getElementById("adm");if(!el)return;S.
     <div class="adm-cfg"><label class="w2">Название<input type="text" data-c="title" maxlength="40" value="${esc(c.title)}"></label>
      <label>Дата старта<input type="date" data-c="date" value="${dd}"></label><label>Время, МСК<input type="time" data-c="time" value="${tt}"></label>
      <label>Мест, команд<input type="number" inputmode="numeric" min="2" max="256" step="1" data-c="max" value="${c.max}"></label>
-     <label class="w2">Призы<input type="text" data-c="prize" maxlength="80" value="${esc(c.prize)}"></label>
      <label class="w3">Описание<input type="text" data-c="desc" maxlength="200" value="${esc(c.desc)}"></label></div>
+    <div class="adm-cfg"><label>Призовой фонд, голды<input type="number" inputmode="numeric" min="0" max="10000000" step="1000" data-c="fund" value="${c.fund||0}"></label>
+     <label class="w2">Другие призы — необязательно<input type="text" data-c="prize" maxlength="80" value="${esc(c.prize)}" placeholder="Например: 2-е место — 5 000 голды"></label></div>
+    <p class="adm-fh" data-cfh>${fundHint(c.fund,d.team)}</p>
     <h4 class="adm-sub2">Telegram-канал для анонсов</h4>
     <p class="muted" style="font-size:13px;margin:0">${d.bot?`Добавьте <b style="color:#fff">@${esc(d.bot)}</b> в администраторы канала с правом «Публикация сообщений» — кнопкой ниже или вручную: канал → «Администраторы» → «Добавить администратора». Кнопка «Опубликовать анонс» отправит в канал пост о турнире с картинкой и кнопкой регистрации.`:"Сначала подключите бота регистрации — он будет публиковать посты в канал."}</p>
     ${d.bot?`<div class="adm-cupb"><a class="btn btn-g btn-sm" href="https://t.me/${encodeURIComponent(d.bot)}?startchannel&admin=post_messages" target="_blank" rel="noopener" data-caddch>${ic("tg")}Добавить бота в канал</a></div>`:""}
@@ -2014,7 +2030,8 @@ function paintAdmCup(d){const el=document.getElementById("adm");if(!el)return;S.
   const g=k=>el.querySelector(`[data-c="${k}"]`);
   const on=el.querySelector("[data-cbon]");if(on)on.onclick=e=>{const v=el.querySelector("#cupTok").value.trim();if(!v){toast("Вставьте токен от @BotFather");return}cupPost({act:"bot",token:v},e.currentTarget,r=>"Бот подключён: @"+r.bot,true)};
   const off=el.querySelector("[data-cboff]");if(off)off.onclick=e=>{if(!confirm("Отключить бота регистрации? Кнопка «Регистрация в Telegram» на плашке перестанет работать."))return;cupPost({act:"botOff"},e.currentTarget,()=>"Бот отключён",true)};
-  el.querySelector("[data-csave]").onclick=e=>cupPost({act:"cfg",on:g("on").checked,reg:g("reg").checked,title:g("title").value,start:mskTs(g("date").value,g("time").value),max:Number(g("max").value),prize:g("prize").value,desc:g("desc").value,channel:g("channel").value,chNew:g("chNew").checked,pic:g("pic").checked},e.currentTarget,()=>"Сохранено",true);
+  g("fund").oninput=()=>{el.querySelector("[data-cfh]").innerHTML=fundHint(Number(g("fund").value)||0,d.team)};
+  el.querySelector("[data-csave]").onclick=e=>cupPost({act:"cfg",on:g("on").checked,reg:g("reg").checked,title:g("title").value,start:mskTs(g("date").value,g("time").value),max:Number(g("max").value),fund:g("fund").value===""?0:Number(g("fund").value),prize:g("prize").value,desc:g("desc").value,channel:g("channel").value,chNew:g("chNew").checked,pic:g("pic").checked},e.currentTarget,()=>"Сохранено",true);
   el.querySelector("[data-cpost]").onclick=e=>cupPost({act:"post",channel:g("channel").value},e.currentTarget,r=>"Анонс опубликован в "+r.channel+(r.noPic?" — без картинки: Telegram её не принял":""));
   el.querySelector("[data-ccopy]").onclick=()=>copyTxt(cupListTxt(S.admCup),"Список команд скопирован");
   el.querySelector("[data-cclear]").onclick=e=>{const n=S.admCup.teams.length;if(!confirm(`Удалить все команды (${n}) из списка? Игрокам ничего не придёт — обычно это нужно перед новым турниром.`))return;cupPost({act:"clear"},e.currentTarget,r=>`Список очищен (${r.n})`)};

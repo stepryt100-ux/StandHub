@@ -18,6 +18,8 @@ const pad = n => String(n).padStart(2, '0');
 const clean = s => String(s == null ? '' : s).replace(/\s+/g, ' ').trim();
 const lc = s => (/^[А-ЯЁA-Z][а-яёa-z]/.test(s) ? s[0].toLowerCase() + s.slice(1) : s); // «Промокоды…» → «промокоды…» посреди фразы
 const dot = s => (/[.!?…]$/.test(s) ? s : s + '.');
+const num = n => String(n).replace(/\B(?=(\d{3})+(?!\d))/g, '\u00a0'); // 50000 → «50 000» (неразрывный пробел)
+const FUND_MAX = 10000000;
 const plural = (n, a, b, c) => { const m = n % 10, h = n % 100; return m === 1 && h !== 11 ? a : m >= 2 && m <= 4 && (h < 12 || h > 14) ? b : c; };
 // ближайшая суббота, 19:00 по Москве
 function nextSat(now = Date.now()) {
@@ -40,7 +42,7 @@ const cleanCh = s => {
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 const fs = require('fs'), path = require('path');
 // картинка анонса по умолчанию — «Кубок открытия» 1280×720; админ может загрузить свою
-const DEF_IMG = path.join(__dirname, 'assets', 'cup-open.jpg'), DEF_V = 'd1';
+const DEF_IMG = path.join(__dirname, 'assets', 'cup-open.jpg'), DEF_V = 'd2';
 let defBuf = null;
 const defImg = () => { if (!defBuf) { try { defBuf = fs.readFileSync(DEF_IMG); } catch { defBuf = Buffer.alloc(0); } } return defBuf; };
 // ошибки доступа к каналу — с ними картинку не обойти, публиковать текстом бесполезно
@@ -48,10 +50,19 @@ const ACCESS_ERR = /chat not found|rights|not a member|forbidden|administrator|a
 
 module.exports = function ({ db, save, sendTo, sendAll, tell, alertAdmins, escH, siteUrl, partyOf, mainBot = () => null, envToken = '', mainToken = '' }) {
   const C = db.cup = db.cup || {};
-  C.cfg = { on: true, reg: true, title: 'Кубок открытия', start: nextSat(), prize: 'Промокоды на голду', desc: 'Собери пати из пяти человек, регистрация в нашем Telegram', max: 16, channel: '', chNew: false, pic: true, ...(C.cfg || {}) };
+  const was = C.cfg;
+  // fund — призовой фонд в голде: его забирает команда-победитель, каждому из пятерых — fund / 5; prize — другие призы (необязательно)
+  C.cfg = { on: true, reg: true, title: 'Кубок открытия', start: nextSat(), fund: 50000, prize: '', desc: 'Собери пати из пяти человек, регистрация в нашем Telegram', max: 16, channel: '', chNew: false, pic: true, ...(C.cfg || {}) };
+  // v1.11.2: вместо «Промокоды на голду» — призовой фонд 50 000 голды (по 10 000 каждому из победителей)
+  if (was && was.fund === undefined && was.prize === 'Промокоды на голду') C.cfg.prize = '';
   C.teams = C.teams || [];
   C.seq = Math.max(C.seq || 0, ...C.teams.map(t => t.n || 0));
   const cfg = C.cfg;
+  const share = () => Math.floor(cfg.fund / TEAM);
+  // призы для Telegram: фонд и доля каждого победителя, плюс другие призы, если есть
+  const prizeTg = () => cfg.fund > 0
+    ? `💰 Призовой фонд: <b>${num(cfg.fund)} голды</b>\n🥇 Всё забирает команда-победитель — по ${num(share())} голды каждому игроку${cfg.prize ? `\n🎁 Также: ${escH(lc(cfg.prize))}` : ''}`
+    : `🎁 Призы: ${escH(lc(cfg.prize))}`;
   const user = id => db.users.find(u => u.id === id);
   const nick = id => (user(id) || { nick: '?' }).nick;
   const teamOf = uid => C.teams.find(t => t.members.includes(uid)) || null;
@@ -126,7 +137,7 @@ module.exports = function ({ db, save, sendTo, sendAll, tell, alertAdmins, escH,
   // ---------- состояние для сайта ----------
   const pubState = () => {
     const ph = phase(), left = cfg.max - C.teams.length;
-    return { type: 'cup', phase: ph, title: cfg.title, start: cfg.start, until: cfg.start + SHOW_AFTER, prize: cfg.prize, desc: cfg.desc, max: cfg.max,
+    return { type: 'cup', phase: ph, title: cfg.title, start: cfg.start, until: cfg.start + SHOW_AFTER, fund: cfg.fund, share: share(), prize: cfg.prize, desc: cfg.desc, max: cfg.max,
       left: ph === 'open' && left <= 3 ? left : null, bot, channel: cfg.channel && cfg.channel[0] === '@' ? cfg.channel.slice(1) : null };
   };
   const state = uid => { const t = uid ? teamOf(uid) : null; return { ...pubState(), my: t ? { name: t.name, cap: nick(t.cap), isCap: t.cap === uid, members: t.members.map(nick) } : null }; };
@@ -139,7 +150,7 @@ module.exports = function ({ db, save, sendTo, sendAll, tell, alertAdmins, escH,
     const ph = phase(), left = cfg.max - C.teams.length;
     const st = ph === 'open' ? `✅ Регистрация открыта${left <= 3 ? ` — осталось ${left} ${plural(left, 'место', 'места', 'мест')}` : ''}`
       : ph === 'full' ? '⛔ Все места уже заняты' : ph === 'closed' ? '⛔ Регистрация закрыта' : ph === 'live' ? '🔥 Турнир уже идёт' : '⛔ Сейчас турниров нет — следите за новостями';
-    return `🏆 <b>${escH(cfg.title)}</b> — турнир 5 на 5 в StandLeo\n\n📅 ${when(cfg.start)}\n🎁 Призы: ${escH(lc(cfg.prize))}\n👥 Мест: ${cfg.max} ${plural(cfg.max, 'команда', 'команды', 'команд')}\n\n${escH(dot(cfg.desc))}\n\n`
+    return `🏆 <b>${escH(cfg.title)}</b> — турнир 5 на 5 в StandLeo\n\n📅 ${when(cfg.start)}\n${prizeTg()}\n👥 Мест: ${cfg.max} ${plural(cfg.max, 'команда', 'команды', 'команд')}\n\n${escH(dot(cfg.desc))}\n\n`
       + `<b>Как зарегистрироваться</b>\n1. У каждого из пятерых — аккаунт на ${siteA('/#/register')}, подтверждённый в ${vb()}\n2. Капитан собирает на сайте пати из 5 человек: «Играть» → «Пригласить» (звать можно друзей с сайта)\n3. Капитан нажимает здесь «${B_REG}» и пишет название команды\n\n${st}`;
   };
   const info = chat => say(chat, infoText(), { reply_markup: KB });
@@ -236,7 +247,7 @@ module.exports = function ({ db, save, sendTo, sendAll, tell, alertAdmins, escH,
 
   // ---------- канал: анонс и новые команды ----------
   const regKb = () => ({ inline_keyboard: [[{ text: '📝 Зарегистрировать команду', url: `https://t.me/${bot}?start=cup` }], [{ text: '🌐 Сайт StandHub', url: siteUrl }]] });
-  const annText = () => `🏆 <b>${escH(cfg.title.toUpperCase())}</b>\nТурнир 5 на 5 в StandLeo\n\n📅 ${when(cfg.start)}\n🎁 Призы: ${escH(lc(cfg.prize))}\n👥 Мест: ${cfg.max} ${plural(cfg.max, 'команда', 'команды', 'команд')}\n\n${escH(dot(cfg.desc))}\n\n👇 Регистрация — по кнопке ниже`;
+  const annText = () => `🏆 <b>${escH(cfg.title.toUpperCase())}</b>\nТурнир 5 на 5 в StandLeo\n\n📅 ${when(cfg.start)}\n${prizeTg()}\n👥 Мест: ${cfg.max} ${plural(cfg.max, 'команда', 'команды', 'команд')}\n\n${escH(dot(cfg.desc))}\n\n👇 Регистрация — по кнопке ниже`;
   const tgErr = r => {
     const d = String((r && r.description) || '');
     if (/chat not found/i.test(d)) return 'Канал не найден. Проверьте адрес — например, @standhub';
@@ -263,20 +274,23 @@ module.exports = function ({ db, save, sendTo, sendAll, tell, alertAdmins, escH,
 
   // ---------- админка ----------
   const adminState = () => ({
-    cfg: { ...cfg }, phase: phase(), bot, botErr, env: !C.token && !!envToken, main: mainBot(), img: (({ v, custom }) => ({ v, custom }))(img()),
+    cfg: { ...cfg }, team: TEAM, phase: phase(), bot, botErr, env: !C.token && !!envToken, main: mainBot(), img: (({ v, custom }) => ({ v, custom }))(img()),
     teams: C.teams.slice().sort((a, b) => a.n - b.n).map(t => ({ id: t.id, n: t.n, name: t.name, at: t.at, cap: nick(t.cap),
       members: t.members.map(id => { const u = user(id) || {}; return { nick: u.nick || '?', soid: u.soid || '', elo: u.elo || 0, tg: u.tgUser || null, cap: id === t.cap }; }) })),
   });
   function setCfg(b) {
     const title = clean(b.title), prize = clean(b.prize), desc = clean(b.desc), start = Number(b.start), max = Number(b.max), ch = cleanCh(b.channel);
+    const fund = b.fund == null ? cfg.fund : b.fund === '' ? 0 : Number(b.fund); // старая вкладка без этого поля — фонд не трогаем
     if (title.length < 2 || title.length > 40) return { error: 'Название — от 2 до 40 символов' };
     if (!Number.isFinite(start) || start < Date.now() - 30 * DAY || start > Date.now() + 365 * DAY) return { error: 'Укажите дату и время старта' };
-    if (!prize || prize.length > 80) return { error: 'Призы — от 1 до 80 символов' };
+    if (!Number.isInteger(fund) || fund < 0 || fund > FUND_MAX) return { error: `Призовой фонд — целое число голды от 0 до ${num(FUND_MAX)}` };
+    if (prize.length > 80) return { error: 'Другие призы — до 80 символов' };
+    if (!fund && !prize) return { error: 'Укажите призовой фонд или напишите призы' };
     if (!desc || desc.length > 200) return { error: 'Описание — от 1 до 200 символов' };
     if (!Number.isInteger(max) || max < 2 || max > 256) return { error: 'Мест — от 2 до 256 команд' };
     if (ch === null) return { error: 'Канал — в виде @название или ссылка t.me/название' };
     if (start !== cfg.start) C.reminded = 0;
-    Object.assign(cfg, { title, start, prize, desc, max, on: !!b.on, reg: !!b.reg, channel: ch, chNew: !!b.chNew, pic: b.pic === undefined ? cfg.pic : !!b.pic });
+    Object.assign(cfg, { title, start, fund, prize, desc, max, on: !!b.on, reg: !!b.reg, channel: ch, chNew: !!b.chNew, pic: b.pic === undefined ? cfg.pic : !!b.pic });
     save(); push(); return { ok: true };
   }
   async function setBot(raw) {
