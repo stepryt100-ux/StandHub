@@ -2,7 +2,7 @@
 const crypto = require('crypto');
 const MODES = { '5v5': 10, '2v2': 4, '1v1': 2 };
 const MODE_NAME = { '5v5': '5 на 5', '2v2': '2 на 2', '1v1': '1 на 1' };
-const MAPS = ['Sandstone', 'Rust', 'Province', 'Zone 7', 'Hanami', 'Breeze', 'Dune', 'Sakura'];
+const MAPS = ['Sandstone', 'Rust', 'Province', 'Zone 7', 'Hanami', 'Breeze', 'Dune']; // Sakura убрана (v1.10.1) — её нет в StandLeo
 const ACCEPT_SEC = 15, BAN_SEC = 20;
 const CLAIM_MIN = 10 * 60e3;           // отметить результат можно через 10 минут после начала игры (тестовые матчи — сразу)
 const CLAIM_WAIT = 30 * 60e3;          // соперники могут оспорить результат 30 минут, потом он засчитывается

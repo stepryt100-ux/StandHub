@@ -282,7 +282,7 @@ tr.click{cursor:pointer}tr.click:hover td{background:var(--card2)}
 .vt{font-size:28px;font-weight:900;font-variant-numeric:tabular-nums;line-height:1}.vt.hot{color:var(--red)}
 .turn{padding:10px 14px;border-radius:6px;background:var(--bg2);border:1px solid var(--line);font-weight:700;margin-bottom:12px}
 .turn.mine{border-color:var(--orange);background:rgba(255,85,0,.12)}
-.vmaps{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
+.vmaps{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}.vmaps .vmap:last-child:nth-child(odd){grid-column:1/-1}
 .vmap{height:72px;border-radius:6px;border:2px solid transparent;color:#fff;display:flex;flex-direction:column;justify-content:flex-end;align-items:flex-start;padding:8px 10px;text-align:left;position:relative;cursor:default}
 .vmap .vn{font-weight:900;text-transform:uppercase;text-shadow:0 1px 3px rgba(0,0,0,.8)}
 .vmap .vb{font-size:11px;font-weight:700;text-transform:uppercase;text-shadow:0 1px 3px rgba(0,0,0,.8)}
@@ -863,7 +863,7 @@ body::after{width:520px;height:520px;left:140px;bottom:-220px;background:radial-
 
 <script>
 /* ===== Справочники ===== */
-const MAPS=[["Sandstone","#c89a5b,#6b4a22"],["Rust","#b5532b,#3e1c0d"],["Province","#7fa36a,#2f4524"],["Zone 7","#6a7f9e,#232c3d"],["Hanami","#d77fa1,#4a2233"],["Breeze","#5fb5c9,#1f4550"],["Dune","#d9b26a,#5c4318"],["Sakura","#e59aa8,#57303a"]];
+const MAPS=[["Sandstone","#c89a5b,#6b4a22"],["Rust","#b5532b,#3e1c0d"],["Province","#7fa36a,#2f4524"],["Zone 7","#6a7f9e,#232c3d"],["Hanami","#d77fa1,#4a2233"],["Breeze","#5fb5c9,#1f4550"],["Dune","#d9b26a,#5c4318"],["Sakura","#e59aa8,#57303a"]]; // цвета карт; Sakura больше не в пуле (см. match.js), цвет оставлен для старых матчей
 const TH=[0,100,801,951,1101,1251,1401,1551,1701,1851,2001];
 function lvlOf(e){let l=1;for(let i=1;i<=10;i++)if(e>=TH[i])l=i;return l}
 function lvlColor(l){return l===1?"var(--l1)":l<=3?"var(--l2)":l<=7?"var(--l4)":l<=9?"var(--l8)":"var(--l10)"}
@@ -987,7 +987,7 @@ function toast(t){const e=document.getElementById("toast");e.textContent=t;e.cla
 function needAuth(){if(!S.user){location.hash="#/login";toast("Войдите, чтобы продолжить");return true}return false}
 function empty(title,text,btn){return `<div class="empty"><div class="empty-ic">${ic("crown")}</div><b>${title}</b><p class="muted">${text}</p>${btn||""}</div>`}
 /* ===== Анимации ===== */
-const APP_V="1.10";
+const APP_V="1.10.1";
 // анимации включены всегда; выключить можно кнопкой «Анимации» (меню слева / низ главной)
 const RM=()=>document.documentElement.classList.contains("no-motion");
 function paintMotion(){document.querySelectorAll("[data-motion] b").forEach(b=>b.textContent=RM()?"выкл":"вкл")}
