@@ -903,6 +903,211 @@ body::after{width:520px;height:520px;left:140px;bottom:-220px;background:radial-
  .pinv-wrap{top:68px;left:12px;right:12px;width:auto}
  .modal .card.pm{padding:20px 16px}
 }
+/* ===== StandHub Premium ===== */
+:root{--gold:#ffc21a;--gold2:#ffe27a}
+.gem{overflow:visible}
+.ava.avp{box-shadow:0 0 0 2px var(--gold),0 0 12px rgba(255,194,26,.45)}
+.slot .ava.avp,.podium .ava.avp,.pinv .ava.avp{box-shadow:0 0 0 3px var(--gold),0 0 18px rgba(255,194,26,.5)}
+.phead .ava.avp{border-color:var(--gold);box-shadow:0 0 0 4px rgba(255,194,26,.18),0 0 34px rgba(255,194,26,.42)}
+.pri{display:inline-flex;vertical-align:-2px;margin-left:5px;color:var(--gold);filter:drop-shadow(0 0 4px rgba(255,194,26,.5))}
+.pri .ic{width:15px;height:15px}
+.cm .pri{margin:0 6px 0 -3px;vertical-align:-1px}.cm .pri .ic{width:13px;height:13px}
+.prm{display:inline-flex;align-items:center;gap:4px;height:20px;padding:0 7px;border-radius:4px;background:linear-gradient(180deg,#ffe58a,#ffbe1a 55%,#f09a00);color:#3a2300;font-size:11px;font-weight:900;letter-spacing:.08em;text-transform:uppercase;box-shadow:0 0 0 1px rgba(255,226,122,.35),0 4px 14px -6px rgba(255,170,0,.8);white-space:nowrap;vertical-align:middle;font-style:normal;line-height:1}
+.prm .ic{width:13px;height:13px}
+.prm.lg{height:28px;padding:0 11px;font-size:12.5px;border-radius:6px}.prm.lg .ic{width:16px;height:16px}
+.side a.pml{color:#ffd84d}.side a.pml .ic,.more a.pml .ic{color:var(--gold)}
+.side a.pml.on{background:linear-gradient(90deg,rgba(255,194,26,.2),rgba(255,194,26,.04) 70%,transparent);box-shadow:inset 3px 0 0 var(--gold);color:#fff}
+.side a.pml.on .ic{color:var(--gold)}
+.more a.pml{border-color:rgba(255,194,26,.4);background:linear-gradient(180deg,rgba(255,194,26,.12),var(--card));color:#ffe9a8}
+.more a.pml.on{border-color:var(--gold);background:rgba(255,194,26,.14)}
+/* страница Premium */
+.prp{display:grid;gap:16px}
+.prp>.tk-sub{margin:14px 0 0}
+.pr-hero{position:relative;overflow:hidden;isolation:isolate;padding:40px;min-height:290px;display:flex;align-items:center;border-color:rgba(255,194,26,.42);background:radial-gradient(60% 120% at 84% 50%,rgba(255,180,0,.3),transparent 62%),radial-gradient(50% 80% at 0% 0%,rgba(255,226,122,.1),transparent 70%),linear-gradient(160deg,#2f2715,#1d1a14 60%,#18171a)}
+.pr-in{position:relative;z-index:1;max-width:560px}
+.pr-kick{display:inline-flex;align-items:center;gap:8px;font-size:12px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:#ffd84d}.pr-kick .ic{width:16px;height:16px;color:var(--gold)}
+.pr-hero h1{font-size:52px;line-height:1;font-weight:900;font-style:italic;text-transform:uppercase;margin:10px 0 12px}
+.pr-hero h1 span{background:linear-gradient(180deg,#fff1b0,#ffc21a 55%,#f08c00);-webkit-background-clip:text;background-clip:text;color:transparent;padding-right:.08em}
+.pr-hero p{color:#d8d3c5;font-size:16px;max-width:470px;margin:0 0 22px}
+.pr-art{position:absolute;right:6%;top:50%;width:240px;height:210px;transform:translateY(-50%);pointer-events:none}
+.pr-art .gem{position:absolute;inset:0;width:100%;height:100%;filter:drop-shadow(0 24px 30px rgba(0,0,0,.55));animation:prFloat 5.5s ease-in-out infinite}
+.pr-art i{position:absolute;display:block;width:22px;height:22px;background:#fff6cf;clip-path:polygon(50% 0,60% 40%,100% 50%,60% 60%,50% 100%,40% 60%,0 50%,40% 40%);animation:prTw 2.8s ease-in-out infinite;opacity:0}
+.pr-art .s1{left:-6%;top:4%}.pr-art .s2{right:-4%;top:30%;width:15px;height:15px;animation-delay:-1s}.pr-art .s3{left:10%;bottom:2%;width:12px;height:12px;animation-delay:-1.9s}
+@keyframes prFloat{0%,100%{transform:translateY(0) rotate(-4deg)}50%{transform:translateY(-12px) rotate(3deg)}}
+@keyframes prTw{0%,100%{opacity:0;transform:scale(.3) rotate(0)}50%{opacity:1;transform:scale(1) rotate(45deg)}}
+.pr-st{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.pr-note{font-size:13px;color:#bdb8aa}
+.pr-act{display:flex;flex-direction:column;gap:3px;padding:12px 18px;border-radius:12px;background:rgba(0,0,0,.32);border:1px solid rgba(255,194,26,.4)}
+.pr-act small{font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
+.pr-act b{display:flex;align-items:center;gap:8px;font-size:18px}.pr-act b .ic{color:var(--gold)}
+.pr-act .muted{font-size:13px}
+.pr-plans{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;padding-top:8px}
+.pr-plan{position:relative;display:flex;flex-direction:column;align-items:center;text-align:center;gap:4px;padding:26px 16px 18px;transition:transform .25s var(--ease),border-color .25s,box-shadow .25s}
+.pr-plan:not(.off):hover{transform:translateY(-3px);border-color:rgba(255,194,26,.5)}
+.pr-plan.pop{border-color:rgba(255,194,26,.75);background:radial-gradient(90% 60% at 50% 0%,rgba(255,194,26,.17),transparent 70%),linear-gradient(180deg,#2d2a22,#212125);box-shadow:0 0 0 1px rgba(255,194,26,.25),0 18px 40px -22px rgba(255,170,0,.6)}
+.pr-plan.off{opacity:.55}
+.pr-plan .sk-row{width:100%}
+.pr-tag{position:absolute;top:-11px;left:50%;transform:translateX(-50%);white-space:nowrap;font-size:10.5px;font-weight:900;letter-spacing:.08em;text-transform:uppercase;padding:3px 10px;border-radius:11px;background:linear-gradient(180deg,#ffe58a,#ffbe1a);color:#3a2300;line-height:16px}
+.pr-tag.best{background:linear-gradient(180deg,#ff8a3d,#ff5500);color:#fff}
+.pr-m b{display:block;font-size:46px;font-weight:900;line-height:1;font-style:italic}
+.pr-m span{font-size:13px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
+.pr-price{display:flex;align-items:center;gap:6px;font-size:28px;font-weight:900;color:#ffd84d;margin-top:10px;font-variant-numeric:tabular-nums;line-height:1.1}
+.zv{width:24px;height:24px;flex:none;vertical-align:-5px}
+.pr-rub{font-size:13px;color:var(--muted)}
+.pr-save{font-size:12px;font-weight:800;color:var(--green);min-height:18px;margin-bottom:10px}
+.pr-plan .btn{width:100%;margin-top:auto;padding:0 10px}
+.pr-plan .btn .zv{width:18px;height:18px}
+.pr-coins{display:flex;align-items:center;gap:18px;padding:18px 22px}
+.pr-coins>.coin{width:54px;height:54px;flex:none}
+.pr-coins>div{flex:1;min-width:0}
+.pr-coins b{font-size:17px}
+.pr-coins p{font-size:14px;margin:2px 0 0}
+.pr-coins .sh-prog{max-width:420px;margin-top:8px}
+.pr-coins .btn{flex:none}
+.pr-perks{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}
+.pr-perk{padding:18px;display:flex;flex-direction:column;gap:8px}
+.pr-pi{width:44px;height:44px;border-radius:12px;display:grid;place-items:center;background:linear-gradient(180deg,rgba(255,194,26,.22),rgba(255,194,26,.06));border:1px solid rgba(255,194,26,.3);color:var(--gold)}
+.pr-pi .ic,.pr-pi .coin{width:24px;height:24px}
+.pr-perk b{font-size:15.5px;line-height:1.3}
+.pr-perk p{font-size:13px;margin:0}
+.pr-steps{grid-template-columns:repeat(3,minmax(0,1fr))}
+.pr-steps .sh-step .n{background:linear-gradient(180deg,#ffe58a,#ffb800);color:#3a2300}
+.pr-pays{padding:2px 0}
+.pr-pay{display:flex;align-items:center;gap:14px;padding:12px 18px;border-bottom:1px solid var(--line)}
+.pr-pay:last-child{border:0}
+.pr-pay.off{opacity:.6}
+.pr-pic{width:38px;height:38px;border-radius:10px;display:grid;place-items:center;background:var(--bg2);border:1px solid var(--line);flex:none;color:var(--gold)}
+.pr-pic .zv,.pr-pic .coin,.pr-pic .ic{width:20px;height:20px}
+.pr-pm{flex:1;min-width:0}.pr-pm b{font-size:14.5px}.pr-pm .muted{font-size:12.5px}
+.pr-pa{text-align:right;white-space:nowrap;display:flex;flex-direction:column;align-items:flex-end;gap:4px;font-size:14px}
+.pr-doc{max-width:none}
+.pr-faq a{color:var(--orange2);text-decoration:underline}
+.pr-pv{height:118px;margin:-8px -24px 10px;display:grid;place-items:center;background:radial-gradient(60% 90% at 50% 100%,rgba(255,194,26,.32),transparent 70%)}
+.pr-pv .gem{width:104px;height:90px;filter:drop-shadow(0 12px 18px rgba(0,0,0,.5))}
+.pr-ld{display:flex;align-items:center;gap:10px;margin-top:14px;padding:12px 14px;border-radius:8px;background:rgba(255,194,26,.08);border:1px dashed rgba(255,194,26,.4);font-size:14px;color:#ffe9a8}
+.pr-ld .spin{border-top-color:var(--gold)}
+.pr-okl{list-style:none;display:grid;gap:8px;margin:14px 0 0}
+.pr-okl li{display:flex;align-items:center;gap:10px;font-size:14px;padding:10px 12px;border-radius:8px;background:var(--bg2);border:1px solid var(--line);text-align:left}
+.pr-okl .ic{color:var(--gold);flex:none}
+.pr-promo{border-color:rgba(255,194,26,.38);background:radial-gradient(50% 140% at 0% 50%,rgba(255,194,26,.2),transparent 70%),linear-gradient(180deg,#28282d,#212125)}
+.pr-promo:hover{border-color:rgba(255,194,26,.7)}
+.pr-promo .gem{width:78px;height:66px;flex:none;filter:drop-shadow(0 8px 12px rgba(0,0,0,.45));margin:0 9px}
+.pr-sup{display:flex;align-items:center;gap:8px;font-size:13.5px;color:#ffd84d;margin:-4px 0 14px}.pr-sup .ic{color:var(--gold);flex:none}
+/* прогноз ELO в комнате матча */
+.fc{border-color:rgba(255,194,26,.35)}
+a.fc{display:block;transition:border-color .25s}a.fc:hover{border-color:rgba(255,194,26,.7)}
+.fc-h{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px}
+.fc-h b{display:flex;align-items:center;gap:8px;font-size:17px}.fc-h b .ic{color:var(--gold)}
+.fc-g{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.fc-g>div{padding:10px 6px;border-radius:8px;background:var(--bg2);border:1px solid var(--line);text-align:center}
+.fc-g span{display:block;font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.05em;color:var(--muted)}
+.fc-g b{display:block;font-size:24px;font-weight:900;font-variant-numeric:tabular-nums;line-height:1.25}
+.fc-g .w b{color:var(--green)}.fc-g .l b{color:var(--red)}
+.fc p{font-size:12.5px;margin-top:10px}
+.fc.lockd .fc-g b{filter:blur(5px);opacity:.75}
+.fc.lockd p{color:#ffd84d}
+/* расширенная статистика профиля */
+.xs{margin-top:16px;padding:20px 22px;position:relative;overflow:hidden;border-color:rgba(255,194,26,.3)}
+.xs-h{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:14px}
+.xs-h b{font-size:17px;display:flex;align-items:center;gap:8px}.xs-h b .ic{color:var(--gold)}
+.xs-g{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(0,1fr);gap:14px}
+.xs-box{background:var(--bg2);border:1px solid var(--line);border-radius:10px;padding:14px 16px;min-width:0}
+.xs-box h4{font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);margin-bottom:10px;display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap}
+.xs-box h4 em{font-style:normal;color:#fff;letter-spacing:0;text-transform:none;font-size:13px}
+.xs-ch{width:100%;height:auto;display:block}
+.xs-ch circle{stroke:#1c1c1f;stroke-width:2}.xs-ch circle.w{fill:var(--green)}.xs-ch circle.l{fill:var(--red)}.xs-ch circle.d{fill:#c9c9d0}
+.xs-ch .lv{stroke:rgba(255,255,255,.09);stroke-dasharray:5 7}
+.xs-map{display:grid;grid-template-columns:minmax(0,96px) minmax(0,1fr) 42px;align-items:center;gap:10px;font-size:13px;padding:5px 0}
+.xs-map b{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.xs-map em{display:block;font-style:normal;color:var(--muted);font-size:11.5px;line-height:1.2}
+.xs-map .bar{margin:0;height:8px;border-radius:4px}
+.xs-map .bar div{border-radius:4px;background:linear-gradient(90deg,var(--orange),var(--gold))}
+.xs-map>span{text-align:right;font-weight:800;font-variant-numeric:tabular-nums}
+.xs-tiles{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-top:14px}
+.xs-tile{background:var(--bg2);border:1px solid var(--line);border-radius:10px;padding:12px 14px;min-width:0}
+.xs-tile span{display:block;font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.05em;color:var(--muted)}
+.xs-tile b{display:block;font-size:22px;font-weight:900;margin-top:2px;font-variant-numeric:tabular-nums;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.xs-fr{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-top:14px;font-size:13px}
+.xs-form{display:flex;gap:4px;flex-wrap:wrap}
+.xs-form .res{width:24px;height:24px;line-height:24px;font-size:11px}
+a.xs.lockd{display:block;min-height:250px}
+.xs.lockd .xs-blur{filter:blur(6px);opacity:.4;pointer-events:none;user-select:none}
+.xs-lock{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:8px;padding:20px;background:radial-gradient(60% 75% at 50% 50%,rgba(20,20,22,.88),rgba(20,20,22,.4))}
+.xs-lock .lk{width:52px;height:52px;border-radius:50%;display:grid;place-items:center;background:linear-gradient(180deg,#ffe58a,#ffb800);color:#3a2300;box-shadow:0 10px 30px -8px rgba(255,170,0,.7)}
+.xs-lock .lk .ic{width:24px;height:24px}
+.xs-lock b{font-size:18px}
+.xs-lock p{font-size:14px;max-width:380px;color:#c9c9d0}
+.xs-lock .btn{margin-top:6px}
+a.xs.lockd:hover .xs-lock .btn{box-shadow:0 8px 24px -8px rgba(255,85,0,.75)}
+/* задания */
+.tk-boost{display:flex;align-items:center;gap:10px;padding:10px 16px;border-radius:10px;background:rgba(255,194,26,.08);border:1px solid rgba(255,194,26,.32);color:#ffe9a8;font-size:13.5px}
+.tk-boost .ic{width:18px;height:18px;color:var(--gold);flex:none}
+.tk-sub .prm{margin-left:8px;vertical-align:2px}
+.tk-row.prt{border-color:rgba(255,194,26,.38);background:radial-gradient(80% 140% at 0% 50%,rgba(255,194,26,.1),transparent 60%),linear-gradient(180deg,#28282d,#212125)}
+.tk-row.prt .tk-ic{background:rgba(255,194,26,.14)}
+.tk-row.prt.lockd .tk-main,.tk-row.prt.lockd .tk-rw,.tk-row.prt.lockd .tk-ic{opacity:.55}
+.tk-row.prt .tk-act .btn .ic{width:16px;height:16px}
+.tk-pr{display:flex;align-items:center;gap:16px;padding:16px 20px;border-color:rgba(255,194,26,.38);background:radial-gradient(50% 140% at 0% 50%,rgba(255,194,26,.16),transparent 70%),linear-gradient(180deg,#28282d,#212125);transition:transform .25s var(--ease),border-color .25s}
+.tk-pr:hover{transform:translateY(-2px);border-color:rgba(255,194,26,.7)}
+.tk-pr .gem{width:58px;height:50px;flex:none}
+.tk-pr>div{flex:1;min-width:0}
+.tk-pr b{font-size:16px}
+.tk-pr p{font-size:13px;margin:2px 0 0}
+/* лобби, магазин */
+.prq{display:inline-flex;align-items:center;gap:4px;color:#ffd84d;font-weight:800;white-space:nowrap}
+.prq .ic{width:14px;height:14px}
+a.prq{text-decoration:underline;text-decoration-color:rgba(255,216,77,.4);text-underline-offset:2px}
+.sh-vis.pr-vis{background:radial-gradient(90% 85% at 50% 100%,rgba(255,194,26,.45),transparent 66%),linear-gradient(160deg,#3a3018,#1f1b15)}
+.pr-vis .gem{width:140px;height:122px;transition:transform .35s var(--ease);filter:drop-shadow(0 14px 18px rgba(0,0,0,.5))}
+.pr-shi:hover .pr-vis .gem{transform:scale(1.06) translateY(-3px)}
+.sh-tag.pr-stag{background:linear-gradient(180deg,#ffe58a,#ffbe1a);color:#3a2300}
+/* админка */
+.adm-pt{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.adm-tile{padding:16px 18px}
+.adm-tile span{display:block;font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.04em;color:var(--muted)}
+.adm-tile b{display:block;font-size:28px;font-weight:900;font-variant-numeric:tabular-nums;margin-top:2px}
+.adm-pp{display:grid;gap:12px;margin:14px 0}
+.adm-pp .adm-cfg{padding-bottom:12px;border-bottom:1px dashed var(--line)}
+.adm-rub{font-size:13px;padding-bottom:10px;min-width:70px}
+.adm-warn{border-color:rgba(255,77,77,.45);background:rgba(255,77,77,.07)}
+.adm-o.orph{background:rgba(255,77,77,.06)}
+.adm-o.off{opacity:.62}
+.adm-o .pri{margin:0;justify-self:center}.adm-o .pri .ic{width:20px;height:20px}
+.card.tkt-prem{border-color:rgba(255,194,26,.6);box-shadow:0 0 0 1px rgba(255,194,26,.2),0 14px 34px -22px rgba(255,170,0,.55)}
+@media (max-width:1100px){.pr-perks,.pr-plans{grid-template-columns:repeat(2,minmax(0,1fr))}.pr-plans{gap:18px 14px}.xs-g{grid-template-columns:1fr}}
+@media (max-width:760px){
+ .pr-hero{padding:22px 18px 22px;min-height:0;display:block}
+ .pr-hero h1{font-size:34px;margin:8px 0 10px}
+ .pr-hero h1 span{display:block}
+ .pr-hero p{font-size:14px;margin-bottom:16px}
+ .pr-art{right:2px;top:10px;transform:none;width:112px;height:98px}
+ .pr-art .s3{display:none}
+ .pr-st .btn-lg{width:100%}
+ .pr-plans{gap:18px 10px}
+ .pr-plan{padding:22px 10px 14px}
+ .pr-m b{font-size:38px}
+ .pr-price{font-size:23px}.pr-price .zv{width:20px;height:20px}
+ .pr-rub{font-size:12px}
+ .pr-plan .btn{font-size:12px;height:38px;gap:5px}
+ .pr-perks{gap:10px}
+ .pr-perk{padding:14px}
+ .pr-perk b{font-size:14.5px}
+ .pr-perk p{font-size:12.5px}
+ .pr-steps{grid-template-columns:1fr}
+ .pr-coins{flex-wrap:wrap;padding:16px}
+ .pr-coins>.coin{width:44px;height:44px}
+ .pr-coins .btn{width:100%}
+ .pr-pay{padding:12px 14px;gap:10px}
+ .pr-promo .gem{width:64px;height:55px;margin:0}
+ .xs{padding:16px}
+ .xs-box{padding:12px}
+ .xs-tiles{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .xs-tile b{font-size:19px}
+ .fc-g b{font-size:20px}
+ .tk-pr{flex-wrap:wrap;padding:16px}.tk-pr .btn{width:100%}
+ .adm-pt{grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+ .adm-tile{padding:12px}.adm-tile span{font-size:10.5px}.adm-tile b{font-size:20px}
+}
 </style>
 </head>
 <body>
@@ -915,6 +1120,9 @@ body::after{width:520px;height:520px;left:140px;bottom:-220px;background:radial-
  <symbol id="coinS" viewBox="0 0 48 48"><circle cx="24" cy="25.8" r="21.6" fill="#a24f00"/><circle cx="24" cy="23.4" r="21.6" fill="url(#cnRim)"/><circle cx="24" cy="23.4" r="19.2" fill="none" stroke="#c26a00" stroke-opacity=".45" stroke-width="2.6" stroke-dasharray="1 1.5" pathLength="120"/><circle cx="24" cy="23.4" r="16.4" fill="#b55a00"/><circle cx="24" cy="24.1" r="15.7" fill="url(#cnFace)"/><circle cx="24" cy="24.1" r="12.6" fill="none" stroke="#ffd2a8" stroke-opacity=".35" stroke-width=".9"/><g transform="translate(24.3 24.5) scale(.56) translate(-16 -16)"><path d="M4 4h24l-6 8h6L10 28l4-11H6z" fill="#7f2400" transform="translate(.9 1.5)"/><path d="M4 4h24l-6 8h6L10 28l4-11H6z" fill="#fff"/></g><path d="M8.4 18A16.6 16.6 0 0 1 20.6 6.9" stroke="#fff" stroke-opacity=".85" stroke-width="2.2" fill="none" stroke-linecap="round"/><circle cx="36.5" cy="10.5" r="1.3" fill="#fff" fill-opacity=".9"/></symbol>
  <symbol id="gbar" viewBox="0 0 64 34" overflow="visible"><path d="M0 33L8 11H56L64 33Z" fill="url(#gbF)" stroke="#b86a00" stroke-width="1.4" stroke-linejoin="round"/><path d="M8 11L14 1H50L56 11Z" fill="url(#gbT)" stroke="#b86a00" stroke-width="1.4" stroke-linejoin="round"/><path d="M13.5 28.5L18 16H46L50.5 28.5Z" fill="none" stroke="#c97a00" stroke-opacity=".55" stroke-width="1.2" stroke-linejoin="round"/><path d="M10 12.5H54" stroke="#fff8d6" stroke-opacity=".8" stroke-width="1.2"/></symbol>
  <symbol id="goldS" viewBox="0 0 160 110"><ellipse cx="80" cy="70" rx="78" ry="46" fill="url(#gbG)"/><ellipse cx="80" cy="103" rx="62" ry="5" fill="#000" fill-opacity=".35"/><use href="#gbar" x="14" y="66" width="64" height="34"/><use href="#gbar" x="82" y="66" width="64" height="34"/><use href="#gbar" x="48" y="33" width="64" height="34"/><path d="M64 61L70 44" stroke="#fff" stroke-opacity=".55" stroke-width="3" stroke-linecap="round"/><path d="M134 18l2.6 7.4 7.4 2.6-7.4 2.6-2.6 7.4-2.6-7.4-7.4-2.6 7.4-2.6z" fill="#fff"/><path d="M26 30l1.8 5 5 1.8-5 1.8-1.8 5-1.8-5-5-1.8 5-1.8z" fill="#fff" fill-opacity=".85"/><path d="M118 52l1.2 3.3 3.3 1.2-3.3 1.2-1.2 3.3-1.2-3.3-3.3-1.2 3.3-1.2z" fill="#fff" fill-opacity=".7"/></symbol>
+ <linearGradient id="stG" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffe680"/><stop offset="1" stop-color="#ffa400"/></linearGradient>
+ <radialGradient id="gmG" cx=".5" cy=".55" r=".5"><stop offset="0" stop-color="#ffc21a" stop-opacity=".55"/><stop offset="1" stop-color="#ffc21a" stop-opacity="0"/></radialGradient>
+ <symbol id="gemS" viewBox="0 0 120 104" overflow="visible"><ellipse cx="60" cy="58" rx="66" ry="56" fill="url(#gmG)"/><g stroke="#fff3c4" stroke-opacity=".55" stroke-width="1.2" stroke-linejoin="round"><path d="M4 36 30 8 32 36z" fill="#ffe27a"/><path d="M30 8 60 36H32z" fill="#ffc53d"/><path d="M30 8h60L60 36z" fill="#fff1b8"/><path d="M90 8 88 36H60z" fill="#ffb31a"/><path d="M90 8l26 28H88z" fill="#f29e00"/><path d="M4 36h28l28 64z" fill="#f0a000"/><path d="M32 36h28v64z" fill="#ffcf4f"/><path d="M60 36h28L60 100z" fill="#e38b00"/><path d="M88 36h28L60 100z" fill="#c27200"/></g><path d="M44 13l2 5.5 5.5 2-5.5 2-2 5.5-2-5.5-5.5-2 5.5-2z" fill="#fff"/></symbol>
 </defs></svg>
 <header class="top">
   <a href="#/" class="logo" aria-label="StandHub — на главную">
@@ -944,7 +1152,7 @@ function lvlColor(l){return l===1?"var(--l1)":l<=3?"var(--l2)":l<=7?"var(--l4)":
 function lvlPct(e){const l=lvlOf(e);if(l===10)return 100;return Math.round((e-TH[l])/(TH[l+1]-TH[l])*100)}
 function badge(e,cls=""){const l=lvlOf(e);return `<span class="lvl ${cls}" style="--c:${lvlColor(l)};--p:${Math.max(8,lvlPct(e))}%" title="Уровень ${l} · ${e} ELO">${l}</span>`}
 function esc(t){return String(t).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
-function ava(n,url){if(url)return `<span class="ava" style="background:#26262b center/cover no-repeat url('${esc(url)}')" role="img" aria-label="${esc(n)}"></span>`;const h=[...n].reduce((a,c)=>a+c.charCodeAt(0),0)%360;return `<span class="ava" style="background:linear-gradient(135deg,hsl(${h} 70% 45%),hsl(${(h+40)%360} 60% 20%))">${esc(n[0].toUpperCase())}</span>`}
+function ava(n,url,pr){const c=pr?"ava avp":"ava";if(url)return `<span class="${c}" style="background:#26262b center/cover no-repeat url('${esc(url)}')" role="img" aria-label="${esc(n)}"></span>`;const h=[...n].reduce((a,c)=>a+c.charCodeAt(0),0)%360;return `<span class="${c}" style="background:linear-gradient(135deg,hsl(${h} 70% 45%),hsl(${(h+40)%360} 60% 20%))">${esc(n[0].toUpperCase())}</span>`}
 function mapBg(m){const x=MAPS.find(a=>a[0]===m);return `linear-gradient(135deg,${x?x[1]:"#555,#222"})`}
 const fmt=n=>Number(n).toLocaleString("ru-RU");
 const kd=u=>u.deaths?(u.kills/u.deaths).toFixed(2):(u.kills?u.kills.toFixed(2):"—");
@@ -994,37 +1202,51 @@ const ICONS={"img":"<path d=\"M21 19V5a2 2 0 00-2-2H5a2 2 0 00-2 2v14a2 2 0 002 
  "download":"<path d=\"M11 3h2v9.2l3.3-3.3 1.4 1.4L12 16l-5.7-5.7 1.4-1.4 3.3 3.3zM4 18h16v3H4z\"/>",
  "logout":"<path d=\"M10 3h9a1 1 0 011 1v16a1 1 0 01-1 1h-9v-2h8V5h-8zM8.6 7.6 10 9l-2 2H15v2H8l2 2-1.4 1.4L4.2 12z\"/>",
  "more":"<circle cx=\"5\" cy=\"12\" r=\"2.2\"/><circle cx=\"12\" cy=\"12\" r=\"2.2\"/><circle cx=\"19\" cy=\"12\" r=\"2.2\"/>",
- "send":"<path d=\"M3 20.5 21 12 3 3.5 3 10l12 2-12 2z\"/>"};
+ "send":"<path d=\"M3 20.5 21 12 3 3.5 3 10l12 2-12 2z\"/>",
+ "gem":"<path d='M6.2 3h11.6l4.2 6L12 21.5 2 9z'/><path d='M2.6 9h18.8M9 3.3 7.5 9 12 20.8M15 3.3 16.5 9 12 20.8' fill='none' stroke='rgba(0,0,0,.4)' stroke-width='1.3' stroke-linejoin='round'/>",
+ "bolt":"<path d='M13.5 2 4.5 13.5h6L9.5 22l9-11.5h-6z'/>",
+ "chart":"<path d='M3 3h2v16h16v2H3z'/><path d='M6.8 15.6 11 10.8l3 3 5.2-6.2 1.5 1.3-6.6 7.8-3-3-2.8 3.2z'/>",
+ "bars":"<path d='M4 13h3.5v8H4zM10.25 8h3.5v13h-3.5zM16.5 3H20v18h-3.5z'/>",
+ "target":"<path fill-rule='evenodd' d='M12 2a10 10 0 110 20 10 10 0 010-20zm0 3a7 7 0 100 14 7 7 0 000-14zm0 3a4 4 0 110 8 4 4 0 010-8zm0 2.5a1.5 1.5 0 100 3 1.5 1.5 0 000-3z'/>",
+ "headset":"<path d='M12 3a8.5 8.5 0 00-8.5 8.5V17a3 3 0 003 3H8v-7H5.5v-1.5a6.5 6.5 0 0113 0V13H16v7h1.5a3 3 0 003-3v-5.5A8.5 8.5 0 0012 3z'/>",
+ "heart":"<path d='M12 21l-1.4-1.3C5.4 15 2 12 2 8.4 2 5.6 4.2 3.4 7 3.4c1.9 0 3.8.9 5 2.4 1.2-1.5 3.1-2.4 5-2.4 2.8 0 5 2.2 5 5 0 3.6-3.4 6.6-8.6 11.3z'/>"};
 const COIN=`<svg class="coin" viewBox="0 0 48 48" aria-hidden="true"><use href="#coinS"/></svg>`;
 const GOLD=()=>`<svg class="gold" viewBox="0 0 160 110" aria-hidden="true"><use href="#goldS"/></svg>`;
+const GEM=()=>`<svg class="gem" viewBox="0 0 120 104" aria-hidden="true"><use href="#gemS"/></svg>`;
+const STAR=`<svg class="zv" viewBox="0 0 24 24" aria-hidden="true"><path fill="url(#stG)" stroke="#c77800" stroke-width=".8" stroke-linejoin="round" d="M12 2.2l2.95 6.1 6.7.9-4.9 4.65 1.2 6.65L12 17.3l-5.95 3.2 1.2-6.65L2.35 9.2l6.7-.9z"/></svg>`;
+// значок Premium у ника (StandHub Premium)
+const PRI=`<span class="pri" title="StandHub Premium" role="img" aria-label="Premium"><svg class="ic" viewBox="0 0 24 24" width="20" height="20" fill="currentColor" aria-hidden="true">${ICONS.gem}</svg></span>`;
+const prI=x=>x&&x.prem?PRI:"";
 // «NEW» у магазина в меню — пока игрок его не открыл
 const shopNew=()=>{try{return !localStorage.getItem("sh_shop_seen")}catch{return false}};
 const SHOP_NB=`<span class="nb new z" data-shopn aria-label="Новое">NEW</span>`;
+const prNew=()=>{try{return !localStorage.getItem("sh_prem_seen")}catch{return false}};
+const PREM_NB=`<span class="nb new z" data-premn aria-label="Новое">NEW</span>`;
 function ic(n){return `<svg class="ic" viewBox="0 0 24 24" width="20" height="20" fill="currentColor" aria-hidden="true">${ICONS[n]}</svg>`}
 function renderChrome(route){
   const u=S.user,tr=document.getElementById("topRight"),side=document.getElementById("side"),more=document.getElementById("more");
-  const tk=u?[u.nick,u.elo,u.admin?1:0,(u.avatar||"").length,(u.avatar||"").slice(-24)].join("|"):"-";
+  const tk=u?[u.nick,u.elo,u.admin?1:0,u.prem?1:0,(u.avatar||"").length,(u.avatar||"").slice(-24)].join("|"):"-";
   if(tr.dataset.k!==tk){tr.dataset.k=tk;
   tr.innerHTML=u?`
     <a class="coins" href="#/shop" title="Монеты — тратьте в магазине" aria-label="Монеты — открыть магазин">${COIN}<b data-coins>${fmt(S.tasks?S.tasks.coins:0)}</b></a>
     <a class="btn btn-o" href="#/lobby">Играть</a>
-    <a class="userchip" href="#/profile" aria-label="Мой профиль">${ava(u.nick,u.avatar)}<span class="nm">${esc(u.nick)}</span>${badge(u.elo,"sm")}</a>
+    <a class="userchip" href="#/profile" aria-label="Мой профиль">${ava(u.nick,u.avatar,u.prem)}<span class="nm">${esc(u.nick)}</span>${badge(u.elo,"sm")}</a>
     <button class="btn btn-g" id="logout">Выйти</button>`:`
     <a class="btn btn-g" href="#/login">Войти</a><a class="btn btn-o" href="#/register">Регистрация</a>`;
   const lo=document.getElementById("logout");if(lo)lo.onclick=logout}
   // в нижнем меню телефона — Главная, Играть, Друзья, Задания и «Ещё»; остальное — в «Ещё»
-  const items=[["#/","home","Главная",1],["#/lobby","play","Играть",1],["#/profile","user","Профиль"],["#/friends","users","Друзья",1],["#/matches","swords","Матчи"],["#/leaderboard","crown","Рейтинг"],["#/tasks","tasks","Задания",1],["#/shop","shop","Магазин"]];
+  const items=[["#/","home","Главная",1],["#/lobby","play","Играть",1],["#/profile","user","Профиль"],["#/friends","users","Друзья",1],["#/matches","swords","Матчи"],["#/leaderboard","crown","Рейтинг"],["#/tasks","tasks","Задания",1],["#/shop","shop","Магазин"],["#/premium","gem","Premium"]];
   if(u&&u.admin)items.push(["#/admin","shield","Админ"]);
-  const nbOf=h=>h==="#/shop"?SHOP_NB:h==="#/friends"?`<span class="nb z" data-frn aria-label="Новые заявки">0</span>`:h==="#/tasks"?`<span class="nb z" data-tkn aria-label="Можно забрать награду">0</span>`:h==="#/admin"?`<span class="nb z" data-admn aria-label="Новые жалобы и обращения">0</span>`:"";
+  const nbOf=h=>h==="#/shop"?SHOP_NB:h==="#/premium"?PREM_NB:h==="#/friends"?`<span class="nb z" data-frn aria-label="Новые заявки">0</span>`:h==="#/tasks"?`<span class="nb z" data-tkn aria-label="Можно забрать награду">0</span>`:h==="#/admin"?`<span class="nb z" data-admn aria-label="Новые жалобы и обращения">0</span>`:"";
   const sk=items.map(x=>x[0]).join()+(u?"|u":"");
-  if(side.dataset.k!==sk){side.dataset.k=sk;side.innerHTML=items.map(([h,i,t,m])=>`<a href="${h}" data-r="${h.slice(1)}"${m?"":' class="dk"'}>${ic(i)}${t}${nbOf(h)}</a>`).join("")+
+  if(side.dataset.k!==sk){side.dataset.k=sk;side.innerHTML=items.map(([h,i,t,m])=>`<a href="${h}" data-r="${h.slice(1)}"${m?"":h==="#/premium"?' class="dk pml"':' class="dk"'}>${ic(i)}${t}${nbOf(h)}</a>`).join("")+
    `<a class="mo" id="moreBtn" role="button" tabindex="0" aria-expanded="false" aria-controls="more">${ic("more")}Ещё<span class="nb dot z" data-mon aria-hidden="true"></span></a>`+
    `<div class="sep"></div><a href="#/rules" data-r="/rules" class="dk">${ic("book")}Правила</a><a href="#/support" data-r="/support" class="dk">${ic("help")}Поддержка<span class="nb z" data-supn aria-label="Ответы поддержки">0</span></a><a href="#" class="dk mot" data-motion>${ic("spark")}Анимации: <b>вкл</b></a><a href="#" class="dk inst hid" data-install>${ic("download")}<span class="il">Установить приложение</span></a>
     <div class="sfoot"><div class="ver">Версия ${APP_V}</div></div>`;
    const mb=document.getElementById("moreBtn");mb.onclick=()=>toggleMore();mb.onkeydown=e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();toggleMore()}};
-   const mi=[["#/profile","user","Профиль"],["#/matches","swords","Матчи"],["#/leaderboard","crown","Рейтинг"],["#/shop","shop","Магазин",SHOP_NB],["#/rules","book","Правила"],["#/support","help","Поддержка",`<span class="nb z" data-supn>0</span>`]];
+   const mi=[["#/profile","user","Профиль"],["#/matches","swords","Матчи"],["#/leaderboard","crown","Рейтинг"],["#/shop","shop","Магазин",SHOP_NB],["#/premium","gem","Premium",PREM_NB],["#/rules","book","Правила"],["#/support","help","Поддержка",`<span class="nb z" data-supn>0</span>`]];
    if(u&&u.admin)mi.push(["#/admin","shield","Админ",`<span class="nb z" data-admn>0</span>`]);
-   more.innerHTML=mi.map(([h,i,t,b])=>`<a href="${h}" data-r="${h.slice(1)}">${ic(i)}${t}${b||""}</a>`).join("")+
+   more.innerHTML=mi.map(([h,i,t,b])=>`<a href="${h}" data-r="${h.slice(1)}"${h==="#/premium"?' class="pml"':""}>${ic(i)}${t}${b||""}</a>`).join("")+
     `<a href="#" class="mot" data-motion>${ic("spark")}Анимации: <b>вкл</b></a><a href="#" class="inst hid" data-install>${ic("download")}<span class="il">Значок на экран</span></a>${u?`<a href="#" data-logout>${ic("logout")}Выйти</a>`:`<a href="#/login">${ic("user")}Войти</a>`}`}
   paintMotion();frBadge();paintCoins();paintInstall();
   const act=a=>{const on=a.dataset.r===route;a.classList.toggle("on",on);if(on)a.setAttribute("aria-current","page");else a.removeAttribute("aria-current")};
@@ -1038,7 +1260,7 @@ document.getElementById("moreBg").onclick=()=>closeMore();
 document.getElementById("more").addEventListener("click",e=>{if(e.target.closest("a[href^='#/']"))closeMore()});
 async function logout(){S.searching=false;stopQTimer();try{await api("/api/logout",{method:"POST"})}catch{}dropSession()}
 function dropSession(to="#/"){S.searching=false;stopQTimer();
-  S.token=null;S.user=null;S.match=null;S.lobbyMs=null;S.fr=null;S.party=null;S.psent=[];S.pinv=[];S.pSeen=false;S.tasks=null;S.shop=null;S.ban=null;S.misses=0;S.badges={};S.chat=null;S.sup=null;
+  S.token=null;S.user=null;S.match=null;S.lobbyMs=null;S.fr=null;S.party=null;S.psent=[];S.pinv=[];S.pSeen=false;S.tasks=null;S.shop=null;S.ban=null;S.misses=0;S.badges={};S.chat=null;S.sup=null;S.prem=null;
   frBadge();paintBadges();paintPInv();closeInvite();closeAccept();closeX();closeMore();localStorage.removeItem("sh_token");connectLive();if(location.hash===to||curHash()===to.slice(1))route();else location.hash=to}
 document.addEventListener("click",e=>{if(!e.target.closest("[data-logout]"))return;e.preventDefault();logout()});
 // монеты и значки в меню
@@ -1046,7 +1268,8 @@ function paintCoins(){const t=fmt(S.tasks?S.tasks.coins:0);document.querySelecto
 function paintBadges(){const b=S.badges||{},set=(sel,n)=>document.querySelectorAll(sel).forEach(el=>{el.textContent=n;el.classList.toggle("z",!n)});
   set("[data-supn]",b.sup||0);set("[data-admn]",(b.admR||0)+(b.admT||0)+(b.admS||0));set("[data-tkn]",S.user&&S.tasks?S.tasks.ready||0:0);
   const nw=shopNew();document.querySelectorAll("[data-shopn]").forEach(el=>el.classList.toggle("z",!nw));
-  const more=(b.sup||0)+(b.admR||0)+(b.admT||0)+(b.admS||0)+(nw?1:0);document.querySelectorAll("[data-mon]").forEach(el=>el.classList.toggle("z",!more))}
+  const pn=prNew();document.querySelectorAll("[data-premn]").forEach(el=>el.classList.toggle("z",!pn));
+  const more=(b.sup||0)+(b.admR||0)+(b.admT||0)+(b.admS||0)+(nw?1:0)+(pn?1:0);document.querySelectorAll("[data-mon]").forEach(el=>el.classList.toggle("z",!more))}
 function onBadges(d){const was=S.badges||{},h=curHash();S.badges=d;paintBadges();
   if(h.startsWith("/admin"))paintAdmTabs();
   if(h==="/support"&&d.sup>0)loadSup();                                  // ответ поддержки пришёл, пока страница открыта
@@ -1061,7 +1284,7 @@ function toast(t){const e=document.getElementById("toast");e.textContent=t;e.cla
 function needAuth(){if(!S.user){location.hash="#/login";toast("Войдите, чтобы продолжить");return true}return false}
 function empty(title,text,btn){return `<div class="empty"><div class="empty-ic">${ic("crown")}</div><b>${title}</b><p class="muted">${text}</p>${btn||""}</div>`}
 /* ===== Анимации ===== */
-const APP_V="1.11.2";
+const APP_V="1.12";
 // анимации включены всегда; выключить можно кнопкой «Анимации» (меню слева / низ главной)
 const RM=()=>document.documentElement.classList.contains("no-motion");
 function paintMotion(){document.querySelectorAll("[data-motion] b").forEach(b=>b.textContent=RM()?"выкл":"вкл")}
@@ -1127,7 +1350,8 @@ async function pageHome(){
       <div class="card rv" style="--i:3" data-cupc>${cupCardIn()}</div>
       <div class="card rv" style="--i:4"><span class="tag">Скоро</span><h3>Турниры</h3><p class="muted">Официальные квалификации и турниры от организаторов сообщества.</p><span class="btn btn-g">Скоро</span></div>
     </div>
-    <a class="card sh-promo rv" style="--i:5" href="#/shop">${GOLD()}<div><b>Магазин открыт</b><span class="sh-new">NEW</span><p class="muted">Меняйте монеты за задания на промокоды на 1000 голды для StandLeo.</p></div><span class="btn btn-o">В магазин</span></a></div></section>
+    <a class="card sh-promo rv" style="--i:5" href="#/shop">${GOLD()}<div><b>Магазин открыт</b><span class="sh-new">NEW</span><p class="muted">Меняйте монеты за задания на промокоды на 1000 голды для StandLeo.</p></div><span class="btn btn-o">В магазин</span></a>
+    <a class="card sh-promo pr-promo rv" style="--i:6" href="#/premium">${GEM()}<div><b>StandHub Premium</b><span class="sh-new">NEW</span><p class="muted">Быстрый поиск, прогноз ELO, расширенная статистика и +50% монет.</p></div><span class="btn btn-o">Подробнее</span></a></div></section>
   <section class="sec" style="padding-top:0"><div class="wrap">
     <h2 class="rv">Рейтинг игроков</h2>
     <p class="muted rv" style="max-width:640px;margin-bottom:24px;--i:1">Поднимайся в таблице лидеров и смотри, где ты находишься среди лучших игроков StandLeo.</p>
@@ -1138,7 +1362,7 @@ async function pageHome(){
   <footer>
     <div><h4>StandHub</h4><p>Соревновательная платформа для StandLeo.</p><p class="ver">Версия ${APP_V}</p></div>
     <div><h4>Помощь</h4><a href="#/support">Поддержка</a><a href="#/rules/anticheat">Античит</a><a href="#/rules">Правила</a><a href="#" data-motion>Анимации: <b>вкл</b></a></div>
-    <div><h4>Платформа</h4><a href="#/lobby">Матчмейкинг</a><a href="#/leaderboard">Рейтинг</a><a href="#/matches">Матчи</a><a href="#/tasks">Задания</a><a href="#/shop">Магазин</a></div>
+    <div><h4>Платформа</h4><a href="#/lobby">Матчмейкинг</a><a href="#/leaderboard">Рейтинг</a><a href="#/matches">Матчи</a><a href="#/tasks">Задания</a><a href="#/shop">Магазин</a><a href="#/premium">Premium</a></div>
     <div><h4>Документы</h4><a href="#/rules">Правила платформы</a><a href="#/rules/privacy">Конфиденциальность</a></div>
   </footer>`;
   entered();reveal();paintMotion();paintInstall();
@@ -1148,7 +1372,7 @@ async function getLb(){try{return await api("/api/leaderboard")}catch{return[]}}
 function lbEmpty(){return empty("Рейтинг пока пуст","Здесь появятся игроки после первых сыгранных матчей. Стань первым!",S.user?`<a class="btn btn-o" href="#/lobby">Найти матч</a>`:`<a class="btn btn-o" href="#/register">Регистрация</a>`)}
 function lbTable(list,compact){
   return `<table><thead><tr><th>#</th><th>Игрок</th><th>Уровень</th><th>ELO</th>${compact?"":"<th>Матчи</th><th>Победы</th><th>K/D</th><th>HS%</th>"}</tr></thead><tbody>
-  ${list.map((p,i)=>`<tr class="click" data-p="${esc(p.nick)}"><td class="rank">${p.rank||i+1}</td><td><div class="pl">${ava(p.nick,p.avatar)}<b>${esc(p.nick)}</b></div></td><td>${badge(p.elo,"sm")}</td><td><b>${p.elo}</b></td>${compact?"":`<td>${p.matches}</td><td>${wr(p)}</td><td>${kd(p)}</td><td>${hsp(p)}</td>`}</tr>`).join("")}</tbody></table>`;
+  ${list.map((p,i)=>`<tr class="click" data-p="${esc(p.nick)}"><td class="rank">${p.rank||i+1}</td><td><div class="pl">${ava(p.nick,p.avatar,p.prem)}<b>${esc(p.nick)}</b>${prI(p)}</div></td><td>${badge(p.elo,"sm")}</td><td><b>${p.elo}</b></td>${compact?"":`<td>${p.matches}</td><td>${wr(p)}</td><td>${kd(p)}</td><td>${hsp(p)}</td>`}</tr>`).join("")}</tbody></table>`;
 }
 
 /* ===== Вход / регистрация ===== */
@@ -1351,7 +1575,7 @@ document.addEventListener("click",async e=>{const b=e.target.closest("[data-fact
     await loadFr()}
   catch(err){toast(err.message);if(b.isConnected)b.disabled=false}
 },true);
-function frRow(u,act,st){return `<div class="frow">${ava(u.nick,u.avatar)}<div class="fn"><a href="#/player/${encodeURIComponent(u.nick)}"><b>${esc(u.nick)}</b></a>${st?`<div class="st${u.inMatch?" m":u.online?" on":""}">${u.inMatch?"● в матче":u.online?"● на сайте":"не в сети"}</div>`:""}</div>${badge(u.elo,"sm")}<div class="fa">${act}</div></div>`}
+function frRow(u,act,st){return `<div class="frow">${ava(u.nick,u.avatar,u.prem)}<div class="fn"><a href="#/player/${encodeURIComponent(u.nick)}"><b>${esc(u.nick)}</b>${prI(u)}</a>${st?`<div class="st${u.inMatch?" m":u.online?" on":""}">${u.inMatch?"● в матче":u.online?"● на сайте":"не в сети"}</div>`:""}</div>${badge(u.elo,"sm")}<div class="fa">${act}</div></div>`}
 function frBody(){if(!S.fr)return `<div class="card pad">${skel(3,false)}</div>`;const {friends,incoming,outgoing}=S.fr;
   return (incoming.length?`<div class="card pad fr-in"><h3>Заявки в друзья<span class="cnt">${incoming.length}</span></h3>${incoming.map(r=>frRow(r.user,`<button class="btn btn-o btn-sm" data-fact="accept" data-id="${r.id}">Принять</button><button class="btn btn-g btn-sm" data-fact="decline" data-id="${r.id}">Отклонить</button>`)).join("")}</div>`:"")
    +`<div class="card pad"><h3>Мои друзья<span class="cnt">${friends.length}</span></h3>${friends.length?friends.map(u=>frRow(u,`${pInvBtn(u.nick,"Позвать в пати")}<button class="btn btn-g btn-sm" data-fact="remove" data-nick="${esc(u.nick)}">Удалить</button>`,1)).join(""):`<p class="muted" style="margin:0">Пока никого нет. Добавьте игрока по ID в игре или нику — или прямо после матча, в комнате матча.</p>`}</div>`
@@ -1394,7 +1618,7 @@ function pageLobby(){
      <div class="party" id="party"></div>
      <div class="ptbar" id="ptbar"></div>
      <div class="findbox">
-       <div><div class="muted" style="font-size:13px">Подбор: все регионы · по уровню ELO</div><div id="qstatus" style="font-weight:700;margin-top:4px">${ban&&!S.searching?`Поиск закрыт до ${new Date(ban.until-S.skew).toLocaleString("ru-RU",ban.until-Date.now()>864e5?{day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"}:{hour:"2-digit",minute:"2-digit"})}`:mem?`Поиск запускает лидер пати — <span style="color:var(--orange2)">${esc(pt.leader)}</span>`:"Готов к поиску"}</div><div id="qhint" class="qhint">${m?"":qHint()}</div>${!ban&&miss?`<div class="qwarn">⚠️ За сутки не принято матчей: ${miss}. Следующий пропуск закроет поиск на ${minStr(PEN[Math.min(miss,3)])}.</div>`:""}</div>
+       <div><div class="muted" style="font-size:13px">Подбор: все регионы · по уровню ELO · ${u.prem?`<span class="prq">${ic("bolt")}Быстрый поиск Premium</span>`:`<a class="prq" href="#/premium">${ic("bolt")}Искать быстрее с Premium</a>`}</div><div id="qstatus" style="font-weight:700;margin-top:4px">${ban&&!S.searching?`Поиск закрыт до ${new Date(ban.until-S.skew).toLocaleString("ru-RU",ban.until-Date.now()>864e5?{day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"}:{hour:"2-digit",minute:"2-digit"})}`:mem?`Поиск запускает лидер пати — <span style="color:var(--orange2)">${esc(pt.leader)}</span>`:"Готов к поиску"}</div><div id="qhint" class="qhint">${m?"":qHint()}</div>${!ban&&miss?`<div class="qwarn">⚠️ За сутки не принято матчей: ${miss}. Следующий пропуск закроет поиск на ${minStr(PEN[Math.min(miss,3)])}.</div>`:""}</div>
        <button class="btn btn-o btn-find ${S.searching?"searching":""}" id="find" ${m||(mem&&!S.searching)||(ban&&!S.searching)?"disabled":""}>${S.searching?"Отменить поиск":ban?"Поиск закрыт":mem?"Ждём лидера":"Найти матч"}</button>
      </div>
      ${u.admin?`<div class="admin-box"><div><b>Тестовый матч с ботами</b><div class="muted" style="font-size:13px;max-width:440px">Видно только администратору. Боты сами примут матч и будут убирать карты. Рейтинг не меняется.</div></div><button class="btn btn-g" id="testM" ${m||S.searching?"disabled":""}>Тест · ${MODE_NAME[S.mode]}</button></div>`:""}
@@ -1419,7 +1643,7 @@ function pageLobby(){
 }
 const lobbyMsHtml=ms=>ms.length?ms.slice(0,4).map(mini).join(""):"Вы ещё не сыграли ни одного матча";
 // лобби перерисовывается только когда что-то важное изменилось — без мерцания
-const lobbyKey=()=>JSON.stringify([S.mode,S.searching,S.match&&[S.match.id,S.match.state,S.match.map,S.match.claim&&S.match.claim.at],S.user&&[S.user.nick,S.user.elo,S.user.admin],S.party&&[S.party.leader,S.party.members.length],banNow()&&S.ban.until,S.misses]);
+const lobbyKey=()=>JSON.stringify([S.mode,S.searching,S.match&&[S.match.id,S.match.state,S.match.map,S.match.claim&&S.match.claim.at],S.user&&[S.user.nick,S.user.elo,S.user.admin,S.user.prem],S.party&&[S.party.leader,S.party.members.length],banNow()&&S.ban.until,S.misses]);
 /* ===== Запрет поиска за непринятые матчи ===== */
 const PEN=[0,5,30,120]; // минуты: 1-й пропуск за сутки — предупреждение, 2-й — 5 мин, 3-й — 30 мин, дальше — 2 часа
 const minStr=n=>n>=60?Math.floor(n/60)+" ч"+(n%60?" "+n%60+" мин":""):n+" мин";
@@ -1444,9 +1668,9 @@ function renderParty(){
   const u=S.user,pt=S.party,lead=!!pt&&pt.leader===u.nick,sent=S.psent||[];
   const mem=pt?pt.members:[],others=mem.filter(x=>x.nick!==u.nick),size=Math.max(1,mem.length);
   const cap=Math.min(5,Math.max(PMAX[S.mode],size+sent.length));
-  const out=[`<div class="slot me">${lead?CROWN:""}${ava(u.nick,u.avatar)}<b>${esc(u.nick)}</b>${badge(u.elo,"sm")}<span class="sst">Вы</span></div>`];
-  for(const x of others)out.push(`<div class="slot mem${x.online||x.inMatch?"":" off"}">${x.leader?CROWN:""}<a class="sl-a" href="#/player/${encodeURIComponent(x.nick)}">${ava(x.nick,x.avatar)}<b>${esc(x.nick)}</b></a>${badge(x.elo,"sm")}<span class="sst${x.inMatch?" m":x.online?" on":""}">${x.inMatch?"в матче":x.online?"на сайте":"не на сайте"}</span>${lead?`<button class="sx" data-pact="kick" data-nick="${esc(x.nick)}" title="Исключить из пати" aria-label="Исключить ${esc(x.nick)} из пати">×</button>`:""}</div>`);
-  for(const r of sent)out.push(`<div class="slot inv">${ava(r.user.nick,r.user.avatar)}<b>${esc(r.user.nick)}</b><span class="sst">приглашён…</span>${r.by===u.nick||lead?`<button class="sx" data-pact="cancel" data-id="${r.id}" title="Отменить приглашение" aria-label="Отменить приглашение для ${esc(r.user.nick)}">×</button>`:""}</div>`);
+  const out=[`<div class="slot me">${lead?CROWN:""}${ava(u.nick,u.avatar,u.prem)}<b>${esc(u.nick)}</b>${badge(u.elo,"sm")}<span class="sst">Вы</span></div>`];
+  for(const x of others)out.push(`<div class="slot mem${x.online||x.inMatch?"":" off"}">${x.leader?CROWN:""}<a class="sl-a" href="#/player/${encodeURIComponent(x.nick)}">${ava(x.nick,x.avatar,x.prem)}<b>${esc(x.nick)}</b></a>${badge(x.elo,"sm")}<span class="sst${x.inMatch?" m":x.online?" on":""}">${x.inMatch?"в матче":x.online?"на сайте":"не на сайте"}</span>${lead?`<button class="sx" data-pact="kick" data-nick="${esc(x.nick)}" title="Исключить из пати" aria-label="Исключить ${esc(x.nick)} из пати">×</button>`:""}</div>`);
+  for(const r of sent)out.push(`<div class="slot inv">${ava(r.user.nick,r.user.avatar,r.user.prem)}<b>${esc(r.user.nick)}</b><span class="sst">приглашён…</span>${r.by===u.nick||lead?`<button class="sx" data-pact="cancel" data-id="${r.id}" title="Отменить приглашение" aria-label="Отменить приглашение для ${esc(r.user.nick)}">×</button>`:""}</div>`);
   while(out.length<cap)out.push(`<button class="slot" data-pact="open" aria-label="Пригласить друга в пати"><span class="plus">+</span>Пригласить</button>`);
   while(out.length<5)out.push(`<div class="slot" style="opacity:.25"></div>`);
   const h=out.join("");if(el.innerHTML!==h)el.innerHTML=h;
@@ -1483,7 +1707,7 @@ async function loadParty(){if(!S.user)return;try{onParty(await api("/api/party")
 function paintPInv(){
   const el=document.getElementById("pInv");if(!el)return;const list=S.user?(S.pinv||[]):[];
   const k=JSON.stringify(list.map(r=>[r.id,r.size,r.mode]));if(el.dataset.k===k)return;el.dataset.k=k;
-  el.innerHTML=list.slice(0,2).map(r=>`<div class="card pinv" role="alertdialog" aria-label="Приглашение в пати от ${esc(r.from.nick)}">${ava(r.from.nick,r.from.avatar)}<div class="pi-t"><b>${esc(r.from.nick)}</b> зовёт вас в пати<div class="muted">${MODE_NAME[r.mode]} · сейчас в пати ${r.size} из ${PMAX[r.mode]}</div></div><div class="pi-a"><button class="btn btn-o btn-sm" data-pact="accept" data-id="${r.id}">Принять</button><button class="btn btn-g btn-sm" data-pact="decline" data-id="${r.id}">Отклонить</button></div></div>`).join("")
+  el.innerHTML=list.slice(0,2).map(r=>`<div class="card pinv" role="alertdialog" aria-label="Приглашение в пати от ${esc(r.from.nick)}">${ava(r.from.nick,r.from.avatar,r.from.prem)}<div class="pi-t"><b>${esc(r.from.nick)}</b> зовёт вас в пати<div class="muted">${MODE_NAME[r.mode]} · сейчас в пати ${r.size} из ${PMAX[r.mode]}</div></div><div class="pi-a"><button class="btn btn-o btn-sm" data-pact="accept" data-id="${r.id}">Принять</button><button class="btn btn-g btn-sm" data-pact="decline" data-id="${r.id}">Отклонить</button></div></div>`).join("")
     +(list.length>2?`<div class="pinv-more">Ещё приглашений: ${list.length-2}</div>`:"");
 }
 // окно «Пригласить в пати» со списком друзей
@@ -1556,6 +1780,7 @@ function onLive(d){
   if(d.type==="friends")return onFriends(d);
   if(d.type==="party")return onParty(d);
   if(d.type==="tasks")return onTasks(d);
+  if(d.type==="premium")return onPrem(d);
   if(d.type==="shopItems")return onShopItems(d);
   if(d.type==="shop")return onShop(d);
   if(d.type==="cup")return onCup(d);
@@ -1647,18 +1872,19 @@ async function pageProfile(name){
   if(location.hash!==h0)return; // пользователь уже ушёл на другую страницу
   const none=p.matches===0&&!ms.length;const own=!!(S.user&&S.user.nick===p.nick);
   app.innerHTML=`<div class="wrap">
-   <div class="phead">${own?`<label class="ava-edit" title="Сменить аватар">${ava(p.nick,p.avatar)}<span class="ava-cam" aria-hidden="true"><svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M9 4l-2 2H4a1 1 0 00-1 1v12a1 1 0 001 1h16a1 1 0 001-1V7a1 1 0 00-1-1h-3l-2-2zm3 4.5A4.5 4.5 0 1112 17.5 4.5 4.5 0 0112 8.5z"/></svg></span><input type="file" accept="image/png,image/jpeg,image/webp" id="avaIn" class="sr" aria-label="Сменить аватар"></label>`:ava(p.nick,p.avatar)}
+   <div class="phead">${own?`<label class="ava-edit" title="Сменить аватар">${ava(p.nick,p.avatar,p.prem)}<span class="ava-cam" aria-hidden="true"><svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M9 4l-2 2H4a1 1 0 00-1 1v12a1 1 0 001 1h16a1 1 0 001-1V7a1 1 0 00-1-1h-3l-2-2zm3 4.5A4.5 4.5 0 1112 17.5 4.5 4.5 0 0112 8.5z"/></svg></span><input type="file" accept="image/png,image/jpeg,image/webp" id="avaIn" class="sr" aria-label="Сменить аватар"></label>`:ava(p.nick,p.avatar,p.prem)}
      <div><div class="flag">${esc(p.region)} · На StandHub с ${new Date(p.created).toLocaleDateString("ru-RU")}</div><h1>${esc(p.nick)}</h1>
-       <div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap;align-items:center"><span class="chip on" style="height:28px;font-size:12px;display:inline-flex;align-items:center">StandLeo</span>${p.commends?`<span class="pill cmd" title="Столько раз игроки сказали «Спасибо» после матчей">👍 ${fmt(p.commends)} «Спасибо»</span>`:""}${own?"":frBtn(p.nick,true)}${!own&&S.user&&S.user.admin?`<button class="btn btn-g btn-sm radm" data-rlink title="Для игрока, у которого нет доступа к Telegram">${ic("lock")}Ссылка для смены пароля</button>`:""}</div></div>
+       <div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap;align-items:center">${p.prem?`<a class="prm lg" href="#/premium" title="StandHub Premium">${ic("gem")}Premium</a>`:""}<span class="chip on" style="height:28px;font-size:12px;display:inline-flex;align-items:center">StandLeo</span>${p.commends?`<span class="pill cmd" title="Столько раз игроки сказали «Спасибо» после матчей">👍 ${fmt(p.commends)} «Спасибо»</span>`:""}${own?"":frBtn(p.nick,true)}${!own&&S.user&&S.user.admin?`<button class="btn btn-g btn-sm radm" data-rlink title="Для игрока, у которого нет доступа к Telegram">${ic("lock")}Ссылка для смены пароля</button>`:""}</div></div>
      <div class="elo-box">${badge(p.elo,"xl")}<div class="elo-prog"><div class="muted" style="font-size:12px;font-weight:700;text-transform:uppercase">Уровень ${l}</div><div class="v"><span data-count="${p.elo}">${p.elo}</span> <span class="muted" style="font-size:14px">ELO</span></div>
        <div class="bar"><div style="width:${lvlPct(p.elo)}%"></div></div><div class="muted" style="font-size:12px">${l<10?`${TH[l]} — ${TH[l+1]-1}`:"Уровень 10 · 2001+"}</div></div></div>
    </div>
    <div class="stats" style="margin-top:24px">
      ${[["Матчи",p.matches],["Победы",wr(p)],["K/D",kd(p)],["Хедшоты",hsp(p)],["Средн. убийств",p.matches?(p.kills/p.matches).toFixed(1):"—"],["Убийств всего",p.kills]].map(([k,v])=>`<div class="card stat"><div class="k">${k}</div><div class="v">${numSpan(v)}</div></div>`).join("")}
    </div>
+   ${none?"":xStats(p,ms)}
    ${none?`<div class="card" style="margin-top:16px">${empty("Матчей пока нет",(S.user&&S.user.nick===p.nick?"Сыграйте первый матч — здесь появятся график ELO, статистика по картам и история игр.":"Этот игрок ещё не сыграл ни одного матча."),S.user&&S.user.nick===p.nick?`<a class="btn btn-o" href="#/lobby">Найти матч</a>`:"")}</div>`:
    `<div class="card" style="margin-top:16px"><div class="thead"><b>История матчей</b></div><div class="scroll">${matchTable(ms,p.nick)}</div></div>`}
-   ${own?`<div class="card pad acc-c" style="margin-top:16px"><div><b>Аккаунт</b><div class="muted" style="font-size:14px;margin-top:4px">Вход по email: <b style="color:#fff">${esc(p.email||"")}</b></div></div><a class="btn btn-g" href="#/password">${ic("lock")}Сменить пароль</a></div>`:""}
+   ${own?`<div class="card pad acc-c" style="margin-top:16px"><div><b>Аккаунт</b><div class="muted" style="font-size:14px;margin-top:4px">Вход по email: <b style="color:#fff">${esc(p.email||"")}</b></div><div class="muted" style="font-size:14px;margin-top:2px">Premium: ${p.prem?`<b style="color:#ffd84d">активен до ${dLong(p.premUntil)}</b>`:`не подключён · <a href="#/premium" style="color:var(--orange2)">подробнее</a>`}</div></div><a class="btn btn-g" href="#/password">${ic("lock")}Сменить пароль</a></div>`:""}
   </div>`;
   const inp=document.getElementById("avaIn");if(inp)inp.onchange=()=>uploadAvatar(inp.files[0]);
   const rl=document.querySelector("[data-rlink]");if(rl)rl.onclick=async()=>{if(!confirm(`Создать ссылку для смены пароля игрока ${p.nick}? Отправляйте её только самому игроку — когда убедитесь, что аккаунт его.`))return;
@@ -1732,7 +1958,7 @@ function renderMatch(m){
   }
 }
 function prow(m,p,acc){
-  return `<div class="prow${p.me?" me":""}">${ava(p.nick,p.avatar)}<div class="pn">${p.bot?`<b>${esc(p.nick)}</b>`:`<a href="#/player/${encodeURIComponent(p.nick)}"><b>${esc(p.nick)}</b></a>`}<div class="pills">${p.party?`<span class="pill pty" title="Пришли в матч вместе, одним пати">${esc(p.party)}</span>`:""}${p.captain?`<span class="pill cap">Капитан</span>`:""}${p.host?`<span class="pill host">Хост</span>`:""}${p.bot?`<span class="pill">Бот</span>`:""}${p.me?`<span class="pill me">Вы</span>`:""}${!acc&&!p.bot&&!p.me?frBtn(p.nick):""}</div></div>
+  return `<div class="prow${p.me?" me":""}">${ava(p.nick,p.avatar,p.prem)}<div class="pn">${p.bot?`<b>${esc(p.nick)}</b>`:`<a href="#/player/${encodeURIComponent(p.nick)}"><b>${esc(p.nick)}</b>${prI(p)}</a>`}<div class="pills">${p.party?`<span class="pill pty" title="Пришли в матч вместе, одним пати">${esc(p.party)}</span>`:""}${p.captain?`<span class="pill cap">Капитан</span>`:""}${p.host?`<span class="pill host">Хост</span>`:""}${p.bot?`<span class="pill">Бот</span>`:""}${p.me?`<span class="pill me">Вы</span>`:""}${!acc&&!p.bot&&!p.me?frBtn(p.nick):""}</div></div>
    <div class="pr">${acc?(p.accepted?`<span class="w">✓ принял</span>`:`<span class="muted">ждём…</span>`):`${badge(p.elo,"sm")}<span>${p.elo}</span>${m.state==="finished"&&p.delta!=null?`<span class="${p.delta>=0?"w":"l"}">${fmtD(p.delta)}</span>`:""}`}</div></div>`;
 }
 function roster(m,t){const ps=m.players.filter(p=>p.team===t).sort((a,b)=>b.elo-a.elo);return `<div class="thead"><b>Команда ${esc(capName(m,t))}</b><span class="muted">${ps.length} игр.</span></div>${ps.map(p=>prow(m,p)).join("")}`}
@@ -1745,7 +1971,7 @@ function center(m){
     return `<div class="card pad"><div class="vhead"><div><h3 style="margin:0">Выбор карты</h3><div class="muted" style="font-size:13px">Капитаны по очереди убирают карты. Последняя оставшаяся — карта матча.</div></div><div class="vt" data-dl="${m.turnDeadline}" aria-label="Время на ход">0:20</div></div>
      <div class="turn ${my?"mine":""}">${my?"Ваш ход — уберите одну карту":`Убирает команда ${esc(capName(m,m.turn))}`}</div>
      <div class="vmaps">${m.maps.map(x=>{const b=m.bans.find(y=>y.map===x);return `<button class="vmap${b?" banned":""}${b&&JUST&&JUST.has(x)?" just":""}${my&&!b?" can":""}" style="background:${mapBg(x)}" ${my&&!b?`data-ban="${esc(x)}" aria-label="Убрать карту ${esc(x)}"`:"disabled"}><span class="vn">${esc(x)}</span>${b?`<span class="vb">Убрана · ${b.auto?"время вышло":"команда "+esc(capName(m,b.team))}</span>`:my?`<span class="vb">Убрать</span>`:""}</button>`}).join("")}</div>
-     <div class="muted" style="font-size:13px;margin-top:10px">Если капитан не успеет за 20 секунд, карта уберётся случайно.</div></div>`+chatPh(m);
+     <div class="muted" style="font-size:13px;margin-top:10px">Если капитан не успеет за 20 секунд, карта уберётся случайно.</div></div>`+fcCard(m)+chatPh(m);
   }
   const mapCard=`<div class="mapbig" style="background:${mapBg(m.map)}"><div><div class="tag" style="color:#fff">Карта матча</div><b>${esc(m.map)}</b></div></div>`;
   if(m.state==="live"){
@@ -1759,7 +1985,7 @@ function center(m){
       <li><b>Найдите хоста в StandLeo по ID</b><span class="muted">Хост: ${esc(h.nick||"")}</span><span class="idcopy"><code class="vcode">${esc(h.soid||"")}</code><button class="btn btn-g btn-sm" data-copy="${esc(h.soid||"")}">Скопировать ID</button></span></li>
       <li><b>Напишите ему «.» в личные сообщения</b><span class="muted">Так хост поймёт, что вы из этого матча, и пригласит вас в лобби</span></li>
       <li><b>Играйте за свою команду</b><span class="muted">Карта ${esc(m.map)} · 13 раундов до победы</span></li></ol></div>`;
-    return mapCard+guide+resultCard(m)+chatPh(m)+(me?`<div class="card pad"><h3>Матч не состоялся?</h3><p class="muted" style="font-size:14px">Если лобби так и не собралось — проголосуйте. Когда наберётся ${m.cancelNeed} из ${m.total} голосов, матч отменится без изменения ELO.</p><button class="btn btn-g" style="margin-top:12px" id="voteC">${me.votedCancel?"Отозвать голос":"Матч не состоялся"} · ${m.cancelVotes}/${m.cancelNeed}</button></div>`:"");
+    return mapCard+guide+fcCard(m)+resultCard(m)+chatPh(m)+(me?`<div class="card pad"><h3>Матч не состоялся?</h3><p class="muted" style="font-size:14px">Если лобби так и не собралось — проголосуйте. Когда наберётся ${m.cancelNeed} из ${m.total} голосов, матч отменится без изменения ELO.</p><button class="btn btn-g" style="margin-top:12px" id="voteC">${me.votedCancel?"Отозвать голос":"Матч не состоялся"} · ${m.cancelVotes}/${m.cancelNeed}</button></div>`:"");
   }
   if(m.state==="dispute")return mapCard+disputeCard(m)+chatPh(m);
   // finished
@@ -1776,7 +2002,7 @@ function fbCard(m){
   const f=m.fb,meP=m.players.find(p=>p.me);if(!f||!meP)return "";
   const others=m.players.filter(p=>!p.me&&!p.bot).sort((a,b)=>(b.team===meP.team)-(a.team===meP.team)||b.elo-a.elo);if(!others.length)return "";
   return `<div class="card pad fbk" id="fbk"><h3>Оцените игроков</h3><p class="muted fbk-sub">Скажите «Спасибо» за хорошую игру или пожалуйтесь на нарушителя. Можно в течение суток после матча.</p>
-   ${others.map(p=>{const c=f.c.includes(p.nick),r=f.r.includes(p.nick);return `<div class="fbr">${ava(p.nick,p.avatar)}<div class="fn"><b>${esc(p.nick)}</b><div class="st">${p.team===meP.team?"Ваша команда":"Соперник"}</div></div><div class="fa">${c?`<span class="frb ok">👍 Спасибо отправлено</span>`:`<button class="frb thx" data-fb="c" data-nick="${esc(p.nick)}">👍 Спасибо</button>`}${r?`<span class="frb wait">Жалоба отправлена</span>`:`<button class="frb rep" data-fb="r" data-nick="${esc(p.nick)}">🚩 Жалоба</button>`}</div></div>`}).join("")}</div>`;
+   ${others.map(p=>{const c=f.c.includes(p.nick),r=f.r.includes(p.nick);return `<div class="fbr">${ava(p.nick,p.avatar,p.prem)}<div class="fn"><b>${esc(p.nick)}</b><div class="st">${p.team===meP.team?"Ваша команда":"Соперник"}</div></div><div class="fa">${c?`<span class="frb ok">👍 Спасибо отправлено</span>`:`<button class="frb thx" data-fb="c" data-nick="${esc(p.nick)}">👍 Спасибо</button>`}${r?`<span class="frb wait">Жалоба отправлена</span>`:`<button class="frb rep" data-fb="r" data-nick="${esc(p.nick)}">🚩 Жалоба</button>`}</div></div>`}).join("")}</div>`;
 }
 function openReport(mid,nick){
   openX(`<form class="card pm" id="repF" role="dialog" aria-modal="true" aria-labelledby="xH"><button type="button" class="pm-x" data-x aria-label="Закрыть">×</button><h3 id="xH">Жалоба на ${esc(nick)}</h3><p class="muted pm-sub">Администратор проверит матч и примет решение. На одного игрока за матч можно пожаловаться один раз.</p>
@@ -1828,7 +2054,7 @@ function chatMode(c,m){
 }
 async function loadChat(c){try{const r=await api(`/api/match/${c.mid}/chat`);const ids=new Set(r.msgs.map(x=>x.id));c.msgs=r.msgs.concat(c.msgs.filter(x=>!ids.has(x.id))).sort((a,b)=>a.id-b.id);c.loaded=true;c.at=Date.now();paintChatList(c,true)}catch{}}
 const cmTime=t=>new Date(t).toLocaleTimeString("ru-RU",{hour:"2-digit",minute:"2-digit"});
-const cmHtml=x=>`<div class="cm${x.me?" me":""}">${x.adm?`<span class="t2 adm">Админ</span>`:""}${x.ch!=="all"?`<span class="t2 tm">Команде</span>`:""}<b class="${x.tm==="A"?"cA":x.tm==="B"?"cB":""}">${esc(x.nick)}</b><span class="tx">${esc(x.t)}</span><time>${cmTime(x.at)}</time></div>`;
+const cmHtml=x=>`<div class="cm${x.me?" me":""}">${x.adm?`<span class="t2 adm">Админ</span>`:""}${x.ch!=="all"?`<span class="t2 tm">Команде</span>`:""}<b class="${x.tm==="A"?"cA":x.tm==="B"?"cB":""}">${esc(x.nick)}</b>${x.pr?PRI:""}<span class="tx">${esc(x.t)}</span><time>${cmTime(x.at)}</time></div>`;
 function paintChatList(c,toBottom){const l=c.el.querySelector(".chat-list");
   l.innerHTML=c.msgs.length?c.msgs.map(cmHtml).join(""):`<div class="chat-empty">${c.loaded?"Сообщений пока нет. Здесь удобно договориться о лобби: кто хост, когда заходить.":"Загружаем сообщения…"}</div>`;
   if(toBottom)l.scrollTop=l.scrollHeight}
@@ -1911,7 +2137,7 @@ function bindMatch(m){
   if(m.state==="live"&&m.claimFrom&&m.claimFrom>now)S.enT=setTimeout(()=>{const x=S.mv[m.id];if(x&&curHash()==="/match/"+m.id)renderMatch(x)},m.claimFrom-now+300);
 }
 /* ----- Админка ----- */
-const ADM_TABS=[["","Матчи"],["reports","Жалобы","admR"],["support","Поддержка","admT"],["shop","Магазин","admS"],["cup","Турнир"]];
+const ADM_TABS=[["","Матчи"],["reports","Жалобы","admR"],["support","Поддержка","admT"],["shop","Магазин","admS"],["premium","Premium"],["cup","Турнир"]];
 // на телефоне вкладки прокручиваются вбок — выбранную показываем целиком
 function tabIntoView(tb){const on=tb&&tb.querySelector(".on");if(!on||tb.scrollWidth<=tb.clientWidth)return;tb.scrollLeft+=on.getBoundingClientRect().left-tb.getBoundingClientRect().left-(tb.clientWidth-on.offsetWidth)/2}
 function paintAdmTabs(){const el=document.getElementById("admTabs");if(!el)return;const b=S.badges||{};
@@ -1920,10 +2146,10 @@ const dtm=t=>new Date(t).toLocaleString("ru-RU",{day:"numeric",month:"short",hou
 async function pageAdmin(tab){
   if(needAuth())return;
   if(!S.user.admin){app.innerHTML=`<div class="wrap">${empty("Нет доступа","Эта страница только для администраторов")}</div>`;return}
-  tab=["reports","support","shop","cup"].includes(tab)?tab:"";
-  const sub={cup:"Турнир на сайте: плашка, бот регистрации команд в Telegram, анонс в канал и список команд. За час до старта бот сам напомнит командам.","":"Идущие и спорные матчи. Спорный — когда результат оспорили или капитаны отметили разное. Доказательства от игроков приходят вам в Telegram.",reports:"Жалобы игроков после матчей. Можно закрыть жалобу или закрыть нарушителю поиск матчей.",support:"Обращения в поддержку. Ответ придёт игроку на сайт и в Telegram.",shop:"Товары, цены и заказы. После покупки игрок пишет вам в Telegram и присылает скриншот заказа — сверьте номер заказа здесь, выдайте промокод и нажмите «Выдан». О каждой покупке придёт сообщение в Telegram."}[tab];
+  tab=["reports","support","shop","premium","cup"].includes(tab)?tab:"";
+  const sub={premium:"Подписка StandHub Premium: цены, выдача вручную, подписчики и платежи. Оплата звёздами проходит через основного бота сама — о каждой оплате придёт сообщение в Telegram.",cup:"Турнир на сайте: плашка, бот регистрации команд в Telegram, анонс в канал и список команд. За час до старта бот сам напомнит командам.","":"Идущие и спорные матчи. Спорный — когда результат оспорили или капитаны отметили разное. Доказательства от игроков приходят вам в Telegram.",reports:"Жалобы игроков после матчей. Можно закрыть жалобу или закрыть нарушителю поиск матчей.",support:"Обращения в поддержку. Ответ придёт игроку на сайт и в Telegram.",shop:"Товары, цены и заказы. После покупки игрок пишет вам в Telegram и присылает скриншот заказа — сверьте номер заказа здесь, выдайте промокод и нажмите «Выдан». О каждой покупке придёт сообщение в Telegram."}[tab];
   app.innerHTML=`<div class="wrap"><div class="adm-top"><h1 class="h">Админка</h1><span class="adm-live" title="Эти цифры видят только админы"><span class="dot"></span>На сайте: ${L("online")} · В поиске: ${L("searching")} · Матчей: ${L("live")}</span></div><div class="tabs" id="admTabs" style="margin-top:-6px">${ADM_TABS.map(([k,t])=>`<a href="#/admin${k?"/"+k:""}" data-tab="${k}" class="${tab===k?"on":""}">${t}<span class="nb z">0</span></a>`).join("")}</div><p class="muted" style="margin:-6px 0 20px">${sub}</p><div id="adm" class="grid"><div class="card">${skel(3)}</div></div></div>`;entered();paintAdmTabs();tabIntoView(document.getElementById("admTabs"));
-  if(tab==="reports")return admReports();if(tab==="support")return admSupport();if(tab==="shop")return admShop();if(tab==="cup")return admCup();
+  if(tab==="reports")return admReports();if(tab==="support")return admSupport();if(tab==="shop")return admShop();if(tab==="cup")return admCup();if(tab==="premium")return admPremium();
   const list=await api("/api/admin/matches").catch(()=>[]);const el=document.getElementById("adm");if(!el)return;
   if(!list.length){el.innerHTML=`<div class="card">${empty("Сейчас нет идущих матчей","Здесь появятся идущие матчи и матчи, где результат оспорили")}</div>`;return}
   const ow=(m,w)=>w==="draw"?"Ничья":w==="cancel"?"Матч не состоялся":"Победа команды "+esc(capName(m,w));
@@ -2101,7 +2327,7 @@ async function admSupport(){
   const d=await api("/api/admin/tickets").catch(()=>null),el=document.getElementById("adm");if(!el||curHash()!=="/admin/support")return;
   if(!d){el.innerHTML=`<div class="card">${empty("Не удалось загрузить","Обновите страницу")}</div>`;return}
   const card=(x,open)=>{const last=x.msgs[x.msgs.length-1],st=x.status==="closed"?["","Закрыто"]:last.by==="admin"?["ans","Ответ отправлен"]:["open","Ждёт ответа"];
-    return `<div class="card pad"><div class="adm-h"><div><a href="#/player/${encodeURIComponent(x.nick)}"><b>${esc(x.nick)}</b></a> <span class="muted" style="font-size:13px">ID в игре ${esc(x.soid)}</span> <span class="pill">${esc(x.topic)}</span>${x.mid?` <a href="#/match/${esc(x.mid)}" class="muted" style="font-size:13px;text-decoration:underline">матч #${esc(x.mid)}</a>`:""}<div class="muted" style="font-size:13px;margin-top:4px">${dtm(x.at)}</div></div><span class="tkt-st ${st[0]}">${st[1]}</span></div>
+    return `<div class="card pad${x.prem?" tkt-prem":""}"><div class="adm-h"><div><a href="#/player/${encodeURIComponent(x.nick)}"><b>${esc(x.nick)}</b></a>${x.prem?` <span class="prm">${ic("gem")}Premium</span>`:""} <span class="muted" style="font-size:13px">ID в игре ${esc(x.soid)}</span> <span class="pill">${esc(x.topic)}</span>${x.mid?` <a href="#/match/${esc(x.mid)}" class="muted" style="font-size:13px;text-decoration:underline">матч #${esc(x.mid)}</a>`:""}<div class="muted" style="font-size:13px;margin-top:4px">${dtm(x.at)}</div></div><span class="tkt-st ${st[0]}">${st[1]}</span></div>
      ${x.msgs.map(m=>`<div class="msg${m.by==="admin"?" adm":""}"><div class="mh"><b>${m.by==="admin"?"Поддержка":esc(x.nick)}</b> · ${dtm(m.at)}</div>${esc(m.t)}</div>`).join("")}
      ${open?`<form class="tkt-f" data-aid="${x.id}"><textarea class="txa" maxlength="1500" rows="2" placeholder="Ответ игроку — придёт на сайт и в Telegram" aria-label="Ответ"></textarea><button class="btn btn-o btn-sm" type="submit">Ответить</button></form><div class="tkt-a"><button class="frb" data-aclose="${x.id}">Закрыть обращение</button></div>`:""}</div>`};
   const kp=keepTx(el);el.innerHTML=(d.open.length?d.open.map(x=>card(x,1)).join(""):`<div class="card">${empty("Открытых обращений нет","Когда игрок напишет в поддержку, обращение появится здесь, а вам придёт сообщение в Telegram")}</div>`)+(d.closed.length?`<h3 class="adm-sub">Закрытые</h3>`+d.closed.map(x=>card(x,0)).join(""):"");restoreTx(el,kp);
@@ -2114,18 +2340,27 @@ async function admSupport(){
 const bonusFor=st=>10+5*(Math.min(Math.max(st,1),7)-1);
 const dn=n=>n%10===1&&n%100!==11?"день":n%10>=2&&n%10<=4&&(n%100<12||n%100>14)?"дня":"дней";
 function onTasks(d){const first=!S.tasks;S.tasks=d;paintCoins();if(d.note)setTimeout(()=>toast(d.note),first?0:2800);
-  if(curHash()==="/tasks")paintTasks();else if(curHash()==="/shop")paintShop()}
+  if(curHash()==="/tasks")paintTasks();else if(curHash()==="/shop")paintShop();else if(curHash()==="/premium")paintPrem()}
 async function loadTasks(){if(!S.user)return;try{onTasks(await api("/api/tasks"))}catch{}}
 function tkHtml(t){
   const btn=(id,can,got)=>got?`<span class="tk-done">✓ Получено</span>`:can?`<button class="btn btn-o" data-claim="${id}">Забрать</button>`:`<span class="tk-wait">В процессе</span>`;
   const rw=n=>`<span class="tk-rw">+${n} ${COIN}</span>`,b=t.bonus;
   return `<div class="card pad tk-head"><div class="tk-bal">${COIN}<div><div class="muted" style="font-size:12px;font-weight:700;text-transform:uppercase">Ваши монеты</div><div class="v">${fmt(t.coins)}</div></div></div><div class="tk-reset">Новые задания через<br><b data-cd="${t.resetAt}">${cdStr(t.resetAt-Date.now()-S.skew)}</b></div></div>
-   <div class="card tk-row${b.got?" got":" ready"}"><div class="tk-ic">📅</div><div class="tk-main"><b>Бонус за вход</b><div class="muted" style="font-size:13px;margin-top:2px">Заходите каждый день — награда растёт. Серия: ${b.streak} ${dn(b.streak)} подряд${b.streak<7?` · завтра +${bonusFor(b.streak+1)}`:""}</div></div>${rw(b.amount)}<div class="tk-act">${btn("bonus",!b.got,b.got)}</div></div>
+   ${t.prem?`<div class="tk-boost">${ic("gem")}<span>Premium активен: <b>+50% монет</b> за задания, сундук и бонус за вход</span></div>`:""}
+   <div class="card tk-row${b.got?" got":" ready"}"><div class="tk-ic">📅</div><div class="tk-main"><b>Бонус за вход</b><div class="muted" style="font-size:13px;margin-top:2px">Заходите каждый день — награда растёт. Серия: ${b.streak} ${dn(b.streak)} подряд${b.streak<7?` · завтра +${Math.round(bonusFor(b.streak+1)*(t.mult||1))}`:""}</div></div>${rw(b.amount)}<div class="tk-act">${btn("bonus",!b.got,b.got)}</div></div>
    <h3 class="tk-sub">Задания дня</h3>
    ${t.list.map(x=>{const done=x.prog>=x.goal;return `<div class="card tk-row${x.got?" got":done?" ready":""}" data-task="${x.id}"><div class="tk-ic">${x.ic}</div><div class="tk-main"><b>${esc(x.title)}</b><div class="tk-prog"><div class="bar"><div style="width:${Math.round(x.prog/x.goal*100)}%"></div></div><span>${x.prog} / ${x.goal}</span></div></div>${rw(x.reward)}<div class="tk-act">${btn(x.id,done,x.got)}</div></div>`}).join("")}
    <div class="card tk-row${t.all.got?" got":t.all.done?" ready":""}"><div class="tk-ic">🎁</div><div class="tk-main"><b>Все задания дня</b><div class="muted" style="font-size:13px;margin-top:2px">Выполните все три задания — получите сундук с бонусом</div></div>${rw(t.all.reward)}<div class="tk-act">${btn("all",t.all.done,t.all.got)}</div></div>
+   ${tkPrem(t,btn,rw)}
    <p class="muted" style="font-size:13px;margin-top:4px">Засчитываются только обычные матчи (тестовые — нет). Задания обновляются каждый день в 00:00 по Москве. Тратьте монеты в <a href="#/shop" style="color:var(--orange2)">магазине</a> — там есть промокоды на голду для StandLeo.</p>`;
 }
+// Premium-задание дня: видят все, забрать может только Premium. Без Premium — подсказка, сколько монет было бы больше
+function tkPrem(t,btn,rw){const pt=t.ptask;if(!pt)return "";const done=pt.prog>=pt.goal;
+  const row=`<h3 class="tk-sub">Premium-задание <span class="prm">${ic("gem")}Premium</span></h3>
+   <div class="card tk-row prt${pt.locked?" lockd":pt.got?" got":done?" ready":""}" data-task="${pt.id}"><div class="tk-ic">${pt.ic}</div><div class="tk-main"><b>${esc(pt.title)}</b><div class="tk-prog"><div class="bar"><div style="width:${Math.round(pt.prog/pt.goal*100)}%"></div></div><span>${pt.prog} / ${pt.goal}</span></div></div>${rw(pt.reward)}<div class="tk-act">${pt.locked?`<a class="btn btn-g" href="#/premium">${ic("lock")}Открыть</a>`:btn(pt.id,done,pt.got)}</div></div>`;
+  if(t.prem)return row;
+  const up=x=>Math.round(x*1.5)-x,extra=up(t.bonus.amount)+t.list.reduce((a,x)=>a+up(x.reward),0)+up(t.all.reward)+pt.reward;
+  return row+`<a class="card tk-pr" href="#/premium">${GEM()}<div><b>С Premium сегодня — на ${fmt(extra)} монет больше</b><p class="muted">+50% за задания, сундук и бонус за вход и Premium-задание каждый день</p></div><span class="btn btn-o">Подробнее</span></a>`}
 function paintTasks(){const el=document.getElementById("tk");if(!el||!S.tasks)return;const h=tkHtml(S.tasks);if(el._h===h)return;const first=!el._h;el._h=h;el.innerHTML=h;if(first)rise(el.children,50,400)}
 function pageTasks(){
   if(!S.user){app.innerHTML=`<div class="wrap"><h1 class="h">Задания</h1><div class="card" style="max-width:860px">${empty("Ежедневные задания","Каждый день — новые задания и бонус за вход. Выполняйте их и получайте монеты для магазина StandHub.",`<a class="btn btn-o" href="#/login">Войти</a>`)}</div></div>`;entered();return}
@@ -2133,7 +2368,7 @@ function pageTasks(){
   paintTasks();loadTasks();
 }
 document.addEventListener("click",async e=>{const b=e.target.closest("[data-claim]");if(!b)return;e.preventDefault();if(b.disabled)return;b.disabled=true;
-  try{const r=await api("/api/tasks/claim",{method:"POST",body:JSON.stringify({id:b.dataset.claim})});onTasks(r.state);toast(`+${r.amount} монет 🎉`);if(b.dataset.claim==="all")confetti()}
+  try{const r=await api("/api/tasks/claim",{method:"POST",body:JSON.stringify({id:b.dataset.claim})});onTasks(r.state);toast(`+${r.amount} монет 🎉${r.boost?" · с Premium +50%":""}`);if(b.dataset.claim==="all")confetti()}
   catch(err){toast(err.message);if(b.isConnected)b.disabled=false;if(err.state)onTasks(err.state)}});
 /* ===== Магазин ===== */
 // промокод выдаёт администратор: после покупки игрок пишет ему в Telegram и присылает скриншот заказа
@@ -2163,6 +2398,11 @@ function shItem(x){
    <div class="sh-body"><b class="sh-name">${esc(x.title)}</b><div class="muted sh-desc">Промокод для StandLeo. После покупки напишите ${esc(shWho())} в Telegram — вам выдадут код.</div>
     <div class="sh-meta"><span class="sh-price">${COIN}<b>${fmt(x.price)}</b></span>${st}</div>${x.limit?`<div class="sh-lim muted">Не больше ${x.limit} в неделю на игрока</div>`:""}${prog}${act}</div></div>`;
 }
+// Premium в магазине — ведёт на страницу Premium (там оплата монетами или звёздами)
+const shPrem=()=>{const c=(S.prem&&S.prem.coins)||{price:30000,days:30,on:true},on=!!(S.user&&S.user.prem);
+  return `<a class="card sh-item pr-shi" href="#/premium"><div class="sh-vis pr-vis"><span class="sh-tag pr-stag">Подписка</span><span class="sh-for">StandHub</span>${GEM()}</div>
+   <div class="sh-body"><b class="sh-name">Premium${c.on?` · ${c.days} ${dn(c.days)}`:""}</b><div class="muted sh-desc">Быстрый поиск, прогноз ELO, расширенная статистика и +50% монет. Оплата ${c.on?"монетами или ":""}звёздами Telegram.</div>
+    <div class="sh-meta">${c.on?`<span class="sh-price">${COIN}<b>${fmt(c.price)}</b></span>`:`<span class="sh-price">${STAR}<b>от ${fmt(Math.min(...((S.prem&&S.prem.plans)||[{stars:50}]).map(p=>p.stars)))}</b></span>`}${on?`<span class="sh-st">У вас активен</span>`:""}</div><span class="btn btn-o sh-cta">${on?"Продлить":"Подробнее"}</span></div></a>`};
 const shSoon=()=>`<div class="card sh-item sh-soon"><div class="sh-vis"><div class="sh-q">${ic("gift")}</div></div><div class="sh-body"><b class="sh-name">Скоро новые товары</b><div class="muted sh-desc">Готовим новые награды. Есть идея, что добавить? Напишите в <a href="#/support">поддержку</a>.</div></div></div>`;
 const shMine=o=>o.length?`<h3 class="tk-sub">Мои покупки</h3><div class="card sh-mine">${o.map(x=>`<div class="sh-ord${x.st==="refund"?" off":""}" data-n="${x.n}"><div class="sh-oic">${GOLD()}</div><div class="sh-om"><b>${esc(x.title)}</b><div class="muted">Заказ №${x.n} · ${dtm(x.at)} · ${fmt(x.price)} монет</div></div><div class="sh-oc">${ostHtml(x.st)}${x.code?`<code class="sh-code">${esc(x.code)}</code><button class="btn btn-g btn-sm" data-copyc="${esc(x.code)}" aria-label="Скопировать код ${esc(x.code)}">${ic("copy")}<span>Скопировать</span></button>`:x.st==="wait"?`<button class="btn btn-o btn-sm" data-ord="${x.n}">${ic("tg")}<span>Получить код</span></button>`:""}</div></div>`).join("")}</div>
   <p class="muted sh-help sh-mhint">Чтобы получить промокод, напишите <a href="${shTg()}" target="_blank" rel="noopener">${esc(shWho())}</a> в Telegram и пришлите скриншот заказа. Код вводится в StandLeo: <b>«События»</b> → <b>«Секретный код»</b>.</p>`:"";
@@ -2182,10 +2422,10 @@ function pageShop(){
   try{localStorage.setItem("sh_shop_seen","1")}catch{}paintBadges();
   if(S.shop&&S.shop.u!==(S.user?S.user.nick:null))S.shop=null;
   app.innerHTML=`<div class="wrap sh">${shHero()}<h3 class="tk-sub">Товары</h3><div class="sh-grid" id="shItems"><div class="card">${skel(3)}</div></div><div id="shMine"></div><div id="shSteps">${shSteps()}</div></div>`;entered();
-  paintShop();loadShop();if(S.user&&!S.tasks)loadTasks();
+  paintShop();loadShop();if(S.user&&!S.tasks)loadTasks();if(!S.prem)loadPrem(true);
 }
 function paintShop(){if(curHash()!=="/shop"||!S.shop)return;const g=document.getElementById("shItems"),m=document.getElementById("shMine"),st=document.getElementById("shSteps");if(!g||!m)return;
-  const h=S.shop.items.map(shItem).join("")+shSoon();if(g._h!==h){const first=!g._h;g._h=h;g.innerHTML=h;if(first)rise(g.children,70,420)}
+  const h=S.shop.items.map(shItem).join("")+shPrem()+shSoon();if(g._h!==h){const first=!g._h;g._h=h;g.innerHTML=h;if(first)rise(g.children,70,420)}
   const hm=shMine(S.shop.orders);if(m._h!==hm){m._h=hm;m.innerHTML=hm}
   if(st){const hs=shSteps();if(st._h!==hs){st._h=hs;st.innerHTML=hs}}}
 function openBuy(x){const c=S.tasks?S.tasks.coins:0;
@@ -2226,20 +2466,21 @@ function pageRules(sec){
   const li=a=>`<ul>${a.map(x=>`<li>${x}</li>`).join("")}</ul>`;
   app.innerHTML=`<div class="wrap"><h1 class="h">Правила StandHub</h1><div class="doc">
    <p class="lead">Играем честно и уважаем друг друга. За нарушения — ограничения поиска матчей.</p>
-   <div class="doc-nav"><a href="#/rules/account">Аккаунт</a><a href="#/rules/accept">Принятие матча</a><a href="#/rules/match">Матч</a><a href="#/rules/anticheat">Античит</a><a href="#/rules/shop">Монеты и магазин</a><a href="#/rules/penalties">Наказания</a><a href="#/rules/privacy">Конфиденциальность</a></div>
+   <div class="doc-nav"><a href="#/rules/account">Аккаунт</a><a href="#/rules/accept">Принятие матча</a><a href="#/rules/match">Матч</a><a href="#/rules/anticheat">Античит</a><a href="#/rules/shop">Монеты и магазин</a><a href="#/rules/premium">Premium</a><a href="#/rules/penalties">Наказания</a><a href="#/rules/privacy">Конфиденциальность</a></div>
    <div class="card" id="r-account"><h2>${ic("user")}Аккаунт</h2>${li(["Один игрок — один аккаунт. Привязывайте только свой игровой ID.","Аккаунт подтверждается скриншотом экрана «Мой профиль» через Telegram-бота.","Забыли пароль — на странице входа нажмите «Забыли пароль?»: код придёт от нашего Telegram-бота. Не помните email — напишите боту /password.","Нельзя играть с чужого аккаунта или давать играть другим со своего (бустинг)."])}</div>
    <div class="card" id="r-accept"><h2>${ic("play")}Поиск и принятие матча</h2>${li(["Найденный матч нужно принять за <b>15 секунд</b>. Не приняли или отклонили — штраф: поиск матчей закрывается на время.","Пропуски считаются за последние 24 часа. Тестовые матчи не считаются.","Если сайт обновлялся, пока шло принятие, — штрафа нет."])}
      <div class="pen"><div><span>1-й пропуск за сутки</span><b>Предупреждение</b></div><div><span>2-й пропуск</span><b>Поиск закрыт на 5 минут</b></div><div><span>3-й пропуск</span><b>30 минут</b></div><div><span>4-й и дальше</span><b>2 часа</b></div></div></div>
    <div class="card" id="r-match"><h2>${ic("swords")}Матч</h2>${li(["Хост создаёт лобби в StandLeo на выбранной карте — 13 раундов до победы.","Игроки находят хоста по ID и пишут ему «.» в личные сообщения — он приглашает в лобби.","Играйте за свою команду до конца матча. Уходить из матча нельзя.","Если лобби так и не собралось — проголосуйте «Матч не состоялся», ELO не изменится.","После игры капитан отмечает результат на сайте: «Мы победили» или «Мы проиграли». Кнопки открываются через 10 минут после начала игры.","Соперники подтверждают результат или оспаривают его в течение 30 минут. Не ответили — результат засчитывается.","Оспоренный матч проверяет администратор. Записывайте экран во время игры: запись или скриншот итогового счёта — лучшее доказательство, его можно отправить нашему Telegram-боту.","Ложный результат или ложный спор — запрет поиска на 7 дней."])}</div>
    <div class="card" id="r-anticheat"><h2>${ic("shield")}Античит и честная игра</h2>${li(["Запрещены читы, макросы, изменённые версии игры и любые программы, дающие преимущество.","Запрещены договорные матчи и намеренный проигрыш.","Запрещены оскорбления, угрозы, спам и реклама — в том числе в чате матча.","Заметили нарушение — после матча нажмите «Жалоба» рядом с игроком в комнате матча. Администратор проверит."])}</div>
    <div class="card" id="r-shop"><h2>${ic("shop")}Монеты и магазин</h2>${li(["Монеты даются за ежедневные задания и бонус за вход. Купить монеты или передать их другому игроку нельзя.","В магазине монеты меняются на награды — например, на промокод на 1000 голды для StandLeo.","После покупки напишите в Telegram "+tgw()+" и пришлите скриншот заказа — вам выдадут промокод. Номер и статус заказа видны в «Магазине», в разделе «Мои покупки».","Чтобы активировать код, в StandLeo на главном экране нажмите «События» → «Секретный код» и вставьте промокод.","Один заказ — один промокод. Покупку нельзя отменить, монеты не возвращаются. Если промокод не выдали или он не сработал — напишите в поддержку, тема «Магазин и промокоды».","Фарм монет с нескольких аккаунтов, договорные матчи и поддельные скриншоты заказов запрещены — за это закрываем поиск матчей."])}</div>
+   <div class="card" id="r-premium"><h2>${ic("gem")}StandHub Premium</h2>${li(["Premium — платная подписка: золотая рамка и значок у ника, быстрый поиск матча, прогноз ELO, расширенная статистика, +50% монет и Premium-задание, приоритет в поддержке.","Оплата — звёздами Telegram через нашего бота или монетами сайта. Автопродления нет: Premium действует оплаченный срок, при продлении дни добавляются к сроку.","Premium не даёт преимуществ в игре: ELO и результаты матчей считаются одинаково для всех. Правила и наказания для всех тоже одинаковые.","Premium привязан к аккаунту StandHub — передать его другому игроку нельзя.","Оплатили, а Premium не включился — напишите в <a href='#/support/premium' style='color:var(--orange2)'>поддержку</a> (тема «Premium и оплата») или отправьте боту /paysupport."])}</div>
    <div class="card" id="r-penalties"><h2>${ic("crown")}Наказания</h2>${li(["Предупреждение или запрет поиска матчей на 1 день или на 7 дней — решает администратор.","Ложный результат матча или ложный спор — запрет поиска на 7 дней.","За серьёзные и повторные нарушения ограничения могут быть дольше.","Считаете наказание ошибкой — напишите в <a href='#/support' style='color:var(--orange2)'>поддержку</a>."])}</div>
-   <div class="card" id="r-privacy"><h2>${ic("help")}Конфиденциальность</h2>${li(["Мы храним ник, email, игровой ID, регион, аватар, историю матчей, покупки в магазине и Telegram-чат для уведомлений и восстановления пароля.","Скриншоты профиля только распознаются и нигде не сохраняются.","Доказательства по матчам (видео и скриншоты) бот пересылает администратору в Telegram — на сайте они не хранятся.","Пароль хранится в зашифрованном виде.","Мы не передаём ваши данные третьим лицам."])}</div>
+   <div class="card" id="r-privacy"><h2>${ic("help")}Конфиденциальность</h2>${li(["Мы храним ник, email, игровой ID, регион, аватар, историю матчей, покупки в магазине и Telegram-чат для уведомлений и восстановления пароля.","Скриншоты профиля только распознаются и нигде не сохраняются.","Доказательства по матчам (видео и скриншоты) бот пересылает администратору в Telegram — на сайте они не хранятся.","Пароль хранится в зашифрованном виде.","Для Premium храним историю платежей: сумму, дату и номер платежа Telegram. Данные карт и кошельков мы не получаем — оплата проходит внутри Telegram.","Мы не передаём ваши данные третьим лицам."])}</div>
   </div></div>`;entered();
   const t=sec&&document.getElementById("r-"+sec);if(t){setTimeout(()=>{t.scrollIntoView({behavior:RM()?"auto":"smooth",block:"start"});t.classList.add("hl")},60)}
 }
 /* ===== Поддержка ===== */
-const TOPICS={question:"Вопрос",match:"Проблема с матчем",account:"Аккаунт и подтверждение",player:"Жалоба на игрока",idea:"Предложение",shop:"Магазин и промокоды",other:"Другое"};
+const TOPICS={question:"Вопрос",match:"Проблема с матчем",account:"Аккаунт и подтверждение",player:"Жалоба на игрока",idea:"Предложение",shop:"Магазин и промокоды",premium:"Premium и оплата",other:"Другое"};
 const FAQ=[["Бот не принимает скриншот профиля","Нужен скриншот экрана «Мой профиль» (вкладка «Общее») целиком, без обрезки — с надписью «Мой профиль» и вашим ID. Чужой профиль («Профиль друга») не подходит. Если ID не читается, отправьте скриншот боту как файл, без сжатия."],
  ["Забыл пароль или email","На странице входа нажмите «Забыли пароль?» — код придёт в Telegram от нашего бота (того, через которого вы подтверждали аккаунт). Не помните email — напишите боту команду /password: он покажет email для входа и пришлёт ссылку для нового пароля."],
  ["Почему у меня закрыт поиск матчей?","Скорее всего, вы не приняли несколько найденных матчей за сутки. 1-й пропуск — предупреждение, 2-й — 5 минут, 3-й — 30 минут, дальше — 2 часа. Сколько осталось, видно в «Играть»."],
@@ -2251,6 +2492,8 @@ const FAQ=[["Бот не принимает скриншот профиля","Н
  ["Где ввести промокод в StandLeo?","На главном экране игры нажмите «События», затем «Секретный код» — и вставьте туда промокод, который вам прислали в Telegram."],
  ["Мне не выдали промокод","Проверьте, что написали @TG в Telegram и прислали скриншот заказа с его номером. Статус заказа виден в «Магазине», в разделе «Мои покупки». Если ответа долго нет — напишите в поддержку, тема «Магазин и промокоды»."],
  ["Промокод не сработал","Проверьте, что вводите его в StandLeo через «События» → «Секретный код», без лишних пробелов. Если всё равно не работает — напишите в поддержку, тема «Магазин и промокоды», и укажите код: администратор проверит и поможет."],
+ ["Как оформить или продлить Premium?","Откройте раздел «Premium», выберите срок и оплатите звёздами Telegram — или оформите месяц за монеты. Автопродления нет; при продлении дни добавляются к текущему сроку."],
+ ["Оплатил Premium, но он не включился","Обычно Premium включается за несколько секунд — бот присылает подтверждение. Если прошло больше 5 минут, напишите сюда (тема «Premium и оплата») или отправьте боту команду /paysupport. Укажите ник и время оплаты."],
  ["Как пожаловаться на игрока?","После матча откройте комнату матча и нажмите «Жалоба» рядом с игроком — это быстрее, чем писать в поддержку."]];
 function supHtml(list){
   return list.map(x=>{const last=x.msgs[x.msgs.length-1],st=x.status==="closed"?["","Закрыто"]:last.by==="admin"?["ans","Есть ответ"]:["open","Ждёт ответа"];
@@ -2263,13 +2506,13 @@ function paintSup(){const el=document.getElementById("supList");if(!el)return;co
     try{const r=await api("/api/support/reply",{method:"POST",body:JSON.stringify({id:f.dataset.tid,text:t.value})});t.value="";S.sup=r.list;paintSup();toast("Сообщение отправлено")}catch(err){toast(err.message);b.disabled=false}});
   el.querySelectorAll("[data-tclose]").forEach(b=>b.onclick=async()=>{b.disabled=true;try{const r=await api("/api/support/close",{method:"POST",body:JSON.stringify({id:b.dataset.tclose})});S.sup=r.list;paintSup();toast("Обращение закрыто")}catch(e){toast(e.message);b.disabled=false}})}
 async function loadSup(){try{const r=await api("/api/support");S.sup=r.list;paintSup();if(r.list.some(x=>x.unread))api("/api/support/seen",{method:"POST"}).catch(()=>{})}catch{}}
-function pageSupport(){
+function pageSupport(sec){
   if(!S.shop)loadShop();
   const u=S.user;
   app.innerHTML=`<div class="wrap"><h1 class="h">Поддержка</h1><div class="doc">
    ${u?`<div class="card hid" id="supMine"><h2>${ic("help")}Мои обращения</h2><div id="supList"></div></div>
-    <div class="card"><h2>${ic("send")}Написать в поддержку</h2><form class="sup-f" id="supF" novalidate>
-     <div class="two"><div><label for="supT">Тема</label><select id="supT">${Object.entries(TOPICS).map(([k,t])=>`<option value="${k}">${t}</option>`).join("")}</select></div>
+    <div class="card"><h2>${ic("send")}Написать в поддержку</h2>${u.prem?`<p class="pr-sup">${ic("gem")}У вас Premium — ваши обращения рассматриваются в первую очередь</p>`:""}<form class="sup-f" id="supF" novalidate>
+     <div class="two"><div><label for="supT">Тема</label><select id="supT">${Object.entries(TOPICS).map(([k,t])=>`<option value="${k}"${k===sec?" selected":""}>${t}</option>`).join("")}</select></div>
       <div><label for="supM">Номер матча <span style="font-weight:400">(если вопрос о матче)</span></label><input id="supM" maxlength="20" placeholder="например, 3fa9c01b2d" autocomplete="off"></div></div>
      <div><label for="supX">Сообщение</label><textarea class="txa" id="supX" maxlength="1500" rows="5" placeholder="Опишите, что случилось. Ответ придёт сюда и в Telegram."></textarea></div>
      <div><button class="btn btn-o" type="submit">Отправить</button></div></form></div>`
@@ -2308,9 +2551,216 @@ async function pageLeaderboard(){
   app.innerHTML=`<div class="wrap"><h1 class="h">Таблица лидеров</h1><div id="lb"><div class="card">${skel(8)}</div></div></div>`;entered();
   const list=(await getLb()).map((p,i)=>({...p,rank:i+1}));const el=document.getElementById("lb");if(!el)return;
   if(!list.length){el.innerHTML=`<div class="card">${lbEmpty()}</div>`;return}
-  el.innerHTML=`${list.length>=3?`<div class="lb-top">${[1,0,2].map(i=>{const p=list[i];return `<a href="#/player/${encodeURIComponent(p.nick)}" class="card podium p${i+1}"><span class="rk">#${i+1}</span>${ava(p.nick,p.avatar)}<b style="font-size:18px;display:block">${esc(p.nick)}</b><div style="display:flex;justify-content:center;align-items:center;gap:8px;margin-top:8px">${badge(p.elo,"sm")}<b>${p.elo} ELO</b></div><div class="muted" style="font-size:13px;margin-top:4px">${p.matches} матчей · ${wr(p)} побед</div></a>`}).join("")}</div>`:""}
+  el.innerHTML=`${list.length>=3?`<div class="lb-top">${[1,0,2].map(i=>{const p=list[i];return `<a href="#/player/${encodeURIComponent(p.nick)}" class="card podium p${i+1}"><span class="rk">#${i+1}</span>${ava(p.nick,p.avatar,p.prem)}<b style="font-size:18px;display:block">${esc(p.nick)}${prI(p)}</b><div style="display:flex;justify-content:center;align-items:center;gap:8px;margin-top:8px">${badge(p.elo,"sm")}<b>${p.elo} ELO</b></div><div class="muted" style="font-size:13px;margin-top:4px">${p.matches} матчей · ${wr(p)} побед</div></a>`}).join("")}</div>`:""}
    <div class="card scroll">${lbTable(list.length>=3?list.slice(3):list,false)}</div>`;
   fadeRows(el);bind();
+}
+
+/* ===== StandHub Premium ===== */
+// оплата звёздами Telegram через основного бота (сайт получает ссылку на счёт) или монетами сайта
+const PR_MN={1:"месяц",3:"месяца",6:"месяцев",12:"месяцев"};
+const dLong=t=>new Date(t).toLocaleDateString("ru-RU",{day:"numeric",month:"long",year:"numeric"}).replace(/\s*г\.?$/,"");
+const prLeft=t=>Math.max(1,Math.ceil((t-Date.now()-S.skew)/864e5-.02)); // −30 мин: сразу после оплаты «90 дней», а не 91
+const PR_PERKS=[["crown","Золотая рамка и значок","Золотая рамка у аватара и значок Premium — в профиле, рейтинге, матчах и чате"],
+ ["bolt","Быстрый поиск матча","Вас подбирают в первую очередь, а круг соперников по ELO расширяется быстрее"],
+ ["chart","Прогноз ELO","В комнате матча видно, сколько ELO вы получите за победу и потеряете за поражение"],
+ ["bars","Расширенная статистика","График ELO, винрейт по картам и серии побед — в любом профиле"],
+ ["coin","+50% монет","За задания дня, сундук и бонус за вход — копите на промокоды быстрее"],
+ ["target","Premium-задание","Каждый день — отдельное задание с наградой до 150 монет"],
+ ["headset","Приоритет в поддержке","Ваши обращения — первыми в очереди у администратора"],
+ ["heart","Поддержка StandHub","Помогаете проекту расти: новые режимы, турниры и призы"]];
+const PR_FAQ=[["Что такое звёзды Telegram и где их взять?","Звёзды ⭐ — валюта Telegram для оплаты в ботах. Купить их можно прямо в Telegram: «Настройки» → «Мои звёзды». Если звёзд не хватает, Telegram сам предложит докупить их в окне оплаты."],
+ ["Подписка продлевается сама?","Нет, автосписаний нет. Premium действует оплаченный срок. За 3 дня до конца бот напомнит — продлить можно в пару нажатий."],
+ ["Что будет, если продлить заранее?","Дни добавятся к текущему сроку — ничего не сгорит."],
+ ["Можно оформить Premium за монеты?","Да: @COINS монет — @DAYS Premium. Монеты дают за ежедневные задания и бонус за вход."],
+ ["Оплатил, а Premium не включился","Обычно Premium включается за несколько секунд — бот присылает подтверждение. Если прошло больше 5 минут, напишите в <a href=\"#/support/premium\">поддержку</a> (тема «Premium и оплата») или отправьте боту команду /paysupport. Укажите ник и время оплаты."],
+ ["Premium даёт преимущество в игре?","Нет. ELO и результаты матчей считаются одинаково для всех. Premium ускоряет поиск, показывает больше статистики и даёт бонусные монеты."],
+ ["Можно вернуть оплату?","Если что-то пошло не так — напишите в поддержку. Администратор может вернуть звёзды на ваш счёт в Telegram, срок Premium при этом уменьшится на оплаченные дни."]];
+function onPrem(d){
+  S.prem={...S.prem,...d};
+  if(S.user&&"on" in d){const on=!!d.on,until=d.until||0;if(!!S.user.prem!==on||(S.user.premUntil||0)!==until){S.user.prem=on;S.user.premUntil=until;renderChrome(curHash().split("/").slice(0,2).join("/"));refreshLobby()}}
+  const w=document.querySelector("#xModal.show [data-prwait]");if(w&&(d.until||0)>Number(w.dataset.prwait))prDone();
+  const h=curHash();if(h==="/premium")paintPrem();else if(h==="/shop")paintShop();
+}
+// lite — без ссылок на оплату (нужны только цены)
+async function loadPrem(lite){try{onPrem(await api("/api/premium"+(lite?"?lite=1":"")))}
+  catch{const el=document.getElementById("prPlans");if(el&&curHash()==="/premium"&&!(S.prem&&S.prem.plans)){el._h="";el.innerHTML=`<div class="card" style="grid-column:1/-1">${empty("Не удалось загрузить тарифы","Проверьте интернет и обновите страницу")}</div>`}}}
+function pagePremium(){
+  try{localStorage.setItem("sh_prem_seen","1")}catch{}paintBadges();
+  app.innerHTML=`<div class="wrap prp">
+   <section class="card pr-hero"><div class="sh-stripes" aria-hidden="true"></div>
+    <div class="pr-art" aria-hidden="true">${GEM()}<i class="s1"></i><i class="s2"></i><i class="s3"></i></div>
+    <div class="pr-in"><div class="pr-kick">${ic("gem")}StandHub Premium</div><h1>Играй <span>на максимум</span></h1>
+     <p>Быстрый поиск матча, прогноз ELO, расширенная статистика, +50% монет и золотая рамка у ника.</p><div id="prSt"></div></div></section>
+   <h3 class="tk-sub" id="prPlansH">Выберите срок</h3>
+   <div class="pr-plans" id="prPlans">${[0,1,2,3].map(()=>`<div class="card pr-plan">${skel(3,false)}</div>`).join("")}</div>
+   <div id="prCoins"></div>
+   <h3 class="tk-sub">Что даёт Premium</h3>
+   <div class="pr-perks">${PR_PERKS.map(([i,t,x])=>`<div class="card pr-perk"><span class="pr-pi">${i==="coin"?COIN:ic(i)}</span><b>${t}</b><p class="muted">${x}</p></div>`).join("")}</div>
+   <h3 class="tk-sub">Как оформить</h3>
+   <div class="sh-steps pr-steps">
+    <div class="card sh-step"><span class="n">1</span><div><b>Выберите срок</b><p class="muted">1, 3, 6 или 12 месяцев — чем дольше, тем выгоднее</p></div></div>
+    <div class="card sh-step"><span class="n">2</span><div><b>Оплатите звёздами</b><p class="muted">Telegram откроет счёт от нашего бота — подтвердите оплату</p></div></div>
+    <div class="card sh-step"><span class="n">3</span><div><b>Premium включится сам</b><p class="muted">Сразу после оплаты — бот пришлёт подтверждение</p></div></div></div>
+   <div id="prPays"></div>
+   <div class="doc pr-doc"><div class="card faq pr-faq" id="prFaq"></div></div>
+  </div>`;entered();
+  rise(app.querySelectorAll(".pr-perk"),40,380);
+  paintPrem();loadPrem();if(S.user&&!S.tasks)loadTasks();
+}
+function prPlan(p,base,d){
+  const u=S.user,link=d.links&&d.links[p.id],save=base&&p.id!==base.id?Math.round((1-p.stars/(base.stars*p.months))*100):0;
+  const tag=p.id==="m3"?`<span class="pr-tag">Популярный</span>`:p.id==="m12"?`<span class="pr-tag best">Выгоднее всего</span>`:"";
+  const act=!p.on?`<button class="btn btn-g" disabled>Недоступно</button>`
+   :!u?`<a class="btn btn-o" href="#/login">Войти и оформить</a>`
+   :!d.stars?`<button class="btn btn-g" disabled>Оплата недоступна</button>`
+   :link?`<a class="btn btn-o" href="${esc(link)}" target="_blank" rel="noopener" data-pay="${p.id}">${u.prem?"Продлить":"Оплатить"}</a>`
+   :d.links?`<button class="btn btn-g" data-prl>Обновить</button>`
+   :`<button class="btn btn-g" disabled>Загрузка…</button>`;
+  return `<div class="card pr-plan${p.id==="m3"&&p.on?" pop":""}${p.on?"":" off"}">${tag}
+   <div class="pr-m"><b>${p.months}</b><span>${PR_MN[p.months]||"мес."}</span></div>
+   <div class="pr-price">${STAR}<b>${fmt(p.stars)}</b></div>
+   <div class="pr-rub">≈ ${fmt(p.rub)} ₽${p.months>1?` · ${fmt(Math.round(p.rub/p.months))} ₽/мес`:""}</div>
+   <div class="pr-save">${save>0?`Выгода ${save}%`:"&nbsp;"}</div>${act}</div>`;
+}
+function prCoinsHtml(d){const c=d.coins;if(!c||!c.on)return "";const u=S.user,have=S.tasks?S.tasks.coins:0,need=Math.max(0,c.price-have);
+  const act=!u?`<a class="btn btn-g" href="#/login">Войти</a>`:!S.tasks?`<button class="btn btn-g" disabled>Загрузка…</button>`
+   :need?`<a class="btn btn-g" href="#/tasks">Заработать ещё ${fmt(need)}</a>`:`<button class="btn btn-o" data-prcoins>Купить за ${fmt(c.price)}</button>`;
+  return `<div class="card pr-coins">${COIN}<div><b>Premium за монеты</b><p class="muted">${fmt(c.price)} монет — ${c.days} ${dn(c.days)} Premium${u&&u.prem?" (дни добавятся к сроку)":""}. Монеты дают за задания и бонус за вход.</p>${u&&S.tasks&&need?`<div class="sh-prog"><div class="bar"><div style="width:${Math.min(100,Math.round(have/c.price*100))}%"></div></div><span>${fmt(have)} / ${fmt(c.price)}</span></div>`:""}</div>${act}</div>`}
+const prTerm=(id,days)=>{const p=S.prem&&(S.prem.plans||[]).find(x=>x.id===id);return p?`${p.months} ${PR_MN[p.months]}`:`${days} ${dn(days)}`};
+function prPaysHtml(d){const l=d.pays||[];if(!S.user||!l.length)return "";
+  return `<h3 class="tk-sub">Мои платежи</h3><div class="card pr-pays">${l.map(x=>{
+    const t=x.kind==="admin"?"Подарок от администрации":x.kind==="coins"?"Premium за монеты":"Premium · "+prTerm(x.plan,x.days);
+    const a=x.kind==="stars"?`${fmt(x.amount)} ⭐`:x.kind==="coins"?`${fmt(x.amount)} монет`:"бесплатно";
+    return `<div class="pr-pay${x.refunded?" off":""}"><span class="pr-pic">${x.kind==="stars"?STAR:x.kind==="coins"?COIN:ic("gift")}</span><div class="pr-pm"><b>${t}</b><div class="muted">${dtm(x.at)} · +${x.days} ${dn(x.days)}</div></div><div class="pr-pa"><b>${a}</b>${x.refunded?`<span class="sh-ost orf">Возвращено</span>`:""}</div></div>`}).join("")}</div>`}
+function paintPrem(){if(curHash()!=="/premium")return;const d=S.prem,u=S.user;
+  const set=(id,h)=>{const el=document.getElementById(id);if(!el||el._h===h)return false;el._h=h;el.innerHTML=h;return true};
+  const pl=d&&d.plans?d.plans.filter(p=>p.on):[],min=pl.length?Math.min(...pl.map(p=>Math.round(p.rub/p.months))):0;
+  set("prSt",!u?`<div class="pr-st"><a class="btn btn-o" href="#/register">Регистрация</a><a class="btn btn-g" href="#/login">Войти</a><span class="pr-note">Premium оформляется на аккаунт StandHub</span></div>`
+   :u.prem?`<div class="pr-st"><div class="pr-act"><small>Ваш Premium</small><b>${ic("gem")}Активен до ${dLong(u.premUntil)}</b><span class="muted">Осталось ${prLeft(u.premUntil)} ${dn(prLeft(u.premUntil))} · продлите заранее — дни добавятся</span></div></div>`
+   :`<div class="pr-st"><button class="btn btn-o btn-lg" data-prgo>${ic("gem")}Оформить Premium</button>${min?`<span class="pr-note">от ${fmt(min)} ₽ в месяц · без автопродления</span>`:""}</div>`);
+  const fq=PR_FAQ.filter(x=>!x[1].includes("@COINS")||(d&&d.coins&&d.coins.on)).map(([q,a])=>`<details><summary>${q}</summary><p>${a.replace("@COINS",d&&d.coins?fmt(d.coins.price):"").replace("@DAYS",d&&d.coins?d.coins.days+" "+dn(d.coins.days):"")}</p></details>`).join("");
+  set("prFaq",`<h2>${ic("help")}Вопросы о Premium</h2>${fq}`);
+  if(!d||!d.plans)return;
+  const base=d.plans.find(p=>p.id==="m1")||d.plans[0],plans=document.getElementById("prPlans");
+  if(set("prPlans",d.plans.map(p=>prPlan(p,base,d)).join(""))&&plans&&!plans._r){plans._r=1;rise(plans.children,70,420)}
+  set("prCoins",prCoinsHtml(d));set("prPays",prPaysHtml(d));
+}
+// ждём оплату: окно сменится на «Premium активирован», когда сервер сообщит об оплате
+function prWait(id,href){const p=S.prem&&(S.prem.plans||[]).find(x=>x.id===id);if(!p)return;
+  openX(`<div class="card pm pr-pm" role="dialog" aria-modal="true" aria-labelledby="xH" data-prwait="${(S.user&&S.user.premUntil)||0}"><button type="button" class="pm-x" data-x aria-label="Закрыть">×</button>
+   <div class="pr-pv">${GEM()}</div><h3 id="xH">Оплата в Telegram</h3><p class="muted pm-sub">Premium на ${p.months} ${PR_MN[p.months]} — ${fmt(p.stars)} ⭐</p>
+   <ol class="howto"><li><span>В Telegram откроется счёт от нашего бота</span></li><li><span>Подтвердите оплату звёздами. Не хватает звёзд — Telegram предложит их купить</span></li><li><span>Вернитесь сюда — Premium включится сам</span></li></ol>
+   <div class="pr-ld"><span class="spin"></span><span>Ждём оплату…</span></div>
+   <div class="row2" style="margin-top:16px"><a class="btn btn-o" href="${esc(href)}" target="_blank" rel="noopener">${ic("tg")}Открыть оплату снова</a><button class="btn btn-g" type="button" data-x>Закрыть</button></div></div>`)}
+function prDone(){const u=S.user;if(!u)return;
+  openX(`<div class="card pm pr-pm" role="dialog" aria-modal="true" aria-labelledby="xH"><button type="button" class="pm-x" data-x aria-label="Закрыть">×</button>
+   <div class="pr-pv">${GEM()}</div><h3 id="xH">Premium активирован!</h3><p class="muted pm-sub">Действует до <b style="color:#fff">${dLong(u.premUntil)}</b>. Спасибо, что поддерживаете StandHub!</p>
+   <ul class="pr-okl"><li>${ic("bolt")}Быстрый поиск матча уже работает</li><li>${ic("target")}Premium-задание ждёт в «Заданиях»</li><li>${ic("chart")}Прогноз ELO — в комнате следующего матча</li></ul>
+   <div class="row2" style="margin-top:16px"><a class="btn btn-o" href="#/lobby">Найти матч</a><a class="btn btn-g" href="#/tasks">К заданиям</a></div></div>`);
+  confetti()}
+function prBuyCoins(){const d=S.prem,c=d&&d.coins,u=S.user;if(!c||!u)return;const have=S.tasks?S.tasks.coins:0;
+  openX(`<div class="card pm pr-pm" role="dialog" aria-modal="true" aria-labelledby="xH"><button type="button" class="pm-x" data-x aria-label="Закрыть">×</button>
+   <div class="pr-pv">${GEM()}</div><h3 id="xH">Premium за монеты</h3><p class="muted pm-sub">${c.days} ${dn(c.days)} StandHub Premium${u.prem?" — дни добавятся к текущему сроку":""}.</p>
+   <div class="sh-sum"><div><span>Цена</span><b>${COIN}${fmt(c.price)}</b></div><div><span>Останется</span><b>${COIN}${fmt(Math.max(0,have-c.price))}</b></div></div>
+   <p class="muted" style="font-size:13px;margin-top:12px">Покупку нельзя отменить.</p>
+   <div class="row2" style="margin-top:16px"><button class="btn btn-o" id="prcYes">Купить за ${fmt(c.price)}</button><button class="btn btn-g" type="button" data-x>Отмена</button></div></div>`);
+  const y=document.getElementById("prcYes");
+  y.onclick=async()=>{y.disabled=true;y.textContent="Покупаем…";
+    try{const r=await api("/api/premium/coins",{method:"POST"});if(S.tasks){S.tasks.coins=r.coins;paintCoins()}onPrem(r.state);prDone()}
+    catch(err){closeX();toast(err.message);if(err.state)onPrem(err.state)}};
+}
+document.addEventListener("click",e=>{const b=e.target.closest("[data-pay],[data-prl],[data-prcoins],[data-prgo]");if(!b)return;
+  if(b.dataset.pay){prWait(b.dataset.pay,b.href);return} // ссылку на счёт открывает сам браузер
+  e.preventDefault();if(b.disabled)return;
+  if("prl" in b.dataset){b.disabled=true;b.textContent="Загрузка…";loadPrem();return}
+  if("prgo" in b.dataset){const h=document.getElementById("prPlansH");if(h)h.scrollIntoView({behavior:RM()?"auto":"smooth",block:"start"});return}
+  if(!S.user)return needAuth();prBuyCoins()});
+// прогноз ELO в комнате матча (Premium); без Premium — закрытая карточка
+function fcCard(m){
+  if(!m.me||!["veto","live"].includes(m.state))return "";const f=m.fc;
+  const g=(w,d,l)=>`<div class="fc-g"><div class="w"><span>Победа</span><b>${w}</b></div><div class="d"><span>Ничья</span><b>${d}</b></div><div class="l"><span>Поражение</span><b>${l}</b></div></div>`;
+  if(!f)return S.user&&S.user.prem?"":`<a class="card pad fc lockd" href="#/premium"><div class="fc-h"><b>${ic("chart")}Прогноз ELO</b><span class="prm">${ic("lock")}Premium</span></div>${g("+18","0","−18")}<p>Узнайте до игры, сколько ELO получите или потеряете — с StandHub Premium</p></a>`;
+  const sg=v=>v===0?"0":fmtD(v).replace("-","−");
+  return `<div class="card pad fc"><div class="fc-h"><b>${ic("chart")}Прогноз ELO</b><span class="prm">${ic("gem")}Premium</span></div>${g(sg(f.win),sg(f.draw),sg(f.loss))}<p class="muted">${m.test?"Тестовый матч — рейтинг не изменится, прогноз для примера.":"По среднему ELO команд — так же считается итог матча."}</p></div>`;
+}
+// расширенная статистика профиля (Premium): график ELO, винрейт по картам, серии
+function eloChart(pts,res){
+  const W=600,H=210,px=12,py=16,mn=Math.min(...pts),mx=Math.max(...pts),sp=Math.max(30,mx-mn),lo=mn-sp*.12,hi=mx+sp*.12;
+  const X=i=>(px+i*(W-2*px)/Math.max(1,pts.length-1)).toFixed(1),Y=v=>(py+(hi-v)/(hi-lo)*(H-2*py)).toFixed(1);
+  const line=pts.map((v,i)=>(i?"L":"M")+X(i)+" "+Y(v)).join("");
+  const lv=TH.slice(2).filter(t=>t>lo&&t<hi).map(t=>`<line class="lv" x1="0" x2="${W}" y1="${Y(t)}" y2="${Y(t)}"/>`).join("");
+  return `<svg class="xs-ch" viewBox="0 0 ${W} ${H}" role="img" aria-label="График ELO: от ${pts[0]} до ${pts[pts.length-1]}"><defs><linearGradient id="xsA" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ff7a1a" stop-opacity=".38"/><stop offset="1" stop-color="#ff7a1a" stop-opacity="0"/></linearGradient></defs>${lv}
+   <path d="${line}L${X(pts.length-1)} ${H}L${X(0)} ${H}Z" fill="url(#xsA)"/><path d="${line}" fill="none" stroke="#ff8a2a" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
+   ${pts.slice(1).map((v,i)=>`<circle cx="${X(i+1)}" cy="${Y(v)}" r="${pts.length>24?3.5:5}" class="${res[i]||"d"}"/>`).join("")}</svg>`;
+}
+function xsMaps(rows){return rows.map(([k,n,w])=>{const pc=n?Math.round(w/n*100):0;return `<div class="xs-map"><div><b>${esc(k)}</b><em>${n} ${plr(n,"матч","матча","матчей")}</em></div><div class="bar"><div style="width:${pc}%"></div></div><span class="${pc>=50?"w":"l"}">${pc}%</span></div>`}).join("")}
+function xsLocked(){
+  return `<a class="card xs lockd" href="#/premium" aria-label="Расширенная статистика — с StandHub Premium"><div class="xs-blur" aria-hidden="true"><div class="xs-h"><b>${ic("bars")}Расширенная статистика</b></div>
+   <div class="xs-g"><div class="xs-box"><h4><span>ELO</span></h4>${eloChart([1000,1018,1004,1027,1049,1036,1058,1081,1069,1094],["w","l","w","w","l","w","w","l","w"])}</div><div class="xs-box"><h4><span>Винрейт по картам</span></h4>${xsMaps([["Sandstone",9,6],["Rust",7,4],["Province",5,2],["Zone 7",4,3]])}</div></div></div>
+   <div class="xs-lock"><span class="lk">${ic("lock")}</span><b>Расширенная статистика</b><p>График ELO, винрейт по картам и серии побед — с StandHub Premium</p><span class="btn btn-o btn-sm">${ic("gem")}Подключить Premium</span></div></a>`;
+}
+function xStats(p,ms){
+  const hist=(ms||[]).filter(m=>!m.test).slice().reverse().map(m=>({m,x:m.players.find(y=>y.nick===p.nick)||{}})); // от старых к новым
+  if(!hist.length)return "";
+  if(!(S.user&&S.user.prem))return xsLocked();
+  const R=h=>h.x.draw?"d":h.x.win?"w":"l",aft=h=>h.x.elo!=null?Math.max(100,h.x.elo+(h.x.delta||0)):null;
+  const last=hist.slice(-30),pts=[last[0].x.elo,...last.map(aft)].filter(v=>v!=null),all=[hist[0].x.elo,...hist.map(aft)].filter(v=>v!=null);
+  let best=0,run=0;for(const h of hist){run=R(h)==="w"?run+1:0;best=Math.max(best,run)}
+  const lr=R(hist[hist.length-1]);let cur=0;for(let i=hist.length-1;i>=0&&R(hist[i])===lr;i--)cur++;
+  const ten=hist.slice(-10),d10=ten.reduce((a,h)=>a+(h.x.delta||0),0);
+  const by={};for(const h of hist){const k=h.m.map||"—",o=by[k]=by[k]||[k,0,0];o[1]++;if(h.x.win)o[2]++}
+  const maps=Object.values(by).sort((a,b)=>b[1]-a[1]||b[2]-a[2]).slice(0,6);
+  const curS=lr==="d"?"—":`${cur} ${lr==="w"?plr(cur,"победа","победы","побед"):plr(cur,"поражение","поражения","поражений")}`;
+  const tile=(k,v,c)=>`<div class="xs-tile"><span>${k}</span><b${c?` class="${c}"`:""}>${v}</b></div>`;
+  return `<div class="card xs"><div class="xs-h"><b>${ic("bars")}Расширенная статистика</b><span class="prm">${ic("gem")}Premium</span></div>
+   <div class="xs-g"><div class="xs-box"><h4><span>ELO · ${last.length} ${plr(last.length,"матч","матча","матчей")}</span>${pts.length>1?`<em>${Math.min(...pts)} — ${Math.max(...pts)}</em>`:""}</h4>${pts.length>1?eloChart(pts,last.map(R)):`<p class="muted" style="font-size:13px">Сыграйте ещё матч — появится график</p>`}</div>
+    <div class="xs-box"><h4><span>Винрейт по картам</span></h4>${xsMaps(maps)}</div></div>
+   <div class="xs-tiles">${tile("Текущая серия",curS,lr==="w"?"w":lr==="l"?"l":"")}${tile("Лучшая серия побед",best?`${best} ${plr(best,"победа","победы","побед")}`:"—")}${tile(`ELO за ${ten.length} ${plr(ten.length,"матч","матча","матчей")}`,fmtD(d10).replace("-","−"),d10>=0?"w":"l")}${tile("Пик ELO",all.length?Math.max(...all):"—")}</div>
+   <div class="xs-fr"><span class="muted">Последние матчи</span><div class="xs-form">${ten.slice().reverse().map(h=>{const r=R(h);return `<span class="res ${r}">${r==="w"?"W":r==="l"?"L":"D"}</span>`}).join("")}</div></div></div>`;
+}
+// админка → Premium
+const PR_KIND={stars:"Звёзды",coins:"Монеты",admin:"Выдал админ",revoke:"Забрал админ"};
+async function admPremium(){const el=document.getElementById("adm");if(!el)return;
+  try{paintAdmPrem(await api("/api/admin/premium"))}catch(e){el.innerHTML=`<div class="card">${empty("Не удалось загрузить Premium",esc(e.message))}</div>`}}
+function paintAdmPrem(d){const el=document.getElementById("adm");if(!el||curHash()!=="/admin/premium")return;
+  const keep=[...el.querySelectorAll("[data-g]")].map(i=>[i.dataset.g,i.value]); // ник и дни в форме выдачи не стираются при обновлении
+  const MN=p=>p?`${p.months} ${PR_MN[p.months]}`:"",left=t=>{const n=prLeft(t);return n+" "+dn(n)};
+  const pay=x=>{const sum=x.kind==="stars"?`${fmt(x.amount)} ⭐`:x.kind==="coins"?`${fmt(x.amount)} монет`:"";
+    const what=x.kind==="revoke"?"Premium отключён":x.plan?MN(d.plans.find(p=>p.id===x.plan)):x.days?`${x.days} ${dn(x.days)}`:"";
+    const can=["stars","coins"].includes(x.kind)&&!x.refunded;
+    return `<div class="adm-o${x.refunded?" off":""}${x.orphan?" orph":""}"><b class="adm-on">№${x.n}</b>
+     <div class="adm-ow">${x.nick?`<a href="#/player/${encodeURIComponent(x.nick)}"><b>${esc(x.nick)}</b></a>`:`<b style="color:var(--red)">Аккаунт не найден</b>`} <span class="pill">${PR_KIND[x.kind]||esc(x.kind)}</span>
+      <div class="muted">${[what,sum,dtm(x.at),x.by?"админ "+esc(x.by):""].filter(Boolean).join(" · ")}</div>${x.refunded?`<div class="muted">↩️ Возвращено ${dtm(x.refunded)}${x.refBy?" · "+esc(x.refBy):""}</div>`:""}</div>
+     <div class="adm-oa">${can?`<button class="btn btn-g btn-sm" data-prref="${x.n}">${x.kind==="stars"?"Вернуть звёзды":"Вернуть монеты"}</button>`:""}</div></div>`};
+  el.innerHTML=`${d.bot?"":`<div class="card pad adm-warn">⚠️ Основной бот не подключён — оплата звёздами сейчас не работает. Premium можно выдать вручную или продавать за монеты.</div>`}
+   <div class="adm-pt"><div class="card adm-tile"><span>Подписчиков</span><b>${fmt(d.active)}</b></div><div class="card adm-tile"><span>Звёзд за 30 дней</span><b>${fmt(d.stars30)} ⭐</b></div><div class="card adm-tile"><span>Звёзд всего</span><b>${fmt(d.starsAll)} ⭐</b></div></div>
+   <div class="card pad" id="admPc"><b style="font-size:17px">Цены</b><div class="muted" style="font-size:13px;margin-top:2px">Цена — в звёздах Telegram. «≈ ₽» на сайте считается сам: 1 ⭐ ≈ 2 ₽. Новая цена сразу появится на сайте и в боте.</div>
+    <div class="adm-pp">${d.plans.map(p=>`<div class="adm-cfg" data-pl="${p.id}"><label>${MN(p)}, звёзд<input type="number" inputmode="numeric" min="1" max="10000" step="1" data-k="stars" value="${p.stars}"></label><span class="adm-rub muted">≈ ${fmt(p.rub)} ₽</span><label class="chk"><input type="checkbox" data-k="on"${p.on?" checked":""}><span>Продаётся</span></label></div>`).join("")}
+     <div class="adm-cfg" data-pc><label>За монеты: цена<input type="number" inputmode="numeric" min="1" max="10000000" step="1000" data-k="price" value="${d.coins.price}"></label><label>Дней Premium<input type="number" inputmode="numeric" min="1" max="365" step="1" data-k="days" value="${d.coins.days}"></label><label class="chk"><input type="checkbox" data-k="on"${d.coins.on?" checked":""}><span>Продаётся за монеты</span></label></div></div>
+    <button class="btn btn-o btn-sm" data-prsave>Сохранить цены</button></div>
+   <div class="card pad"><b style="font-size:17px">Выдать или забрать Premium</b><div class="muted" style="font-size:13px;margin-top:2px">Например, в подарок победителям турнира. Дни добавляются к текущему сроку, игрок получит сообщение в Telegram.</div>
+    <div class="adm-cfg" style="margin-top:12px"><label>Ник игрока<input type="text" data-g="nick" maxlength="40" autocomplete="off" spellcheck="false" placeholder="Ник на StandHub"></label><label>Дней<input type="number" inputmode="numeric" min="1" max="3650" step="1" data-g="days" value="30"></label><button class="btn btn-o btn-sm" data-grant>${ic("gift")}Выдать</button><button class="btn btn-g btn-sm" data-revoke>Забрать Premium</button></div></div>
+   <h3 class="adm-sub">Подписчики${d.subs.length?" · "+d.subs.length:""}</h3>
+   <div class="card">${d.subs.length?d.subs.map(s=>`<div class="adm-o"><span class="pri">${ic("gem")}</span><div class="adm-ow"><a href="#/player/${encodeURIComponent(s.nick)}"><b>${esc(s.nick)}</b></a><div class="muted">до ${dLong(s.until)} · осталось ${left(s.until)}</div></div><div class="adm-oa"><button class="frb" data-prfill="${esc(s.nick)}">Продлить / забрать</button></div></div>`).join(""):empty("Подписчиков пока нет","Когда игрок оформит Premium, он появится здесь, а вам придёт сообщение в Telegram")}</div>
+   <h3 class="adm-sub">Платежи</h3>
+   <div class="card">${d.pays.length?d.pays.map(pay).join(""):empty("Платежей пока нет","Здесь будут оплаты звёздами, покупки за монеты и выдачи вручную")}</div>
+   <div class="card pad adm-cb"><b style="font-size:17px">${ic("spark")}Как вывести звёзды</b><ol class="howto adm-steps"><li><span>Звёзды за Premium копятся на балансе основного бота. Telegram берёт свою комиссию.</span></li><li><span>Вывод — через <b>Fragment</b> в TON, от 1000 ⭐. Звёзды становятся доступны для вывода примерно через 21 день после оплаты.</span></li><li><span>В Telegram откройте профиль бота → «Баланс» (или @BotFather → ваш бот → Balance) → вывод через Fragment.</span></li></ol></div>`;
+  if(!el._rs){el._rs=1;rise(el.children,40,320)}
+  const post=async(body,btn,msg)=>{if(btn)btn.disabled=true;try{const r=await api("/api/admin/premium",{method:"POST",body:JSON.stringify(body)});toast(msg(r));paintAdmPrem(r.admin)}catch(e){toast(e.message);if(btn&&btn.isConnected)btn.disabled=false}};
+  const pc=el.querySelector("#admPc"),rub=v=>v>0?`≈ ${fmt(Math.max(1,Math.round(v*2)-1))} ₽`:"";
+  pc.querySelectorAll('[data-pl] [data-k="stars"]').forEach(i=>i.oninput=()=>{i.closest(".adm-cfg").querySelector(".adm-rub").textContent=rub(Number(i.value))});
+  pc.querySelector("[data-prsave]").onclick=e=>{const plans={};pc.querySelectorAll("[data-pl]").forEach(r=>{plans[r.dataset.pl]={stars:Number(r.querySelector('[data-k="stars"]').value),on:r.querySelector('[data-k="on"]').checked}});
+    const c=pc.querySelector("[data-pc]"),g=k=>c.querySelector(`[data-k="${k}"]`);
+    post({act:"cfg",plans,coins:{price:Number(g("price").value),days:Number(g("days").value),on:g("on").checked}},e.currentTarget,()=>"Цены сохранены")};
+  const gn=el.querySelector('[data-g="nick"]'),gd=el.querySelector('[data-g="days"]'),nk=()=>gn.value.trim().replace(/^@/,"");
+  keep.forEach(([k,v])=>{const i=el.querySelector(`[data-g="${k}"]`);if(i)i.value=v});
+  el.querySelector("[data-grant]").onclick=e=>{const n=nk(),k=Number(gd.value);if(!n)return gn.focus();if(!confirm(`Выдать Premium игроку ${n} на ${k} ${dn(k)}?`))return;post({act:"grant",nick:n,days:k},e.currentTarget,r=>`Premium выдан: ${r.nick} — до ${dLong(r.until)}`)};
+  el.querySelector("[data-revoke]").onclick=e=>{const n=nk();if(!n)return gn.focus();if(!confirm(`Забрать Premium у ${n}? Он отключится сразу, игрок получит сообщение.`))return;post({act:"revoke",nick:n},e.currentTarget,r=>`Premium отключён: ${r.nick}`)};
+  el.querySelectorAll("[data-prfill]").forEach(b=>b.onclick=()=>{gn.value=b.dataset.prfill;gn.scrollIntoView({behavior:RM()?"auto":"smooth",block:"center"});gn.focus({preventScroll:true})});
+  el.querySelectorAll("[data-prref]").forEach(b=>b.onclick=()=>{const x=d.pays.find(p=>String(p.n)===b.dataset.prref);if(!x)return;
+    if(!confirm(`Вернуть платёж №${x.n}${x.nick?" игроку "+x.nick:""}? ${x.kind==="stars"?x.amount+" ⭐ вернутся ему в Telegram":fmt(x.amount)+" монет вернутся на баланс"}.${x.days?` Срок Premium уменьшится на ${x.days} ${dn(x.days)}.`:""}`))return;
+    post({act:"refund",n:x.n},b,()=>`Платёж №${x.n} возвращён`)});
 }
 
 /* ===== Роутер ===== */
@@ -2322,7 +2772,7 @@ function route(){
   else if(a==="forgot")pageForgot();else if(a==="reset")pageReset(b);else if(a==="password")pagePassword();
   else if(a==="lobby")pageLobby();else if(a==="profile")pageProfile();else if(a==="player")pageProfile(decodeURIComponent(b));
   else if(a==="friends")pageFriends();else if(a==="matches")pageMatches();else if(a==="match")pageMatch(b);else if(a==="leaderboard")pageLeaderboard();else if(a==="admin")pageAdmin(b);
-  else if(a==="tasks")pageTasks();else if(a==="shop")pageShop();else if(a==="rules")pageRules(b);else if(a==="support")pageSupport();else pageHome();
+  else if(a==="tasks")pageTasks();else if(a==="shop")pageShop();else if(a==="rules")pageRules(b);else if(a==="support")pageSupport(b);else if(a==="premium")pagePremium();else pageHome();
   bind();
 }
 function bind(){

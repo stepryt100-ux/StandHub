@@ -16,10 +16,12 @@ const save = () => fs.writeFileSync(DB_FILE, JSON.stringify(db, null, 2));
 // сессии хранятся в базе, чтобы не разлогинивало после обновления сайта
 const sessions = { get: t => (t ? db.sessions[t] : undefined), set: (t, id) => { db.sessions[t] = id; save(); }, delete: t => { if (db.sessions[t]) { delete db.sessions[t]; save(); } } };
 
+let premium = null; // подписка StandHub Premium (premium.js, подключается ниже)
+const premOn = u => !!(premium && u && premium.isPrem(u));
 const hash = (pw, salt = crypto.randomBytes(16).toString('hex')) => salt + ':' + crypto.scryptSync(pw, salt, 32).toString('hex');
 const check = (pw, stored) => { const [salt] = stored.split(':'); return hash(pw, salt) === stored; };
 const pub = u => u && ({ nick: u.nick, region: u.region, elo: u.elo, matches: u.matches, wins: u.wins,
-  kills: u.kills, deaths: u.deaths, assists: u.assists, hsKills: u.hsKills, created: u.created, commends: u.commends || 0,
+  kills: u.kills, deaths: u.deaths, assists: u.assists, hsKills: u.hsKills, created: u.created, commends: u.commends || 0, prem: premOn(u),
   avatar: u.avatar ? `/api/avatar/${encodeURIComponent(u.nick)}?v=${u.avatarV}` : null });
 const verified = () => db.users.filter(u => u.verified);
 function cleanup() { const n = db.users.length; db.users = db.users.filter(u => u.verified || Date.now() - new Date(u.created) < PENDING_TTL); if (db.users.length !== n) save(); }
@@ -29,7 +31,7 @@ const pendingInfo = u => ({ pending: true, code: u.vcode, bot: botUsername, nick
 // администраторы: ники через запятую в переменной ADMIN_NICKS (в Railway → Variables). По умолчанию — владелец сайта Kartez.
 const ADMINS = (process.env.ADMIN_NICKS || 'Kartez').split(',').map(s => s.trim().toLowerCase()).filter(Boolean);
 const isAdmin = u => !!u && ADMINS.includes(u.nick.toLowerCase());
-const meOf = u => ({ ...pub(u), email: u.email, admin: isAdmin(u) });
+const meOf = u => ({ ...pub(u), email: u.email, admin: isAdmin(u), premUntil: premOn(u) ? u.premUntil : 0 });
 
 // ---------- онлайн (реальные подключения) ----------
 const clients = new Map(); // res -> {visitorId, userId}
@@ -179,8 +181,13 @@ async function handlePhoto(msg) {
   finally { botBusy.delete(chatId); }
 }
 async function onUpdate(upd) {
-  const msg = upd.message; if (!msg || msg.chat.type !== 'private') return;
+  // оплата Premium звёздами: Telegram спрашивает подтверждение перед списанием, потом присылает successful_payment
+  if (upd.pre_checkout_query) return premium.preCheckout(upd.pre_checkout_query);
+  const msg = upd.message; if (!msg) return;
+  if (msg.successful_payment) return premium.paid(msg);
+  if (msg.chat.type !== 'private') return;
   const text = (msg.text || '').trim();
+  if (premium.isCmd(text)) return premium.botCmd(msg.chat.id, text);
   // доказательства по матчу: кнопка «Отправить доказательства» на сайте открывает бота с /start proof_<id>
   const pf = text.match(/^\/start\s+proof_([a-f0-9]{4,20})$/i);
   if (pf) return proofs.start(msg.chat.id, pf[1].toLowerCase());
@@ -198,12 +205,12 @@ async function startBot() {
   if (!TG_TOKEN) return console.log('TELEGRAM_BOT_TOKEN не задан — бот выключен');
   const me = await tg('getMe', {}); if (!me.ok) return console.error('Бот: неверный токен', me);
   botUsername = me.result.username; console.log('Бот запущен: @' + botUsername);
-  tg('setMyCommands', { commands: [{ command: 'password', description: 'Забыли пароль? Ссылка для нового пароля' }] }).catch(() => {});
+  tg('setMyCommands', { commands: [{ command: 'premium', description: 'StandHub Premium — оформить или продлить' }, { command: 'password', description: 'Забыли пароль? Ссылка для нового пароля' }, { command: 'paysupport', description: 'Помощь с оплатой' }] }).catch(() => {});
   await tg('deleteWebhook', {});
   let offset = 0;
   for (;;) {
     try {
-      const r = await tg('getUpdates', { offset, timeout: 50 });
+      const r = await tg('getUpdates', { offset, timeout: 50, allowed_updates: ['message', 'pre_checkout_query'] });
       for (const u of r.result || []) { offset = u.update_id + 1; onUpdate(u).catch(e => console.error(e)); }
     } catch (e) { await new Promise(r => setTimeout(r, 3000)); }
   }
@@ -223,13 +230,14 @@ const tgName = async u => {
 // ---------- пароль: восстановление через Telegram и смена в профиле ----------
 const account = require('./account')({ db, save, hash, check, say, escH, siteUrl: SITE_URL, bot: () => botUsername, newSession, dropSessions, meOf });
 // ---------- ежедневные задания и монеты ----------
-const tasks = require('./tasks')({ db, save, sendTo });
+const tasks = require('./tasks')({ db, save, sendTo, isPrem: premOn });
 // ---------- матчи ----------
 let party = null; // модуль пати (подключается ниже)
 match = require('./match')({ db, save, sendTo, broadcast, siteUrl: SITE_URL, avatarOf: u => pub(u).avatar, tell: tgUser, alertAdmins,
   partyOf: uid => (party ? party.partyOf(uid) : null), isOnline,
   pushState: (uid, extra) => sendTo(uid, { ...stateOf(uid), ...extra }), onPartyChange: pt => party && party.pushParty(pt),
-  isAdminId: uid => isAdmin(db.users.find(u => u.id === uid)), adminIds: () => adminUsers().map(u => u.id), onFinish: m => tasks.onFinish(m) });
+  isAdminId: uid => isAdmin(db.users.find(u => u.id === uid)), adminIds: () => adminUsers().map(u => u.id), onFinish: m => tasks.onFinish(m),
+  isPrem: uid => premOn(db.users.find(u => u.id === uid)) });
 // ---------- доказательства по матчам: файлы из бота пересылаются администраторам ----------
 const proofs = require('./proofs')({ db, tg, say, escH, go, match, isCmd: account.isCmd, adminChats: () => [...new Set(adminUsers().map(u => u.tgChat).filter(Boolean))] });
 // ---------- друзья ----------
@@ -242,9 +250,12 @@ const badges = uid => { const u = db.users.find(x => x.id === uid); return { typ
 const pushBadges = uid => { for (const id of new Set([uid, ...adminUsers().map(u => u.id)])) if (id && isOnline(id)) sendTo(id, badges(id)); };
 // ---------- «Спасибо» и жалобы после матча, поддержка ----------
 feedback = require('./feedback')({ db, save, sendTo, tell: tgUser, go, escH, alertAdmins, match, tasks, onChange: () => pushBadges(null) });
-support = require('./support')({ db, save, sendTo, tell: tgUser, go, escH, alertAdmins, onChange: uid => pushBadges(uid) });
+support = require('./support')({ db, save, sendTo, tell: tgUser, go, escH, alertAdmins, onChange: uid => pushBadges(uid), isPrem: uid => premOn(db.users.find(u => u.id === uid)) });
 // ---------- магазин: монеты → промокоды ----------
 const shop = require('./shop')({ db, save, sendTo, sendAll, tell: tgUser, alertAdmins, go, escH, tgName, onCoins: uid => sendTo(uid, tasks.state(uid)), onPending: () => pushBadges(null) });
+// ---------- подписка StandHub Premium: звёзды Telegram через основного бота или монеты сайта ----------
+premium = require('./premium')({ db, save, sendTo, tell: tgUser, say, tg, alertAdmins, go, escH, siteUrl: SITE_URL, botOn: () => !!botUsername,
+  onCoins: uid => sendTo(uid, tasks.state(uid)), onChange: uid => sendTo(uid, tasks.state(uid)) });
 // ---------- турнир «Кубок открытия»: плашка на сайте и отдельный бот регистрации команд ----------
 const cup = require('./cup')({ db, save, sendTo, sendAll, tell: tgUser, alertAdmins, escH, siteUrl: SITE_URL, partyOf: uid => party.partyOf(uid),
   mainBot: () => botUsername, envToken: process.env.CUP_BOT_TOKEN || '', mainToken: TG_TOKEN });
@@ -263,7 +274,7 @@ http.createServer(async (req, res) => {
     res.writeHead(200, { 'Content-Type': 'text/event-stream', 'Cache-Control': 'no-cache', Connection: 'keep-alive', 'X-Accel-Buffering': 'no' });
     const userId = sessions.get(url.searchParams.get('token')) || null;
     clients.set(res, { visitorId: url.searchParams.get('vid') || crypto.randomUUID(), userId, token: userId ? url.searchParams.get('token') : null });
-    if (userId) { sse(res, party.state(userId)); sse(res, stateOf(userId)); sse(res, friends.state(userId)); sse(res, tasks.state(userId)); sse(res, badges(userId)); party.touch(userId); }
+    if (userId) { sse(res, party.state(userId)); sse(res, stateOf(userId)); sse(res, friends.state(userId)); sse(res, tasks.state(userId)); sse(res, premium.state(userId)); sse(res, badges(userId)); party.touch(userId); }
     sse(res, stats()); broadcast();
     // закрыл сайт — через 20 секунд убираем из поиска (если не вернулся); если искало пати — поиск останавливается у всех
     req.on('close', () => {
@@ -410,6 +421,23 @@ http.createServer(async (req, res) => {
     const b = await body(req, 4e3), act = String(b.act || ''), id = String(b.item || '');
     const r = act === 'cfg' ? shop.setCfg(id, b) : act === 'contact' ? shop.setContact(b.contact) : act === 'order' ? shop.setOrder(u, b.n, String(b.do || '')) : { error: 'Неизвестное действие' };
     return send(res, r.error ? 400 : 200, { ...r, admin: shop.adminState() });
+  }
+  // ---------- Premium ----------
+  if (p === '/api/premium' || p === '/api/premium/coins') {
+    const u = authUser(req);
+    if (p === '/api/premium') return send(res, 200, { ...premium.state(u && u.id), ...(url.searchParams.has('lite') ? {} : { links: u ? await premium.payLinks(u) : null }) }); // lite — только цены, без ссылок на оплату
+    if (req.method !== 'POST') return send(res, 405, { error: 'Нужен POST' });
+    if (!u) return send(res, 401, { error: 'Войдите в аккаунт' });
+    const r = premium.buyCoins(u);
+    return send(res, r.error ? 400 : 200, { ...r, state: premium.state(u.id) });
+  }
+  if (p === '/api/admin/premium') {
+    const u = authUser(req); if (!isAdmin(u)) return send(res, 403, { error: 'Только для администратора' });
+    if (req.method !== 'POST') return send(res, 200, premium.adminState());
+    const b = await body(req, 4e3), act = String(b.act || '');
+    const r = act === 'cfg' ? premium.setCfg(b) : act === 'grant' ? premium.grant(u, b.nick, b.days) : act === 'revoke' ? premium.revoke(u, b.nick)
+      : act === 'refund' ? await premium.refund(u, b.n) : { error: 'Неизвестное действие' };
+    return send(res, r.error ? 400 : 200, { ...r, admin: premium.adminState() });
   }
   // ---------- турнир ----------
   if (p === '/api/cup') { const u = authUser(req); return send(res, 200, cup.state(u && u.id)); }

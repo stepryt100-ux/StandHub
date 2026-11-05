@@ -13,6 +13,9 @@ const FALSE_BAN = 7 * 24 * 3600e3;     // ложный результат или
 const CHANGES = 3;                     // капитан может отметить результат максимум 3 раза (2 изменения)
 const PROOF_MAX = 10;                  // доказательств от одного игрока по одному матчу
 const K = 50;                          // равные команды: +25 / −25
+const PREM_HEAD = 120e3;               // Premium: в очереди впереди всех, кто ждёт меньше 2 минут
+const RANGE0 = 150, RANGE_K = 10;      // допуск по ELO при поиске: 150 сразу, потом +10 в секунду (до 1500)
+const PREM_RANGE0 = 300, PREM_RANGE_K = 30; // Premium: допуск сразу 300 и растёт втрое быстрее — матч находится намного быстрее
 const DAY = 24 * 3600e3;
 // штраф за непринятый матч (считаем пропуски за последние сутки): 1-й — предупреждение, 2-й — 5 минут, 3-й — 30 минут, дальше — 2 часа
 const MISS_BAN = [0, 5, 30, 120];
@@ -36,9 +39,10 @@ module.exports = function (ctx) {
   const partyOf = uid => (ctx.partyOf ? ctx.partyOf(uid) : null);
   const isOnline = ctx.isOnline || (() => true), pushState = ctx.pushState || (() => {}), onParty = ctx.onPartyChange || (() => {});
   const isAdminId = ctx.isAdminId || (() => false), adminIds = ctx.adminIds || (() => []), onFinish = ctx.onFinish || (() => {});
+  const isPrem = ctx.isPrem || (() => false); // подписка StandHub Premium (premium.js)
   // чат пишем на диск не на каждое сообщение, а раз в пару секунд
   let saveT = null; const saveSoon = () => { if (!saveT) saveT = setTimeout(() => { saveT = null; save(); }, 2000); };
-  // в очереди стоят группы: один игрок или пати целиком — { uids, pid, joined, prio }
+  // в очереди стоят группы: один игрок или пати целиком — { uids, pid, joined, prio, prem } (prem — в группе есть игрок с Premium)
   const queues = { '5v5': [], '2v2': [], '1v1': [] };
   const userById = id => db.users.find(u => u.id === id);
   const nickOf = id => (userById(id) || {}).nick || 'Игрок';
@@ -47,7 +51,7 @@ module.exports = function (ctx) {
   const open = () => db.matches.filter(m => OPEN.includes(m.state));
   const matchOf = uid => db.matches.find(m => BUSY.includes(m.state) && m.players.some(p => p.id === uid));
   const entryOf = uid => { for (const k in queues) { const q = queues[k].find(x => x.uids.includes(uid)); if (q) return { mode: k, q }; } return null; };
-  const queueEntry = uid => { const e = entryOf(uid); return e ? { mode: e.mode, waited: Date.now() - e.q.joined, party: e.q.uids.length > 1 } : null; };
+  const queueEntry = uid => { const e = entryOf(uid); return e ? { mode: e.mode, waited: Date.now() - e.q.joined, party: e.q.uids.length > 1, prem: !!e.q.prem } : null; };
   const inQueue = uid => (queueEntry(uid) || {}).mode || null;
   const people = q => q.reduce((a, x) => a + x.uids.length, 0);
   const searching = () => Object.values(queues).reduce((a, q) => a + people(q), 0);
@@ -100,7 +104,7 @@ module.exports = function (ctx) {
       }
     }
     drop(uids);
-    queues[mode].push({ uids, pid: pt ? pt.id : null, joined: Date.now(), prio: Date.now() });
+    queues[mode].push({ uids, pid: pt ? pt.id : null, joined: Date.now(), prio: Date.now(), prem: uids.some(id => isPrem(id)) });
     if (pt) {
       if (pt.mode !== mode) { pt.mode = mode; save(); onParty(pt); }
       for (const id of uids) if (id !== u.id) pushState(id, { note: `${u.nick} запустил(а) поиск матча · ${MODE_NAME[mode]}` });
@@ -125,12 +129,13 @@ module.exports = function (ctx) {
 
   // подбор: самая долго ждущая группа + ближайшие по ELO; допуск по ELO растёт со временем ожидания. Регион не учитывается.
   // Пати не разбиваются: группы должны делиться на две равные команды целиком.
+  // Premium-группы стоят в очереди так, будто ждут на 2 минуты дольше, а допуск по ELO у них шире и растёт втрое быстрее.
   const avgElo = x => x.uids.reduce((a, id) => a + (userById(id) || { elo: 1000 }).elo, 0) / x.uids.length;
   function canSplit(sizes, half) { let r = new Set([0]); for (const s of sizes) { const n = new Set(r); for (const v of r) if (v + s <= half) n.add(v + s); r = n; } return r.has(half); }
   function pick(q, N) {
     const first = q[0], half = N / 2, fe = avgElo(first);
     if (first.uids.length > half) return null;
-    const range = Math.min(1500, 150 + ((Date.now() - first.prio) / 1000) * 10);
+    const range = Math.min(1500, (first.prem ? PREM_RANGE0 : RANGE0) + ((Date.now() - first.prio) / 1000) * (first.prem ? PREM_RANGE_K : RANGE_K));
     const cands = q.slice(1).filter(x => x.uids.length <= half && Math.abs(avgElo(x) - fe) <= range)
       .sort((a, b) => Math.abs(avgElo(a) - fe) - Math.abs(avgElo(b) - fe)).slice(0, 14);
     const chosen = [first];
@@ -144,14 +149,17 @@ module.exports = function (ctx) {
     };
     return dfs(0, first.uids.length) ? chosen : null;
   }
+  const rank = x => x.prio - (x.prem ? PREM_HEAD : 0);
   function tick() {
     for (const mode in queues) {
       const N = MODES[mode];
       for (;;) {
-        const q = queues[mode].filter(x => x.uids.every(id => userById(id) && !matchOf(id))).sort((a, b) => a.prio - b.prio);
+        const q = queues[mode].filter(x => x.uids.every(id => userById(id) && !matchOf(id))).sort((a, b) => rank(a) - rank(b));
         queues[mode] = q;
         if (people(q) < N) break;
-        const picked = pick(q, N);
+        // ведущая — первая группа в очереди; если ей пока некого подобрать по ELO, пробуем следующие — остальные не ждут зря
+        let picked = null;
+        for (let i = 0; i < q.length && !picked; i++) picked = pick(i ? [q[i], ...q.slice(0, i), ...q.slice(i + 1)] : q, N);
         if (!picked) break;
         queues[mode] = q.filter(x => !picked.includes(x));
         createMatch(mode, picked.flatMap(x => x.uids.map(userById)), false, picked.map(x => x.uids));
@@ -191,7 +199,7 @@ module.exports = function (ctx) {
       if (!ids.length || ids.some(id => bad.includes(id))) continue;
       const pt = partyOf(ids[0]);
       if (ids.length > 1 ? !pt || pt.members.length !== ids.length || !ids.every(id => pt.members.includes(id)) : pt && pt.members.length > 1) continue;
-      drop(ids); queues[m.mode].push({ uids: ids, pid: ids.length > 1 ? pt.id : null, joined: Date.now(), prio: Date.now() - 120e3 }); m.requeued.push(...ids);
+      drop(ids); queues[m.mode].push({ uids: ids, pid: ids.length > 1 ? pt.id : null, joined: Date.now(), prio: Date.now() - 120e3, prem: ids.some(id => isPrem(id)) }); m.requeued.push(...ids);
     }
     save(); notify(m); broadcast(); setTimeout(tick, 500);
     for (const id in m.missed) pushState(id); // показать запрет поиска
@@ -410,7 +418,7 @@ module.exports = function (ctx) {
   const hasTeams = m => m.players.some(p => p.team);
   const chatOpen = m => hasTeams(m) && (['veto', 'live', 'dispute'].includes(m.state) || (['finished', 'cancelled'].includes(m.state) && !!endedAt(m) && Date.now() - endedAt(m) < AFTER));
   const chatSees = (m, uid, x) => x.ch === 'all' || isAdminId(uid) || (P(m, uid) || {}).team === x.ch;
-  const chatView = (m, x, uid) => ({ id: x.id, nick: x.nick, t: x.t, ch: x.ch, at: x.at, tm: x.tm || null, me: x.uid === uid, adm: !!x.adm });
+  const chatView = (m, x, uid) => ({ id: x.id, nick: x.nick, t: x.t, ch: x.ch, at: x.at, tm: x.tm || null, me: x.uid === uid, adm: !!x.adm, pr: isPrem(x.uid) });
   const chatAt = new Map();
   function chatList(mid, uid) {
     const m = find(mid); if (!m) return { error: 'Матч не найден' };
@@ -436,6 +444,12 @@ module.exports = function (ctx) {
   // «Спасибо» и жалобы доступны сутки после матча, который дошёл хотя бы до выбора карты (не тестовый)
   const fbOpen = m => !m.test && hasTeams(m) && ['finished', 'cancelled'].includes(m.state) && !!endedAt(m) && Date.now() - endedAt(m) < FB_TTL;
 
+  // прогноз ELO для игрока с Premium: сколько получит за победу, поражение и ничью (так же, как считает finish)
+  function forecast(m, team) {
+    const avg = t => { const ps = m.players.filter(p => p.team === t); return ps.reduce((a, p) => a + p.elo, 0) / ps.length; };
+    const expA = 1 / (1 + Math.pow(10, (avg('B') - avg('A')) / 400)), dA = s => Math.round(K * (s - expA));
+    return team === 'A' ? { win: dA(1), loss: dA(0), draw: dA(0.5) } : { win: -dA(0), loss: -dA(1), draw: -dA(0.5) };
+  }
   // ---------- что видит игрок ----------
   function view(m, vid) {
     const me = P(m, vid), host = P(m, m.host), myTeam = me && me.team;
@@ -448,12 +462,13 @@ module.exports = function (ctx) {
     return {
       id: m.id, mode: m.mode, test: m.test, state: m.state, now: Date.now(), created: m.created,
       acceptDeadline: m.acceptDeadline, accepted: m.accepted.length, total: m.players.length, iAccepted: m.accepted.includes(vid), requeuedMe: !!(m.requeued && m.requeued.includes(vid)),
-      players: m.players.map(p => ({ nick: p.nick, elo: p.elo, avatar: p.avatar, bot: p.bot, team: m.state === 'accept' ? null : p.team,
+      players: m.players.map(p => ({ nick: p.nick, elo: p.elo, avatar: p.avatar, bot: p.bot, team: m.state === 'accept' ? null : p.team, prem: !p.bot && isPrem(p.id),
         captain: m.captains.A === p.id ? 'A' : m.captains.B === p.id ? 'B' : null, host: p.id === m.host, me: p.id === vid,
         accepted: m.accepted.includes(p.id), delta: m.deltas ? m.deltas[p.id] : null, party: gl[p.id] ? (gn > 1 ? 'Пати ' + gl[p.id] : 'Пати') : null })),
       maps: m.maps, bans: m.bans, turn: m.turn, turnDeadline: m.turnDeadline, map: m.map, liveAt: m.liveAt || null,
       host: host ? { nick: host.nick, soid: me ? host.soid : null } : null,
       me: me ? { team: myTeam, captain: !!myTeam && m.captains[myTeam] === vid, host: m.host === vid, votedCancel: votes.includes(vid) } : null,
+      fc: me && myTeam && ['veto', 'live'].includes(m.state) && isPrem(vid) ? forecast(m, myTeam) : null,
       reports: { A: !!m.reports.A, B: !!m.reports.B },
       claim: c ? { team: c.team, result: c.result, nick: nickOf(c.by || m.captains[c.team]), at: c.at, until: c.at + CLAIM_WAIT, mine: c.by === vid, n: c.n || 1, left: CHANGES - (c.n || 1) } : null,
       claimFrom: m.state === 'live' && !m.test && m.liveAt ? m.liveAt + CLAIM_MIN : null,
@@ -468,7 +483,7 @@ module.exports = function (ctx) {
   }
   function notify(m) { for (const p of real(m)) sendTo(p.id, { type: 'match', match: view(m, p.id) }); }
   const summary = m => ({ id: m.id, mode: m.mode, map: m.map, test: m.test, scoreA: m.scoreA, scoreB: m.scoreB, winner: m.winner, date: m.finishedAt,
-    players: m.players.map(p => ({ nick: p.nick, team: p.team, captain: m.captains.A === p.id ? 'A' : m.captains.B === p.id ? 'B' : null, delta: m.deltas ? m.deltas[p.id] : null, win: m.winner === p.team, draw: m.winner === 'draw' })) });
+    players: m.players.map(p => ({ nick: p.nick, team: p.team, elo: p.elo, captain: m.captains.A === p.id ? 'A' : m.captains.B === p.id ? 'B' : null, delta: m.deltas ? m.deltas[p.id] : null, win: m.winner === p.team, draw: m.winner === 'draw' })) });
   const history = (nick, withTest) => db.matches.filter(m => m.state === 'finished' && (withTest || !m.test) && (!nick || m.players.some(p => p.nick.toLowerCase() === nick)))
     .sort((a, b) => b.finishedAt - a.finishedAt).slice(0, 100).map(summary);
 
