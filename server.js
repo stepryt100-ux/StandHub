@@ -17,13 +17,15 @@ const save = () => fs.writeFileSync(DB_FILE, JSON.stringify(db, null, 2));
 const sessions = { get: t => (t ? db.sessions[t] : undefined), set: (t, id) => { db.sessions[t] = id; save(); }, delete: t => { if (db.sessions[t]) { delete db.sessions[t]; save(); } } };
 
 let appearance = null;
+const bannerRevisions = new Map(); // Новая загрузка или удаление отменяет более старую обработку.
 let premium = null; // подписка StandHub Premium (premium.js, подключается ниже)
 const premOn = u => !!(premium && u && premium.isPrem(u));
 const hash = (pw, salt = crypto.randomBytes(16).toString('hex')) => salt + ':' + crypto.scryptSync(pw, salt, 32).toString('hex');
 const check = (pw, stored) => { const [salt] = stored.split(':'); return hash(pw, salt) === stored; };
 const pub = u => u && ({ nick: u.nick, region: u.region, elo: u.elo, matches: u.matches, wins: u.wins,
   kills: u.kills, deaths: u.deaths, assists: u.assists, hsKills: u.hsKills, created: u.created, commends: u.commends || 0, prem: premOn(u), appearance: appearance ? appearance.active(u) : {frame:null,banner:null},
-  avatar: u.avatar ? `/api/avatar/${encodeURIComponent(u.nick)}?v=${u.avatarV}` : null });
+  avatar: u.avatar ? `/api/avatar/${encodeURIComponent(u.nick)}?v=${u.avatarV}` : null,
+  banner: appearance && appearance.active(u).banner === 'banner_custom' ? `/api/banner/${encodeURIComponent(u.nick)}?v=${u.bannerV}` : null });
 const verified = () => db.users.filter(u => u.verified);
 function cleanup() { const n = db.users.length; db.users = db.users.filter(u => u.verified || Date.now() - new Date(u.created) < PENDING_TTL); if (db.users.length !== n) save(); }
 const newCode = () => { let c; do { c = String(crypto.randomInt(100000, 999999)); } while (db.users.some(u => u.vcode === c)); return c; };
@@ -32,7 +34,7 @@ const pendingInfo = u => ({ pending: true, code: u.vcode, bot: botUsername, nick
 // администраторы: ники через запятую в переменной ADMIN_NICKS (в Railway → Variables). По умолчанию — владелец сайта Kartez.
 const ADMINS = (process.env.ADMIN_NICKS || 'Kartez').split(',').map(s => s.trim().toLowerCase()).filter(Boolean);
 const isAdmin = u => !!u && ADMINS.includes(u.nick.toLowerCase());
-const meOf = u => ({ ...pub(u), email: u.email, admin: isAdmin(u), premUntil: premOn(u) ? u.premUntil : 0 });
+const meOf = u => ({ ...pub(u), email: u.email, admin: isAdmin(u), premUntil: premOn(u) ? u.premUntil : 0, customBannerOwned: appearance ? appearance.state(u).items.some(x=>x.id==='banner_custom' && x.owned) : false, customBannerImage: !!u.bannerImage });
 
 // ---------- онлайн (реальные подключения) ----------
 const clients = new Map(); // res -> {visitorId, userId}
@@ -341,6 +343,34 @@ http.createServer(async (req, res) => {
     if (m[2].length > 700000) return send(res, 400, { error: 'Картинка слишком большая' });
     u.avatar = m[2]; u.avatarType = 'image/' + m[1]; u.avatarV = Date.now(); save();
     return send(res, 200, meOf(u));
+  }
+  if (p === '/api/banner' && req.method === 'POST') {
+    const u=authUser(req); if(!u) return send(res,401,{error:'Войдите в аккаунт'});
+    if(!cosmetics.state(u).items.find(x=>x.id==='banner_custom').owned) return send(res,403,{error:'Сначала купите свой фон в магазине'});
+    if(!sharp) return send(res,503,{error:'Загрузка изображений временно недоступна'});
+    const revision=(bannerRevisions.get(u.id)||0)+1; bannerRevisions.set(u.id,revision);
+    const b=await body(req, 1450000); if(b.tooBig) return send(res,400,{error:'Фотография должна весить не больше 1 МБ'}); const m=/^data:image\/(?:jpeg|png|webp);base64,([A-Za-z0-9+/]+={0,2})$/.exec(String(b.image||''));
+    if(!m) return send(res,400,{error:'Выберите фотографию JPEG, PNG или WebP'}); if(m[1].length>1398104) return send(res,400,{error:'Фотография должна весить не больше 1 МБ'});
+    try {
+      const buf=Buffer.from(m[1],'base64'); if(buf.length>1048576) return send(res,400,{error:'Фотография должна весить не больше 1 МБ'}); const image=sharp(buf,{limitInputPixels:20000000,failOn:'error'});
+      const meta=await image.metadata();
+      if(!['jpeg','png','webp'].includes(meta.format) || !meta.width || !meta.height || meta.width<100 || meta.height<100) return send(res,400,{error:'Выберите фотографию размером не менее 100 × 100 пикселей'});
+      const result=await image.rotate().resize(1400,500,{fit:'cover'}).webp({quality:78}).toBuffer();
+      if(result.length>400000) return send(res,400,{error:'Не удалось уменьшить изображение. Выберите другую фотографию'});
+      if(bannerRevisions.get(u.id)!==revision) return send(res,409,{error:'Эта загрузка отменена более новым изменением фона'});
+      const r=cosmetics.setBanner(u,result); return send(res,r.error?400:200,{...r,user:meOf(u),state:cosmetics.state(u)});
+    } catch { return send(res,400,{error:'Не удалось обработать фотографию. Выберите другой файл'}); }
+  }
+  if (p === '/api/banner/remove' && req.method === 'POST') {
+    const u=authUser(req); if(!u) return send(res,401,{error:'Войдите в аккаунт'});
+    bannerRevisions.set(u.id,(bannerRevisions.get(u.id)||0)+1);
+    const r=cosmetics.removeBanner(u); return send(res,r.error?400:200,{...r,user:meOf(u),state:cosmetics.state(u)});
+  }
+  if (p.startsWith('/api/banner/')) {
+    const n=decodeURIComponent(p.slice(12)).toLowerCase(), u=verified().find(x=>x.nick.toLowerCase()===n);
+    if(!u || !u.bannerImage) {res.writeHead(404);return res.end();}
+    res.writeHead(200,{'Content-Type':'image/webp','Cache-Control':'no-store','X-Content-Type-Options':'nosniff'});
+    return res.end(Buffer.from(u.bannerImage,'base64'));
   }
   if (p.startsWith('/api/avatar/')) {
     const n = decodeURIComponent(p.slice(12)).toLowerCase(); const u = verified().find(x => x.nick.toLowerCase() === n);
