@@ -16,12 +16,13 @@ const save = () => fs.writeFileSync(DB_FILE, JSON.stringify(db, null, 2));
 // сессии хранятся в базе, чтобы не разлогинивало после обновления сайта
 const sessions = { get: t => (t ? db.sessions[t] : undefined), set: (t, id) => { db.sessions[t] = id; save(); }, delete: t => { if (db.sessions[t]) { delete db.sessions[t]; save(); } } };
 
+let appearance = null;
 let premium = null; // подписка StandHub Premium (premium.js, подключается ниже)
 const premOn = u => !!(premium && u && premium.isPrem(u));
 const hash = (pw, salt = crypto.randomBytes(16).toString('hex')) => salt + ':' + crypto.scryptSync(pw, salt, 32).toString('hex');
 const check = (pw, stored) => { const [salt] = stored.split(':'); return hash(pw, salt) === stored; };
 const pub = u => u && ({ nick: u.nick, region: u.region, elo: u.elo, matches: u.matches, wins: u.wins,
-  kills: u.kills, deaths: u.deaths, assists: u.assists, hsKills: u.hsKills, created: u.created, commends: u.commends || 0, prem: premOn(u),
+  kills: u.kills, deaths: u.deaths, assists: u.assists, hsKills: u.hsKills, created: u.created, commends: u.commends || 0, prem: premOn(u), appearance: appearance ? appearance.active(u) : {frame:null,banner:null},
   avatar: u.avatar ? `/api/avatar/${encodeURIComponent(u.nick)}?v=${u.avatarV}` : null });
 const verified = () => db.users.filter(u => u.verified);
 function cleanup() { const n = db.users.length; db.users = db.users.filter(u => u.verified || Date.now() - new Date(u.created) < PENDING_TTL); if (db.users.length !== n) save(); }
@@ -253,6 +254,7 @@ feedback = require('./feedback')({ db, save, sendTo, tell: tgUser, go, escH, ale
 support = require('./support')({ db, save, sendTo, tell: tgUser, go, escH, alertAdmins, onChange: uid => pushBadges(uid), isPrem: uid => premOn(db.users.find(u => u.id === uid)) });
 // ---------- магазин: монеты → промокоды ----------
 const shop = require('./shop')({ db, save, sendTo, sendAll, tell: tgUser, alertAdmins, go, escH, tgName, onCoins: uid => sendTo(uid, tasks.state(uid)), onPending: () => pushBadges(null) });
+const cosmetics = appearance = require('./appearance')({ db, save, onCoins: uid => sendTo(uid, tasks.state(uid)) });
 // ---------- подписка StandHub Premium: звёзды Telegram через основного бота или монеты сайта ----------
 premium = require('./premium')({ db, save, sendTo, tell: tgUser, say, tg, alertAdmins, go, escH, siteUrl: SITE_URL, botOn: () => !!botUsername,
   onCoins: uid => sendTo(uid, tasks.state(uid)), onChange: uid => sendTo(uid, tasks.state(uid)) });
@@ -404,6 +406,28 @@ http.createServer(async (req, res) => {
     if (req.method !== 'POST') return send(res, 405, { error: 'Нужен POST' });
     const r = tasks.claim(u, String((await body(req, 2e3)).id || ''));
     return send(res, r.error ? 400 : 200, { ...r, state: tasks.state(u.id) });
+  }
+  // ---------- оформление профиля и промокоды ----------
+  if (p === '/api/cosmetics' || p === '/api/cosmetics/buy' || p === '/api/cosmetics/equip') {
+    const u = authUser(req);
+    if (p === '/api/cosmetics' && req.method === 'GET') return send(res, 200, cosmetics.state(u));
+    if (req.method !== 'POST') return send(res, 405, {error:'Нужен POST'});
+    if (!u) return send(res, 401, {error:'Войдите в аккаунт'});
+    const b = await body(req, 2000);
+    const r = p === '/api/cosmetics/buy' ? cosmetics.buy(u, String(b.item||'')) : p === '/api/cosmetics/equip' ? cosmetics.equip(u,String(b.kind||''),String(b.item||'')) : {error:'Неизвестное действие'};
+    return send(res, r.error ? 400 : 200, {...r,state:cosmetics.state(u),user:meOf(u)});
+  }
+  if (p === '/api/promo/redeem' && req.method === 'POST') {
+    const u=authUser(req); if (!u) return send(res,401,{error:'Войдите в аккаунт'});
+    const r=cosmetics.redeem(u,(await body(req,2000)).code); return send(res,r.error?400:200,r);
+  }
+  if (p === '/api/admin/cosmetics' || p === '/api/admin/promos') {
+    const u=authUser(req); if(!isAdmin(u)) return send(res,403,{error:'Только для администратора'});
+    if(req.method === 'GET') return send(res,200,p.endsWith('promos')?{promos:cosmetics.adminPromos()}:cosmetics.state(null));
+    if(req.method !== 'POST') return send(res,405,{error:'Нужен POST'});
+    const b=await body(req,4000);
+    const r=p.endsWith('promos') ? (b.act==='create'?cosmetics.createPromo(b):b.act==='update'?cosmetics.updatePromo(b):{error:'Неизвестное действие'}) : cosmetics.configure(String(b.item||''),b.price,b.on===true);
+    return send(res,r.error?400:200,{...r,...(p.endsWith('promos')?{promos:cosmetics.adminPromos()}:cosmetics.state(null))});
   }
   // ---------- магазин ----------
   if (p === '/api/shop' || p.startsWith('/api/shop/')) {
