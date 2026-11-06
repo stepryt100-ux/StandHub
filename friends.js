@@ -1,5 +1,5 @@
 // friends.js — друзья: заявки по ID в игре или нику, принять / отклонить, список друзей
-const crypto = require('crypto');
+const crypto = require('crypto'), gameId = require('./game-id');
 const DAY = 24 * 3600e3;
 const MAX_FRIENDS = 300, MAX_OUT = 30; // защита от спама заявками
 const escH = s => String(s).replace(/[&<>]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c]));
@@ -29,19 +29,22 @@ module.exports = function ({ db, save, sendTo, tell, go, pub, isOnline, matchOf 
     b.friends = [...new Set([...(b.friends || []), a.id])];
     db.freqs = db.freqs.filter(r => !((r.from === a.id && r.to === b.id) || (r.from === b.id && r.to === a.id)));
   }
-  // поиск игрока: ID в игре (цифры) или ник на StandHub
-  function find(q) {
+  // Ищем по игровому ID или нику; неоднозначное совпадение не выбираем молча.
+  function find(q, nickOnly = false) {
     q = String(q || '').trim().replace(/^@/, '');
     if (!q) return null;
     const ver = db.users.filter(u => u.verified);
-    if (/^\d{5,12}$/.test(q)) { const u = ver.find(x => x.soid === q); if (u) return u; }
-    return ver.find(x => x.nick.toLowerCase() === q.toLowerCase()) || null;
+    const byId = nickOnly ? null : ver.find(x => gameId.same(x.soid,q));
+    const byNick = ver.find(x => x.nick.toLowerCase() === q.toLowerCase());
+    if(byId && byNick && byId.id !== byNick.id) return {ambiguous:true};
+    return byId || byNick || null;
   }
   const accepted = (who, to) => tell(to.id, `🤝 <b>${escH(who.nick)}</b> принял(а) вашу заявку — теперь вы друзья на StandHub.\n${go('/#/friends')}`);
 
-  function request(me, q) {
-    const to = find(q);
-    if (!to) return { error: /^\d+$/.test(String(q || '').trim()) ? 'Игрок с таким ID не найден на StandHub' : 'Игрок с таким ником не найден на StandHub' };
+  function request(me, q, nickOnly = false) {
+    const to = find(q, nickOnly);
+    if (!to) return { error: /^\d+$/.test(String(q || '').trim()) ? 'Игрок с таким ID не найден на StandHub' : 'Игрок с таким ником не найден на StandHub (проверьте ник или игровой ID)' };
+    if (to.ambiguous) return { error: 'Этому запросу соответствуют ID и ник разных игроков. Найдите нужного игрока через поиск сайта и отправьте заявку из его профиля.' };
     if (to.id === me.id) return { error: 'Это ваш аккаунт 🙂' };
     if (isFriend(me, to)) return { error: `${to.nick} уже у вас в друзьях` };
     if (db.freqs.some(r => r.from === me.id && r.to === to.id)) return { error: `Заявка для ${to.nick} уже отправлена — ждём ответа` };

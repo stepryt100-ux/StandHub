@@ -1,5 +1,6 @@
 // StandHub server. Запуск: npm start
 const http = require('http'), fs = require('fs'), path = require('path'), crypto = require('crypto');
+const gameId = require('./game-id');
 const PORT = process.env.PORT || 3000;
 const DB_FILE = process.env.DB_FILE || path.join(process.env.RAILWAY_VOLUME_MOUNT_PATH || path.join(__dirname, 'data'), 'db.json');
 const PUB = path.join(__dirname, 'public');
@@ -61,11 +62,11 @@ setInterval(() => { for (const r of clients.keys()) r.write(': ping\n\n'); }, 25
 // распознавание текста (eng+rus): скриншот профиля в боте и итоговый экран матча.
 // Обработчик создаётся при первой картинке и выгружается после 10 минут простоя, чтобы не занимать память.
 const workers = {};
-async function ocr(buf, langs = 'eng') {
+async function ocr(buf, langs = 'eng', boxes = false) {
   let w = workers[langs];
   if (!w) { const { createWorker } = require('tesseract.js'); w = workers[langs] = { p: createWorker(langs).catch(e => { delete workers[langs]; throw e; }) }; }
   clearTimeout(w.t); w.busy = (w.busy || 0) + 1;
-  try { const { data } = await (await w.p).recognize(buf); return data.text || ''; }
+  try { const { data } = await (await w.p).recognize(buf, {}, boxes ? { text: true, blocks: true } : undefined); return boxes ? data : (data.text || ''); }
   finally { w.busy--; w.t = setTimeout(async () => { if (w.busy || workers[langs] !== w) return; delete workers[langs]; try { (await w.p).terminate(); } catch {} }, 10 * 60e3); }
 }
 // ищем ID на скриншоте: путаница O/0 и I/1; цифры, разбитые пробелами, склеиваем,
@@ -126,6 +127,22 @@ async function profileImages(buf) {
     return [top, full];
   } catch (e) { console.error('Обработка скриншота:', e.message); return [buf]; }
 }
+// ID находится в первой строке карточки профиля, над ником. Отдельное распознавание
+// ограниченной области не позволяет принять за буквенный ID ник, название клана или статистику.
+async function readCustomId(buf) {
+  if (!sharp) return '';
+  try {
+    const {width:W,height:H}=await sharp(buf,{limitInputPixels:20000000}).metadata();
+    if(!W || !H || W<400 || H<200) return '';
+    const rect={left:Math.floor(W*.218),top:Math.floor(H*.098),width:Math.floor(W*.26),height:Math.ceil(H*.044)};
+    const cropWidth = Math.max(1400,rect.width*4);
+    const crop=await sharp(buf,{limitInputPixels:20000000}).extract(rect).resize({width:cropWidth}).grayscale().normalize().png().toBuffer();
+    const data = await ocr(crop,'eng',true);
+    const line = data.blocks?.flatMap(b => b.paragraphs.flatMap(p => p.lines))[0];
+    const word = line?.words?.find(x => x.bbox.x0 < cropWidth * .12);
+    return word && /^[A-Za-z0-9]{3,20}$/.test(word.text) ? word.text : '';
+  } catch(e) {console.error('Распознавание ID:',e.message);return '';}
+}
 const botBusy = new Set(); // один скриншот за раз от каждого чата
 const HOWTO = 'Как сделать правильный:\n1. Откройте в игре свой профиль (вкладка «Общее»)\n2. Сделайте скриншот всего экрана, без обрезки\n3. Пришлите его сюда\n\nНа скриншоте должны быть видны надпись «Мой профиль» и ваш ID.';
 const NOT_PROFILE = '❌ Этот скриншот не подходит — это не экран «Мой профиль» из StandLeo.\n\n' + HOWTO;
@@ -165,20 +182,22 @@ async function handlePhoto(msg) {
       if (profileCheck(text).ok && findIds(text).all.includes(u.soid)) break;
     }
     const pc = profileCheck(text), ids = findIds(text);
-    console.log(`Проверка скриншота ${u.nick}: профиль=${pc.ok} (свой=${pc.own}, чужой=${pc.foreign}, надписей=${pc.marks}), ID найден=${ids.all.includes(u.soid)}`);
     if (pc.foreign) return say(chatId, FOREIGN_PROFILE);
     if (!pc.ok) return say(chatId, NOT_PROFILE);
-    if (ids.all.includes(u.soid)) {
-      const taken = verified().find(x => x.soid === u.soid);
+    const isNumeric = /^\d+$/.test(u.soid), foundCustom = isNumeric ? '' : await readCustomId(buf);
+    const idMatches = isNumeric ? ids.all.includes(u.soid) : foundCustom === u.soid;
+    console.log(`Проверка скриншота ${u.nick}: профиль=${pc.ok} (свой=${pc.own}, чужой=${pc.foreign}, надписей=${pc.marks}), ID найден=${idMatches}`);
+    if (idMatches) {
+      const taken = verified().find(x => gameId.same(x.soid,u.soid));
       if (taken) return say(chatId, '❌ Этот игровой ID уже подтверждён другим аккаунтом StandHub. Если это ошибка — напишите в поддержку.');
       u.verified = true; u.tgId = msg.from.id; if (msg.from.username) u.tgUser = msg.from.username; u.vcode = null;
-      db.users = db.users.filter(x => x === u || x.verified || (x.soid !== u.soid && x.nick.toLowerCase() !== u.nick.toLowerCase() && x.email !== u.email));
+      db.users = db.users.filter(x => x === u || x.verified || (!gameId.same(x.soid,u.soid) && x.nick.toLowerCase() !== u.nick.toLowerCase() && x.email !== u.email));
       save();
       return say(chatId, `✅ <b>Всё верно!</b> ID <code>${escH(u.soid)}</code> совпадает.\n\nАккаунт <b>${escH(u.nick)}</b> подтверждён — теперь можно войти на сайт:\n${go('/#/login')}`);
     }
-    const shown = ids.shown.filter(x => x.length >= 6 && x.length <= 10).slice(0, 3);
+    const shown = isNumeric ? ids.shown.filter(x => x.length >= 6 && x.length <= 10).slice(0, 3) : (foundCustom ? [foundCustom] : []);
     return say(chatId, shown.length
-      ? `❌ ID не совпадает.\nНа скриншоте найдено: <code>${shown.map(escH).join(', ')}</code>\nНа сайте указано: <code>${escH(u.soid)}</code>\n\nПроверьте ID или пришлите другой скриншот.`
+      ? `❌ ID не совпадает.\nНа скриншоте найдено: <code>${shown.map(escH).join(', ')}</code>\nНа сайте указано: <code>${escH(u.soid)}</code>\n\nПроверьте ID и регистр букв или пришлите другой скриншот.`
       : '❌ Экран профиля вижу, но не получилось прочитать ID. Пришлите скриншот в лучшем качестве — например, отправьте его как файл, без сжатия.');
   } catch (e) { console.error('OCR error', e); return say(chatId, '⚠️ Не удалось обработать картинку, попробуйте ещё раз.'); }
   finally { botBusy.delete(chatId); }
@@ -295,12 +314,12 @@ http.createServer(async (req, res) => {
     cleanup();
     const b = await body(req); const nick = String(b.nick || '').trim(), email = String(b.email || '').trim().toLowerCase(), soid = String(b.soid || '').trim();
     if (nick.length < 3 || nick.length > 20 || !/^[\w.\-]+$/.test(nick)) return send(res, 400, { field: 'nick', error: 'Ник: 3–20 символов, латиница, цифры, _ . -' });
-    if (!/^\d{5,12}$/.test(soid)) return send(res, 400, { field: 'soid', error: 'ID — от 5 до 12 цифр' });
+    if (!gameId.valid(soid)) return send(res, 400, { field: 'soid', error: 'Цифровой ID — 5–12 цифр; буквенный ID — 3–20 латинских букв и цифр' });
     if (!/^\S+@\S+\.\S+$/.test(email)) return send(res, 400, { field: 'email', error: 'Введите корректный email' });
     if (String(b.pw || '').length < 6) return send(res, 400, { field: 'pw', error: 'Минимум 6 символов' });
     if (verified().some(u => u.nick.toLowerCase() === nick.toLowerCase())) return send(res, 409, { field: 'nick', error: 'Этот ник уже занят' });
     if (verified().some(u => u.email === email)) return send(res, 409, { field: 'email', error: 'Этот email уже зарегистрирован' });
-    if (verified().some(u => u.soid === soid)) return send(res, 409, { field: 'soid', error: 'Этот игровой ID уже привязан к другому аккаунту' });
+    if (verified().some(u => gameId.same(u.soid,soid))) return send(res, 409, { field: 'soid', error: 'Этот игровой ID уже привязан к другому аккаунту' });
     // повторная регистрация того же email до подтверждения — заменяем старую заявку
     db.users = db.users.filter(u => u.verified || u.email !== email);
     const u = { id: crypto.randomUUID(), nick, email, soid, region: ['Европа', 'СНГ'].includes(b.region) ? b.region : 'Европа', pw: hash(String(b.pw)),
@@ -415,7 +434,7 @@ http.createServer(async (req, res) => {
     if (p === '/api/friends') return send(res, 200, friends.state(u.id));
     if (req.method !== 'POST') return send(res, 405, { error: 'Неверный запрос' });
     const b = await body(req, 2e3), act = p.slice(13), id = String(b.id || '');
-    const r = act === 'request' ? friends.request(u, b.nick || b.q) : act === 'accept' ? friends.accept(u, id) : act === 'decline' ? friends.decline(u, id)
+    const r = act === 'request' ? friends.request(u, b.nick || b.q, !!b.nick) : act === 'accept' ? friends.accept(u, id) : act === 'decline' ? friends.decline(u, id)
       : act === 'cancel' ? friends.cancel(u, id) : act === 'remove' ? friends.remove(u, b.nick) : { error: 'Неизвестное действие' };
     return send(res, r.error ? 400 : 200, r);
   }

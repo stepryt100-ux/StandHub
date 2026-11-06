@@ -1407,7 +1407,7 @@ function pageAuth(type){
    <h1>${reg?"Создать аккаунт":"Вход в StandHub"}</h1>
    <p class="muted">${reg?"Присоединяйся к соревновательному StandLeo":"Рады видеть снова, боец"}</p>
    ${reg?`<div class="field"><label for="nick">Никнейм</label><input id="nick" autocomplete="nickname" placeholder="Например, Fl4mus"><div class="err" id="e-nick"></div></div>
-   <div class="field"><label for="soid">Игровой ID в StandLeo</label><input id="soid" inputmode="numeric" placeholder="123456789"><div class="err" id="e-soid"></div></div>`:""}
+   <div class="field"><label for="soid">Игровой ID в StandLeo</label><input id="soid" type="text" maxlength="20" autocapitalize="off" spellcheck="false" placeholder="123456789 или Player123"><div class="muted" style="font-size:13px;margin-top:5px">Цифры или латинские буквы и цифры, как в игре. Учитывайте регистр букв.</div><div class="err" id="e-soid"></div></div>`:""}
    <div class="field"><label for="email">Email</label><input id="email" type="email" autocomplete="email" placeholder="you@mail.ru"><div class="err" id="e-email"></div></div>
    <div class="field"><label for="pw">Пароль</label><input id="pw" type="password" autocomplete="${reg?"new-password":"current-password"}" placeholder="••••••••"><div class="err" id="e-pw"></div></div>
    ${reg?"":`<div class="fp-l"><a href="#/forgot" id="fpLink">Забыли пароль?</a></div>`}
